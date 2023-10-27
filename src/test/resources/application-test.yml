@@ -1,0 +1,6 @@
+  # 이 파일에 설정 후, 아래와 같이 사용 가능.
+  #@SpringBootTest
+  #  @ActiveProfiles("test")
+  #  public class UserRepositoryTest {
+  #  // 테스트 메서드들
+  #}

@@ -7,6 +7,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.Optional;
 @Service
 public class CommentService {
     final CommentRepository cRepo;
+    final PostRepository pRepo;
     @PersistenceContext
     EntityManager em;
 
@@ -27,7 +30,11 @@ public class CommentService {
 
         return  cRepo.findAllByPost(com);
     }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void create(Post post, String content, Account account) {
+        pRepo.updateCommentCount(post.getId(), 1);
+
         Comment answer = new Comment();
         answer.setContent(content);
         answer.setCreateDate(LocalDateTime.now());
@@ -36,9 +43,14 @@ public class CommentService {
         cRepo.save(answer);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(Comment answer) {
+        pRepo.updateCommentCount(answer.getPost().getId(), -1);
         this.cRepo.delete(answer);
     }
+
+
+
 
     public Comment getComment(Integer id) {
         Optional<Comment> answer = this.cRepo.findById(id);

@@ -16,8 +16,8 @@
             <td class="text-start">
                 <a th:href="@{|/post/detail/${post.id}|}" th:text="${post.title}"></a>
                 <span class="text-danger small ms-2"
-                      th:if="${#lists.size(post.commentList) > 0}"
-                      th:text="${#lists.size(post.commentList)}">
+                      th:if="${post.commentCount > 0}"
+                      th:text="${post.commentCount}">
                 </span>
             </td>
             <td><span th:if="${post.author != null}" th:text="${post.author.username}"></span></td>

@@ -28,8 +28,21 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    // mappedBy : 주인임을 설정한다. (Comment.post 필드와 매핑)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> commentList;
+
+    private Integer commentCount;
+
+
+    // 엔터티가 영속성 컨텍스트에 로드되는 시점에서만 작동함.(주의)
+    /*@PostLoad
+    public void setDefaultValues() {
+        if (this.commentCount == null) {
+
+        }
+    }*/
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Account author;
@@ -63,5 +76,9 @@ public class Post {
 
     public void setModifyDate(LocalDateTime now) {
         this.modifyDate = now;
+    }
+
+    public void setCommentCount(int size) {
+        commentCount = size;
     }
 }

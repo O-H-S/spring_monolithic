@@ -7,14 +7,17 @@ import com.ohs.monolithic.board.PostRepository;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.IHasSourceLocation;
 import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
@@ -45,7 +48,7 @@ public class PostReadService {
 
         Optional<Post> question = null;
         if (relatedData)
-            question = this.repository.findAsCompleteById(id);
+            question = this.repository.findWithCommentListById(id);
         else{
             question = this.repository.findById(id);
         }
@@ -69,6 +72,12 @@ public class PostReadService {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return this.repository.findAllByBoard(pageable, boardReference);
     }
+
+   @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void test(){
+        repository.findByTitle("testTitle");
+
+   }
 
     /*public void test(){
         List<Post> all = this.repository.findAll();

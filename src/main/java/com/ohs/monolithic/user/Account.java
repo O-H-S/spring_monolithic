@@ -20,8 +20,23 @@ public class Account {
 
     private String password;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = true)
     private String email;
+
+    @Column(nullable = true)
+    private String provider;  // 소셜 로그인 제공자 (예: google, facebook, kakao)
+
+    @Column(nullable = true)
+    private String providerId;  // 소셜 로그인 제공자에서의 사용자 ID
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
+    }
+
 
     public void setUsername(String username) {
         this.username = username;
