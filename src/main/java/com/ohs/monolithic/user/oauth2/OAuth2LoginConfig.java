@@ -1,20 +1,13 @@
-package com.ohs.monolithic;
+package com.ohs.monolithic.user.oauth2;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -43,7 +36,7 @@ public class OAuth2LoginConfig {
         return ((request, response, authentication) -> {
 
             System.out.println("success handler");
-            DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            //DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
             response.sendRedirect("/");
             /*String id = defaultOAuth2User.getAttributes().get("id").toString();
             String body = """
