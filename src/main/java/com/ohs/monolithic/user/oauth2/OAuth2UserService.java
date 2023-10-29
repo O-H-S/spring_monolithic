@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +31,13 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         // 유저 권한 지정.
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(UserRole.USER.getValue());
 
-        // 이 부분 공부해야함.
+        // 유저를 식별할 수 있는 attributeKey를 가져온다.
+        // 이 값은 사전에 application 설정 파일 안에 정의된 상태이다. (user-name-attribute)
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
+        //System.out.println((userNameAttributeName)); 는 "id"라는 문자열을 반환한다.
 
         // Debug 용
         oAuth2User.getAttributes().forEach((key, value) -> {
@@ -46,7 +49,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
 
         // 고유한 id 값을 name으로 가지는 계정이 없다면, 새롭게 만든다.
-        String username = oAuth2User.getAttribute("id").toString();
+        //
+        String username = Objects.requireNonNull(oAuth2User.getAttribute(userNameAttributeName)).toString();
         Account _siteUser = null;
         try {
             _siteUser = this.accountService.getAccount(username);
@@ -57,7 +61,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         // attribute 정의
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-        attributes.put("name", username);
+        //attributes.put("name", username);
 
 
         // DefaultOAuth2User 객체를 소유하여, 기능 구현되므로 생성자로 넘겨주기.

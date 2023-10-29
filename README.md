@@ -8,8 +8,9 @@
     - ...
   - 관련된 Security Filter와 로직 문서화
   - CustomOAuth2User 구현해야 할 메소드 공부하기.
-  - "Name, Username, Nickname, ID" 차이점 정리하기.
-  - "카카오 로그인" 버튼 디자인 변경하기.
+  - <s>"Name, Username, Nickname, ID" 차이점 정리하기.</s>
+  - 닉네임 기능 구현하기
+  - "카카오 로그인" 버튼 디자인 변경하기.~~~~
   - 
   - ...
     

@@ -24,7 +24,6 @@ logging:
         type:
           descriptor:
             #sql: trace
-      springframework:
-        security:
-          web:
-            FilterChainProxy=DEBUG:
+      #springframework:
+      #  security: DEBUG
+

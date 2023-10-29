@@ -46,7 +46,7 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
     // name attribute는 사전에 추가되어야한다.
     @Override
     public String getUsername() {
-        return oAuth2User.getAttribute("name"); //
+        return this.getName(); //
     }
 
     // 나머지 공부하여 구현해야함.
@@ -59,7 +59,7 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
     public boolean isAccountNonLocked() {
         return true;
     }
-
+    // 실패한 로그인 시도가 일정 횟수를 초과와 같은 기능에 필요, LockedException 반환
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -69,4 +69,7 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    /* 비활성화된 계정(장기휴면),이메일 인증 X 등등.. 다양한 상황에서 로그인을 제한
+        false 반환하면, DisabledException 발생
+    */
 }
