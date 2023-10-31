@@ -1,12 +1,16 @@
 package com.ohs.monolithic.board.manage;
 
 
+import com.ohs.monolithic.board.Board;
 import com.ohs.monolithic.board.Post;
 import com.ohs.monolithic.board.PostRepository;
 import com.ohs.monolithic.board.read.PostReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +47,21 @@ public class BoardManageController {
         model.addAttribute("board", id);
 
         return "post_list";
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PatchMapping("/me/admin")
+    @PostMapping("/{id}/title")
+    public String titleChange(@AuthenticationPrincipal UserDetails user, @PathVariable("id") Integer id, @RequestParam String boardTitle){
+
+        Board target = bService.getBoardByID(id);
+        target.setTitle(boardTitle);
+        bService.save(target);
+
+        System.out.println(id.toString());
+        //System.out.println(boardTitle);
+
+        return "redirect:/";
     }
 
     /*@PostMapping("/write/{id}")

@@ -28,8 +28,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         // super.loadUser 이 메소드의 반환 타입은 DefaultOAuth2User 이다.
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        // 유저 권한 지정.
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(UserRole.USER.getValue());
+
 
         // 유저를 식별할 수 있는 attributeKey를 가져온다.
         // 이 값은 사전에 application 설정 파일 안에 정의된 상태이다. (user-name-attribute)
@@ -56,8 +55,12 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             _siteUser = this.accountService.getAccount(username);
         }
         catch(Exception e) {
-            _siteUser = this.accountService.create(username, null, "", provider, username);
+            _siteUser = this.accountService.create(username, null, "", provider, username, UserRole.USER);
         }
+
+        // 유저 권한 지정.
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(_siteUser.getRole().toString());
+
 
         // attribute 정의
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());

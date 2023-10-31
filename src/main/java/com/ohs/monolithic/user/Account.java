@@ -29,6 +29,17 @@ public class Account {
     @Column(nullable = true)
     private String providerId;  // 소셜 로그인 제공자에서의 사용자 ID
 
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+    @PostLoad
+    protected void onCreate() {
+        if (role == null) {
+            role = UserRole.USER;
+        }
+    }
+
+
     public void setProvider(String provider) {
         this.provider = provider;
     }
@@ -51,4 +62,9 @@ public class Account {
     public void setPassword(String encode) {
         this.password = encode;
     }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
 }
