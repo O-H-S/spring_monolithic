@@ -1,13 +1,26 @@
 package com.ohs.monolithic.user;
 
+import com.ohs.monolithic.user.exception.FailedAdminLoginException;
+import jakarta.persistence.PostLoad;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -15,6 +28,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserController {
 
     private final AccountService service;
+
+    @PreAuthorize("isAuthenticated()")
+    //@PatchMapping("/me/admin")
+    @PostMapping("/me/admin")
+    public String tryLoginToAdmin(@AuthenticationPrincipal UserDetails user, @RequestParam String secretKey){
+        System.out.println("trying to get admin role : " + secretKey);
+        try {
+            service.upgradeToAdmin(user.getUsername(), secretKey);
+            Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+            List<GrantedAuthority> updatedAuthorities = AuthorityUtils.createAuthorityList(UserRole.ADMIN.toString());
+
+            if (currentAuth instanceof UsernamePasswordAuthenticationToken) {
+                // 일반 로그인 사용자
+                UserDetails userDetails = (UserDetails) currentAuth.getPrincipal();
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(userDetails, null, updatedAuthorities);
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+            } else if (currentAuth instanceof OAuth2AuthenticationToken) {
+                // OAuth2 로그인 사용자
+                OAuth2User oauth2User = (OAuth2User) currentAuth.getPrincipal();
+                OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(oauth2User, updatedAuthorities, ((OAuth2AuthenticationToken) currentAuth).getAuthorizedClientRegistrationId());
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+            }
+
+        }
+        catch(FailedAdminLoginException e){
+            System.out.println("failed to get role");
+        }
+        return "redirect:/";
+    }
 
     @GetMapping("/signup")
     public String signup(AccountCreateForm accountCreateForm) {

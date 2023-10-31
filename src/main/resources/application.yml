@@ -6,11 +6,11 @@ spring:
     import: classpath:application-secret.yml
 
   #JPA
-  #jpa:
+  jpa:
     #show_sql: true
-    #database-platform: org.hibernate.dialect.MySQL8Dialect
-    #hibernate:
-      #ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
     #properties:
     #  hibernate:
         #format_sql: true
