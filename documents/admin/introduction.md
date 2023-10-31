@@ -11,7 +11,7 @@
 ![adminLogin_Element.png](images%2FadminLogin_Element.png)
 ![adminLogin_InputModal.png](images%2FadminLogin_InputModal.png)
 
-- 정상적으로 로그인 되었다면, 아래와 같은 화면이 나온다.
+- 정상적으로 로그인 되었다면, 아래와 같은 화면이 나온다.![img.png](../images/intelliJ_mdFileTip_imageTag.png)
 ![admin_index.png](images%2Fadmin_index.png)
 
 ---
