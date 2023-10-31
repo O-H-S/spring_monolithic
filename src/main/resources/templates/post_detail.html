@@ -1,12 +1,17 @@
 <html layout:decorate="~{layout}">
 
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 <title layout:fragment="title" th:text="${post.title}">
 
 </title>
 
 <div layout:fragment="content" class="container my-3">
+
+    <a th:href="@{|/board/${boardID}|}" class="btn btn-secondary my-3">
+        <i class="fas fa-arrow-left"></i> 목록
+    </a>
+
     <!-- 질문 -->
     <h2 class="border-bottom py-2" th:text="${post.title}"></h2>
     <div class="card my-3">

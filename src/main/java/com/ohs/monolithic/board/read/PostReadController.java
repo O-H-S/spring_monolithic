@@ -52,7 +52,7 @@ public class PostReadController {
             System.out.println(Thread.currentThread().getId());
             Thread.currentThread().interrupt();
         }*/
-
+        model.addAttribute("boardID", post.getBoard().getId());
         model.addAttribute("post", post);
         model.addAttribute("commentList", commentService.getComments(id));
 

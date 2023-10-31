@@ -27,6 +27,8 @@ public class BoardManageService {
     public List<Board> getBoards() {
         return bRepo.findAll();
     }
-
+    public Board getBoard(Integer id){
+        return bRepo.findById(id).get();
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.ohs.monolithic.board.manage;
 
 
+import com.ohs.monolithic.board.Board;
 import com.ohs.monolithic.board.Post;
 import com.ohs.monolithic.board.PostRepository;
 import com.ohs.monolithic.board.read.PostReadService;
@@ -34,11 +35,14 @@ public class BoardManageController {
     public String showBoard(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
 
         Page<Post> paging = this.pService.getList(page, id);
+        Board curBoard = this.bService.getBoard(id);
         for (Post post : paging) {
 
             //System.out.println(post.getCommentList().get(0));
         }
         // 현재 페이지를 추상화함.
+        model.addAttribute("title", curBoard.getTitle());
+        model.addAttribute("desc", curBoard.getDescription());
         model.addAttribute("paging", paging);
         model.addAttribute("board", id);
 
