@@ -1,6 +1,5 @@
 package com.ohs.monolithic.user;
 
-import com.ohs.monolithic.board.Comment;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.user.exception.FailedAdminLoginException;
 import jakarta.validation.constraints.Null;

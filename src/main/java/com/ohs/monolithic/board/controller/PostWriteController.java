@@ -1,9 +1,10 @@
-package com.ohs.monolithic.board.write;
+package com.ohs.monolithic.board.controller;
 
 
-import com.ohs.monolithic.board.Post;
-import com.ohs.monolithic.board.PostForm;
-import com.ohs.monolithic.board.read.PostReadService;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.dto.PostForm;
+import com.ohs.monolithic.board.service.PostReadService;
+import com.ohs.monolithic.board.service.PostWriteService;
 import com.ohs.monolithic.user.Account;
 import com.ohs.monolithic.user.AccountService;
 import jakarta.validation.Valid;

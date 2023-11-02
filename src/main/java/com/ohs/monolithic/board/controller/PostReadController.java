@@ -1,20 +1,18 @@
-package com.ohs.monolithic.board.read;
+package com.ohs.monolithic.board.controller;
 
 
-import com.ohs.monolithic.board.CommentForm;
-import com.ohs.monolithic.board.CommentService;
-import com.ohs.monolithic.board.Post;
+import com.ohs.monolithic.board.dto.CommentForm;
+import com.ohs.monolithic.board.service.CommentService;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.service.PostReadService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import static java.lang.Thread.*;
 
 
 @RequiredArgsConstructor
@@ -52,7 +50,7 @@ public class PostReadController {
             System.out.println(Thread.currentThread().getId());
             Thread.currentThread().interrupt();
         }*/
-
+        model.addAttribute("boardID", post.getBoard().getId());
         model.addAttribute("post", post);
         model.addAttribute("commentList", commentService.getComments(id));
 

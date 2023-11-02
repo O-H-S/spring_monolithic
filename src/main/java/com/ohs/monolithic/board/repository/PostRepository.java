@@ -1,6 +1,8 @@
-package com.ohs.monolithic.board;
+package com.ohs.monolithic.board.repository;
 
 
+import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;

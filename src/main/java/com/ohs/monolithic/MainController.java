@@ -1,17 +1,14 @@
 package com.ohs.monolithic;
 
-import com.ohs.monolithic.board.Board;
-import com.ohs.monolithic.board.Post;
-import com.ohs.monolithic.board.manage.BoardManageService;
-import com.ohs.monolithic.board.read.PostReadService;
+import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.PostReadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
