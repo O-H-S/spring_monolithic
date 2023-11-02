@@ -36,4 +36,8 @@ public class BoardManageService {
         return bRepo.findById(id).get();
     }
 
+
+    public void save(Board target) {
+        bRepo.save(target);
+    }
 }

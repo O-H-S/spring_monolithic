@@ -4,6 +4,7 @@ import com.ohs.monolithic.user.exception.FailedAdminLoginException;
 import jakarta.persistence.PostLoad;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,6 +69,8 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "signup_form";
         }
+
+        //ClassPathScanningCandidateComponentProvider
 
         if (!accountCreateForm.getPassword1().equals(accountCreateForm.getPassword2())) {
             bindingResult.rejectValue("password2", "passwordInCorrect",

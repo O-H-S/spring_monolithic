@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.manage;
+package com.ohs.monolithic.board.controller;
 
 
 import com.ohs.monolithic.board.domain.Board;
@@ -57,7 +57,7 @@ public class BoardManageController {
     @PostMapping("/{id}/title")
     public String titleChange(@AuthenticationPrincipal UserDetails user, @PathVariable("id") Integer id, @RequestParam String boardTitle){
 
-        Board target = bService.getBoardByID(id);
+        Board target = bService.getBoard(id);
         target.setTitle(boardTitle);
         bService.save(target);
 
