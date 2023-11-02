@@ -1,8 +1,9 @@
-package com.ohs.monolithic.board;
+package com.ohs.monolithic.board.repository;
 
 
+import com.ohs.monolithic.board.domain.Comment;
+import com.ohs.monolithic.board.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

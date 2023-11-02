@@ -1,7 +1,11 @@
-package com.ohs.monolithic.board;
+package com.ohs.monolithic.board.service;
 
 
+import com.ohs.monolithic.board.domain.Comment;
+import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
+import com.ohs.monolithic.board.repository.CommentRepository;
+import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

@@ -1,19 +1,15 @@
-package com.ohs.monolithic.board.manage;
+package com.ohs.monolithic.board.controller;
 
 
-import com.ohs.monolithic.board.Board;
-import com.ohs.monolithic.board.Post;
-import com.ohs.monolithic.board.PostRepository;
-import com.ohs.monolithic.board.read.PostReadService;
+import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.PostReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RequiredArgsConstructor

@@ -1,16 +1,14 @@
-package com.ohs.monolithic.board.read;
+package com.ohs.monolithic.board.service;
 
 
-import com.ohs.monolithic.board.Board;
-import com.ohs.monolithic.board.Post;
-import com.ohs.monolithic.board.PostRepository;
+import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.IHasSourceLocation;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;

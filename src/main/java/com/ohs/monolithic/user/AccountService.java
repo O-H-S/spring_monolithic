@@ -1,8 +1,6 @@
 package com.ohs.monolithic.user;
 
-import com.ohs.monolithic.board.Comment;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

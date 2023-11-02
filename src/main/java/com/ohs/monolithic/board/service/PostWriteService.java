@@ -1,9 +1,9 @@
-package com.ohs.monolithic.board.write;
+package com.ohs.monolithic.board.service;
 
 
-import com.ohs.monolithic.board.Board;
-import com.ohs.monolithic.board.Post;
-import com.ohs.monolithic.board.PostRepository;
+import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
