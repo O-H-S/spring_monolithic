@@ -47,9 +47,13 @@ dependencies {
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
+
+	// 이 스타터는 JUnit, AssertJ, Hamcrest, Mockito와 같은 주요 테스트 라이브러리를 포함하
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("com.h2database:h2")
 }
 
+// 이 코드는 단지 프로젝트 내의 모든 test 태스크가 JUnit 5를 사용하도록 설정만 할 뿐
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
