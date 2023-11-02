@@ -1,9 +1,13 @@
 # 아직 분류하지 않은 devlog
 
 
-- 계정 정보 Entity의 이름이 Account인 것이 바람직한가? (은행 계좌가 떠오름)
+- 유저 정보 Entity의 이름이 Account인 것이 바람직한가? (은행 계좌가 떠오름)
+  - 후보 : Membership, AppUser
+  - User는 스프링 시큐리티의 클래스와 겹치므로 혼란이 생길 것 같음.
+- 게스트 기능 구현하기.
+  - 스프링 시큐리티와 어떻게 연동할 지?
 - 유저 권한 여러개 
-- 스프링 시큐리티 권한의 동적 변경 코드 리팩토링 필요 (UserController.java)
+- 스프링 시큐리티 권한의 동적 변경 코드 리팩토링 필요 (UserController.java안에 코드 있음.)
 - build 관련 파일들을 ignore 대상에 추가시켜서, 보안에 신경쓰자.
 - 원격 저장소 branch 제거하기
   - git push <remote 별칭> -d < branch>
