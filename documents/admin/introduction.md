@@ -1,6 +1,11 @@
+<a href="/README.md" style="font-size: 1.5em;">메인으로</a>
+
 # Admin 
 
-# 어드민 로그인 하기
+
+
+## 이용하기
+### 어드민 로그인 하기
 -   사용자는 로그인 된 상태여야 한다.
 
 ![user_index.png](images%2Fuser_index.png)
@@ -16,6 +21,6 @@
 
 ---
 
-# 게시판 설정 변경하기
+### 게시판 설정 변경하기
 - 어드민 로그인된 상태에서 게시판의 `설정` 버튼을 클릭하여 변경한다.
 ![admin_BoardSettingModal.png](images%2Fadmin_BoardSettingModal.png)
