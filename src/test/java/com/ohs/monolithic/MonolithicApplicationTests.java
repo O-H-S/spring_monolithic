@@ -1,18 +1,15 @@
 package com.ohs.monolithic;
 
-import com.ohs.monolithic.board.Comment;
-import com.ohs.monolithic.board.CommentService;
-import com.ohs.monolithic.board.Post;
-import com.ohs.monolithic.board.read.PostReadService;
-import com.ohs.monolithic.board.write.PostWriteService;
+import com.ohs.monolithic.board.service.CommentService;
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.service.PostReadService;
+import com.ohs.monolithic.board.service.PostWriteService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.*;
-
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @SpringBootTest
 class MonolithicApplicationTests {
