@@ -15,6 +15,7 @@
 
 ## 프로젝트 환경 / 기술 스택
 
+![architecture_brief.png](documents%2Fimages%2Farchitecture_brief.png)
 `IntelliJ 2023.2`  
 `Java17` `Gradle 8.2.1`  
 `SpringBoot 3.1.3`  
