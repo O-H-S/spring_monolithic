@@ -30,14 +30,24 @@ dependencies {
 	// 폼 검증
 	implementation ("org.springframework.boot:spring-boot-starter-validation")
 
-
+	// security와 thymeleaf 연동을 위해 필요함.
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE")
 
+	// 인증/인가
+	implementation("org.springframework.boot:spring-boot-starter-security")
+		// JWT
+		implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+		runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.11.5")
+		runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // Jackson이나 Gson을 사용하는 경우
+
+		//oAuth2
+		implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
+
+
 
 
 
