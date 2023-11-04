@@ -2,9 +2,11 @@
 - application-secret.yml : 민감한 정보들을 보관하기 때문에 로컬에서 관리된다.
   - resources 하위에 위치함.
 ```yml 
-#어드민 로그인을 위한 패스워드
-app: 
-  admin-key: ~~~
+app:
+  #어드민 로그인을 위한 패스워드
+  admin-key: ~~~ 
+  #쿠키 서명을 위한 private key
+  jwt-secret: ~~~
 server:
     # ssl 인증서
     ssl:

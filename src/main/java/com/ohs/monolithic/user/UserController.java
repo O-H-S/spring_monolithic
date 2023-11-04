@@ -1,7 +1,10 @@
 package com.ohs.monolithic.user;
 
 import com.ohs.monolithic.user.exception.FailedAdminLoginException;
+import com.ohs.monolithic.user.jwt.TokenInfo;
 import jakarta.persistence.PostLoad;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -17,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -99,5 +103,25 @@ public class UserController {
     @GetMapping("/login")
     public String login() {
         return "login_form";
+    }
+
+    @PostMapping("api/login") // form 기반 토큰
+    public String loginAsToken(@RequestParam String username,
+                               @RequestParam String password,
+                               HttpServletResponse response){
+
+        System.out.println(username + " " + password);
+        TokenInfo tokenInfo = service.GetJwtToken(username, password);
+        System.out.println(tokenInfo.getAccessToken());
+        // JWT 토큰을 HttpOnly, Secure 쿠키로 설정
+        // ResponseCookie는 뭐지?
+        //Cookie jwtCookie = new Cookie("jwt-token", String.format("Bearer %s", tokenInfo.getAccessToken())); 쿠기에 공백불가
+        Cookie jwtCookie = new Cookie("jwt-token", tokenInfo.getAccessToken());
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true); // HTTPS에서만 쿠키 전송
+        jwtCookie.setPath("/");
+        //jwtCookie.setMaxAge(7 * 24 * 60 * 60); // 쿠키 유효기간 설정 (예: 7일)
+        response.addCookie(jwtCookie);
+        return "redirect:/";
     }
 }
