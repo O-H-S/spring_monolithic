@@ -3,15 +3,22 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.utils.JdbcOperationsRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface PostRepository extends JpaRepository<Post, Integer> {
+
+
+public interface PostRepository extends JpaRepository<Post, Integer>, JdbcOperationsRepository<PostRepository, Post> {
+
 
     //@EntityGraph(attributePaths = { "author.address"}) 이런식으로 중첩된 동작 가능.
     //  Integer id가 실제로 어떤 엔터티를 찾을지 결정하는 기준이 됩니
@@ -37,6 +44,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     // 일대다 관계에서는 불가능한듯? 아니면, list<post> 형태에서 불가능한듯?
     Page<Post> findAll(Pageable pageable);
     Page<Post> findAllByBoard(Pageable pageable, Board board);
+
 
 
     @Modifying

@@ -3,7 +3,10 @@ package com.ohs.monolithic.board.domain;
 
 import com.ohs.monolithic.user.Account;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +15,9 @@ import java.util.Set;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor // @Builder 패턴에서 내부적으로 필요하다.
+@NoArgsConstructor // @Builder 패턴에서 내부적으로 필요하다.
 public class Post {
 
 
@@ -31,6 +37,7 @@ public class Post {
     // mappedBy : 주인임을 설정한다. (Comment.post 필드와 매핑)
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> commentList;
+
 
     private Integer commentCount;
 
