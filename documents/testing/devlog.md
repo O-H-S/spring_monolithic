@@ -63,3 +63,29 @@ JUnit 만으로도 단위 테스트를 충분히 작성할 수 있다. 하지만
 * @InjectMocks: @Mock 또는 @Spy로 생성된 가짜 객체를 자동으로 주입시켜주는 어노테이션
 
 ##### JUnit과 결합 하기 : @ExtendWith(MockitoExtension.class)
+
+
+##### Test에서의 설정
+main/resources/application.yml  
+`override ` test/resources/application.yml (더 높은 우선순위)  
+`override ` @ActiveProfiles (더 높은 우선순위)  
+`override ` @TestPropertySource (더 높은 우선순위)  
+
+##### @Tag를 사용하여, 테스트 대상에서 제외시키기
+
+```
+@Tag("notAutomation")
+public class SlowTest {
+
+    @Test
+    public void benchmarkTest() {
+
+    }
+}
+
+test {
+    useJUnitPlatform {
+        excludeTags 'notAutomation'
+    }
+}
+```

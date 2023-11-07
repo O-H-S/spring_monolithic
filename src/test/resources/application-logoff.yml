@@ -1,0 +1,15 @@
+logging:
+  level:
+    root: error
+    org:
+      springframework: error
+      hibernate:
+        SQL: error
+
+        type: off
+
+spring:
+  jpa:
+    show-sql: false
+  main:
+    banner-mode: off
