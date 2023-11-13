@@ -1,6 +1,8 @@
 <html layout:decorate="~{layout}">
   <style layout:fragment="style">
-
+    .text-muted {
+      color: #6c757d; /* Bootstrap text-muted color */
+    }
   </style>
 
 <!--  <th:block layout:fragment="script_head">
@@ -28,6 +30,7 @@
               <div class="d-flex align-items-center">
                 <h5 class="mb-0 font-weight-bold">
                   <a class="text-black text-decoration-none" th:href="@{|/board/${board.id}|}" th:text="${board.title}"></a>
+                  <small class="text-muted" th:text="'(' + ${board.postCounts} + '개)'"></small>
                 </h5>
                 <!-- Add Settings Button for Admin Users -->
                 <div sec:authorize="hasAuthority('ADMIN')" class="ms-2">
