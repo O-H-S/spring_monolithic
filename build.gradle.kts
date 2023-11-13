@@ -36,6 +36,9 @@ dependencies {
 	implementation ("org.springframework.boot:spring-boot-starter-validation")
 
 
+	// 캐시
+	implementation ("org.springframework.boot:spring-boot-starter-cache")
+
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE")
 
 
