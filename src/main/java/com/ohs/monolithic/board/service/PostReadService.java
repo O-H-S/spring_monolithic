@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import jakarta.persistence.EntityManager;
@@ -26,6 +27,8 @@ import java.util.Optional;
 @Service
 public class PostReadService {
     private final PostRepository repository;
+    private final BoardManageService bService;
+
     @PersistenceContext
     EntityManager em;
 
@@ -56,13 +59,8 @@ public class PostReadService {
         }
     }
 
-    public List<Post> getRecentPosts(Board targetBoard, Integer count){
-        Pageable topN = PageRequest.of(0, count);
-        return repository.findByBoardOrderByCreateDateDesc(targetBoard, topN);
-    }
-
     @Transactional
-    public Page<Post> getList(int page, Integer boardID) {
+    public Page<Post> getListLegacy(int page, Integer boardID) {
         Board boardReference = em.getReference(Board.class, boardID);
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
@@ -70,29 +68,52 @@ public class PostReadService {
         return this.repository.findAllByBoard(pageable, boardReference);
     }
 
+    @Transactional
+    public Page<Post> getListWithoutCounting(int page, Integer boardID) {
+        Board boardReference = em.getReference(Board.class, boardID);
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return this.repository.selectAllByBoard(pageable, boardReference, bService.getPostCount(boardID));
+    }
+
+    @Transactional
+    public Page<PostPaginationDto> getListWithCovering(int page, Integer boardID) {
+        Board boardReference = em.getReference(Board.class, boardID);
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return this.repository.selectAllByBoardWithCovering(pageable, boardReference, bService.getPostCount(boardID));
+    }
+
+    @Transactional
+    public List<PostPaginationDto> getListWithoutOffset(Integer baseID, Integer boardID, Integer count) {
+        Board boardReference = em.getReference(Board.class, boardID);
+        return this.repository.selectNextByBoard(baseID, boardReference, count);
+    }
+
+
+    /*@Transactional
+    public Page<Post> getList(int page, Integer boardID) {
+        Board boardReference = em.getReference(Board.class, boardID);
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return this.repository.findAllByBoard(pageable, boardReference);
+    }*/
+
    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void test(){
         repository.findByTitle("testTitle");
 
    }
 
-    /*public void test(){
-        List<Post> all = this.repository.findAll();
-        //assertEquals(2, all.size());
 
-        Post q = all.get(0);
-        //assertEquals("sbb가 무엇인가요?", q.getTitle())
-        Optional<Post> oq = this.repository.findById(1);
-        if(oq.isPresent()) {
-            Post resultPost = oq.get();
-        }
 
-        Optional<Post> targetPostOP = this.repository.findById(1);
-        Post targetValue = targetPostOP.get();
-        targetValue.setTitle("수정된 제목");
-        this.repository.save(targetValue);
-
-    }*/
+   @Transactional(readOnly = true)
+    public Long calculateCount(Integer id) {
+        return repository.countByBoardId(id);
+    }
 
 
 }

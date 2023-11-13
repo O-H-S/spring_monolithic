@@ -18,6 +18,11 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor // @Builder 패턴에서 내부적으로 필요하다.
 @NoArgsConstructor // @Builder 패턴에서 내부적으로 필요하다.
+@Table(name = "post", indexes = {
+        //@Index(name = "idx_board_id", columnList = "board_id", unique = true), // for counting posts of board(redundant)
+        @Index(name = "idx_board_id_create_date", columnList = "board_id, create_date DESC", unique = true), // for quering posts
+        @Index(name = "idx_id_create_date", columnList = "create_date DESC", unique = true) // for quering posts
+})
 public class Post {
 
 
@@ -26,6 +31,7 @@ public class Post {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
     private Board board;
 
     @Column(length = 200)
@@ -57,6 +63,7 @@ public class Post {
     @ManyToMany
     private Set<Account> voter;
 
+    @Column(name = "create_date")
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 

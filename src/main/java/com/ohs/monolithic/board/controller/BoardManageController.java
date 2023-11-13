@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.controller;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.service.BoardManageService;
 import com.ohs.monolithic.board.service.PostReadService;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +38,13 @@ public class BoardManageController {
     @GetMapping("/{id}")
     public String showBoard(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
 
-        Page<Post> paging = this.pService.getList(page, id);
+        //Page<Post> paging = this.pService.getList(page, id);
+        Page< PostPaginationDto> paging = this.pService.getListWithCovering(page,id);
         Board curBoard = this.bService.getBoard(id);
-        for (Post post : paging) {
-
+        for (PostPaginationDto post : paging) {
             //System.out.println(post.getCommentList().get(0));
         }
-        // 현재 페이지를 추상화함.
+
         model.addAttribute("title", curBoard.getTitle());
         model.addAttribute("desc", curBoard.getDescription());
         model.addAttribute("paging", paging);
