@@ -9,8 +9,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 @Service
@@ -38,7 +45,27 @@ public class PostWriteService {
         q.setContent(content);
         q.setCreateDate(LocalDateTime.now());
         q.setAuthor(user);
-        this.pRepo.save(q);
+        return this.pRepo.save(q);
+
+    }
+
+    @Transactional
+    public void createAll(Integer boardID, List<Post> posts) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if(status == STATUS_ROLLED_BACK) {
+                    System.out.println("rollback");
+                    boardService.incrementPostCount(boardID, -posts.size());
+                }
+            }
+        });
+        boardService.incrementPostCount(boardID, posts.size());
+        //System.out.println(String.format("%d, %d", posts.size(), boardService.getPostCount(boardID)));
+        Board boardReference = em.getReference(Board.class, boardID);
+        posts.forEach(post -> post.setBoard(boardReference));
+
+        pRepo.bulkInsert(posts);
     }
 
     public void modify(Post post, String title, String content) {

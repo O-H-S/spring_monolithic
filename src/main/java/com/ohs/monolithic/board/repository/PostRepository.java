@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 
 
-public interface PostRepository extends JpaRepository<Post, Integer>, JdbcOperationsRepository<PostRepository, Post> {
+public interface PostRepository extends JpaRepository<Post, Integer>, CustomPostRepository {
 
 
     //@EntityGraph(attributePaths = { "author.address"}) 이런식으로 중첩된 동작 가능.
@@ -57,5 +58,5 @@ public interface PostRepository extends JpaRepository<Post, Integer>, JdbcOperat
     @Query("UPDATE Post p SET p.commentCount = (SELECT COUNT(c) FROM Comment c WHERE c.post = p) WHERE p.id = :postId")
     void refreshCommentCount(@Param("postId") Integer postId);
 
-
+    Long countByBoardId(Integer boardId);
 }
