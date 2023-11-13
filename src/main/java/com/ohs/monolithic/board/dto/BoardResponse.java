@@ -14,4 +14,5 @@ public class BoardResponse {
     public final Integer id;
     public final String title;
     public final String description;
+    public final Long postCounts;
 }

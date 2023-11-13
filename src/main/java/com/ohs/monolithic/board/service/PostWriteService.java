@@ -18,7 +18,19 @@ public class PostWriteService {
     @PersistenceContext
     EntityManager em;
     final PostRepository pRepo;
-    public void create(Integer boardID ,String subject, String content, Account user) {
+
+    private final BoardManageService boardService;
+
+    @Transactional
+    public Post create(Integer boardID ,String subject, String content, Account user) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if(status == STATUS_ROLLED_BACK)
+                    boardService.decrementPostCount(boardID);
+            }
+        });
+        boardService.incrementPostCount(boardID);
         Post q = new Post();
         Board boardReference = em.getReference(Board.class, boardID);
         q.setBoard(boardReference);
@@ -36,9 +48,30 @@ public class PostWriteService {
         this.pRepo.save(post);
     }
 
+
+    @Transactional
     public void delete(Post post) {
-        this.pRepo.delete(post);
+        Optional<Post> entity = pRepo.findById(post.getId());
+        if(entity.isEmpty())
+            return;
+
+        Integer boardId = entity.get().getId();
+        boardService.decrementPostCount(boardId);
+        // 트랜잭션 커밋 시 실행될 콜백
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if(status == STATUS_ROLLED_BACK)
+                    boardService.incrementPostCount(boardId);
+            }
+        });
+
+        pRepo.delete(post);
     }
+
+
+
+
     public void vote(Post post, Account siteUser) {
         post.getVoter().add(siteUser);
         this.pRepo.save(post);

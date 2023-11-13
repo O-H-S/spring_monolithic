@@ -36,7 +36,8 @@ public class Board {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-
+    @Column(nullable = true)
+    private Long postCount;
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Post> posts;
@@ -65,5 +66,9 @@ public class Board {
 
     public void setDescription(String desc) {
         description = desc;
+    }
+
+    public void setPostCount(Long count) {
+        postCount = count;
     }
 }
