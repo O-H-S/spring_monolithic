@@ -20,6 +20,7 @@ class GreetingControllerIntegrationTest {
   }
 }
   ```
+* 테스트 환경 구축 : <s>H2</s>, MySQL
 
 - Problem / Error
     - 
