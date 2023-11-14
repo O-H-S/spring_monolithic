@@ -1,4 +1,18 @@
 <html layout:decorate="~{layout}">
+
+<style layout:fragment="style">
+    .execution-time-display {
+        font-size: small; /* 작은 글씨 크기 */
+        text-align: right; /* 오른쪽 정렬 */
+        padding: 10px; /* 패딩 */
+        position: absolute; /* 절대 위치 */
+        bottom: 0; /* 하단에 배치 */
+        right: 0; /* 오른쪽에 배치 */
+        color: gray;
+    }
+</style>
+
+
 <div layout:fragment="content" class="container my-3">
 
     <a th:href="@{/}" class="btn btn-secondary my-3">
@@ -8,6 +22,9 @@
     <!-- 게시판 제목과 설명 -->
     <div class="card mb-4">
         <div class="card-body text-center">
+            <div class="execution-time-display">
+                (<span th:text="${executionTime}">0</span> ms)
+            </div>
             <h3 class="card-title" th:text="${title}">게시판 제목</h3>
             <p class="card-text text-muted" th:text="${desc}">게시판 설명</p>
         </div>
