@@ -6,6 +6,7 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.service.BoardManageService;
 import com.ohs.monolithic.board.service.PostReadService;
+import com.ohs.monolithic.utils.IncludeExecutionTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -35,6 +36,7 @@ public class BoardManageController {
         return "created";
     }
 
+    @IncludeExecutionTime
     @GetMapping("/{id}")
     public String showBoard(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
 
