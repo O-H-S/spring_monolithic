@@ -29,12 +29,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static com.ohs.monolithic.board.domain.QPost.post;
 import static com.ohs.monolithic.user.QAccount.account;
 
 
 @Repository
+
 public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implements CustomPostRepository {
 
     private final JdbcTemplate jdbcTemplate;
@@ -151,28 +153,38 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
 
         // 'id' 필드는 생략.
         // 'board', 'author', 'voter'는 외래 키 관계를 적절히 처리해야함.
-       /* String sql = "INSERT INTO post(title, content, comment_Count, create_Date, board_id, author_id, modify_Date) " +
-                "VALUES (:title, :content, :commentCount, :createDate, :board_id, :author_id ,:modifyDate)";*/
         String sql = "INSERT INTO post(title, content, comment_Count, create_date, modify_Date, board_id) " +
                 "VALUES (?,?,?,?,?,?)";
 
-        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                Post post = posts.get(i);
-                preparedStatement.setString(1, post.getTitle());
-                preparedStatement.setString(2, post.getContent());
-                preparedStatement.setInt(3, /*post.getCommentCount()*/ 0);
-                preparedStatement.setTimestamp(4, Timestamp.valueOf( post.getCreateDate()));
-                preparedStatement.setDate(5, null);
-                preparedStatement.setInt(6, post.getBoard().getId());
-            }
+        int batchSize = 500;
+        IntStream.range(0, (posts.size() + batchSize - 1) / batchSize)
+                .forEach(i -> {
+                    int start = i * batchSize;
+                    int end = Math.min(posts.size(), (i + 1) * batchSize);
+                    List<Post> batchList = posts.subList(start, end);
+                    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement ps, int j) throws SQLException {
+                            Post post = batchList.get(j);
+                            ps.setString(1, post.getTitle());
+                            ps.setString(2, post.getContent());
+                            ps.setInt(3, 0); // 예시로 0 설정
+                            ps.setTimestamp(4, Timestamp.valueOf(post.getCreateDate()));
+                            ps.setDate(5, null);
+                            if (post.getBoard() == null) {
+                                ps.setNull(6, Types.INTEGER); // board_id에 null 설정
+                            } else {
+                                ps.setInt(6, post.getBoard().getId()); // board_id에 값 설정
+                            }
+                        }
 
-            @Override
-            public int getBatchSize() {
-                return posts.size();
-            }
-        });
+                        @Override
+                        public int getBatchSize() {
+                            return batchList.size();
+                        }
+                    });
+                });
+
     }
 
 
