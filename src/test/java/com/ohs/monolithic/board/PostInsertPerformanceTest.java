@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=OFF"
 })*/
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-
+@Import(QuerydslConfig.class)
 public class PostInsertPerformanceTest {
     @Autowired
     PostRepository repository;
@@ -53,6 +53,7 @@ public class PostInsertPerformanceTest {
             posts.add(Post.builder()
                     .title("TestTitle")
                     .author(null)
+                    .createDate(LocalDateTime.now())
                     .content("TestContent")
                     .build()
             );
@@ -67,14 +68,14 @@ public class PostInsertPerformanceTest {
 
     }
 
-    @Test
+    /*@Test
     @Order(0)
     @DisplayName("preperation")
     //@RepeatedTest(2)
     public void insert_TestPreperation(){
         repository.save(posts.get(0));
         entityManager.flush();
-    }
+    }*/
 
 
     @Test
