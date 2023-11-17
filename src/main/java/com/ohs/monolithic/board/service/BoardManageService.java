@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.exception.BoardException;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,8 +68,9 @@ public class BoardManageService {
                 .id(resultBoard.getId()).title(resultBoard.getTitle()).description(resultBoard.getDescription()).build();
     }
 
-    public Long getPostCount(Integer id){
-        return postCountCache.get(id);
+    public Long getPostCount(Integer id) {
+        Long count = postCountCache.get(id);
+        return count;
     }
     public List<Board> getBoardsRaw() {
         return bRepo.findAll();
@@ -89,9 +91,20 @@ public class BoardManageService {
         return results;
     }
     public Board getBoard(Integer id){
+        if(id == null || id < 0){
+            throw new BoardException("올바르지 않은 ID 형식 입니다.");
+        }
+        Long count = postCountCache.get(id);
+        if(count == null)
+            throw new BoardException("존재하지 않은 게시판입니다.");
         return bRepo.findById(id).get();
     }
-
+    public Boolean isExist(Integer id){
+        if (id == null || id < 0) {
+            return false;
+        }
+        return postCountCache.containsKey(id);
+    }
 
     public void save(Board target) {
         bRepo.save(target);
