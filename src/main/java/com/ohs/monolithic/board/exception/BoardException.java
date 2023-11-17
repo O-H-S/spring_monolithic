@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BoardException extends RuntimeException {
 
+    public BoardException(String message) {
+        super(message);
+    }
     /*private final BoardErrorResult errorResult;*/
 
 }
