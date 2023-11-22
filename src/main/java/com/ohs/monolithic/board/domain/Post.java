@@ -20,14 +20,16 @@ import java.util.Set;
 @NoArgsConstructor // @Builder 패턴에서 내부적으로 필요하다.
 @Table(name = "post", indexes = {
         //@Index(name = "idx_board_id", columnList = "board_id", unique = true), // for counting posts of board(redundant)
-        @Index(name = "idx_board_id_create_date", columnList = "board_id, create_date DESC", unique = true), // for quering posts
-        @Index(name = "idx_id_create_date", columnList = "create_date DESC", unique = true) // for quering posts
+        @Index(name = "idx_board_id_create_date", columnList = "board_id, create_date DESC", unique = false), // for quering posts
+        @Index(name = "idx_authoer_id_create_date", columnList = "author_id, create_date DESC", unique = false ) // for quering posts
+
 })
 public class Post {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Column(nullable = false)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
