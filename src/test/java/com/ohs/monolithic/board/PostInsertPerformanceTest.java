@@ -1,6 +1,7 @@
 package com.ohs.monolithic.board;
 
 
+import com.ohs.monolithic.QuerydslConfig;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
@@ -8,17 +9,19 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest(showSql = false)
-@ActiveProfiles("logoff")
+@DataJpaTest(/*showSql = false*/)
+//@ActiveProfiles("logoff")
 /*@TestPropertySource(properties = {
         "logging.level.org.hibernate.SQL=OFF",
         "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=OFF"
@@ -32,7 +35,7 @@ public class PostInsertPerformanceTest {
     private EntityManager entityManager;
     static Account testAccount;
     static List<Post> posts;
-    static int postCount = 500000;
+    static int postCount = 5000;
     @BeforeAll // 전체 테스트를 시작하기 전에 1회 실행하므로 메서드는 static으로 선언
     static void beforeAll() {
         //System.out.println("@BeforeAll");

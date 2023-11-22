@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // 모달 엘리먼트 선택
     var settingsModal = document.getElementById('settingsModal');
     const settingsForm = document.getElementById('settingsForm');
-    console.log("called");
+    const bulkInsertForm = document.getElementById('bulkInsertForm');
+
     // 모달이 보여질 때 이벤트 리스너 설정
     settingsModal.addEventListener('show.bs.modal', function (event) {
         console.log("clicked");
@@ -18,5 +19,35 @@ document.addEventListener('DOMContentLoaded', function () {
         modalBoardName.value = boardTitle;
 
         settingsForm.action = `/board/${boardId}/title`;
+        bulkInsertForm.action = `/api/posts/${boardId}/bulk`;
+
     });
+
+    document.getElementById('bulkInsertForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const boardId = document.getElementById('boardId').value;
+        const title = document.getElementById('title').value;
+        const count = document.getElementById('count').value;
+        const csrfToken = this.querySelector('[name="_csrf"]').value;
+
+        // AJAX 요청을 사용하여 JSON 형식으로 데이터를 전송
+        fetch(`/api/posts/${boardId}/bulk`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ title, count })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => console.log(data))
+            .catch(error => console.error('There has been a problem with your fetch operation:', error));
+    });
+
 });

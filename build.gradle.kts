@@ -46,10 +46,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
 
-
-	//runtimeOnly("mysql:mysql-connector-java") 이전 버전에서는 이렇게 명시해야했음.
+    //runtimeOnly("mysql:mysql-connector-java") 이전 버전에서는 이렇게 명시해야했음.
 	runtimeOnly("com.mysql:mysql-connector-j")
 
 
