@@ -20,6 +20,7 @@ public class Comment {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계: 하나의 Post에 여러 댓글
+    @JoinColumn(name = "post_id")
     private Post post;
 
 /*    @ManyToOne(fetch = FetchType.LAZY)
