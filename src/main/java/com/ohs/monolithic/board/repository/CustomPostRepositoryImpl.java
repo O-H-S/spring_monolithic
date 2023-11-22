@@ -15,6 +15,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +28,12 @@ import org.springframework.stereotype.Repository;
 import javax.print.DocFlavor;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.LongFunction;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.ohs.monolithic.board.domain.QPost.post;
 import static com.ohs.monolithic.user.QAccount.account;
@@ -82,6 +86,8 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
     @Override
     public Page<PostPaginationDto> selectAllByBoardWithCovering(Pageable pageable, Board board, Long allCounts) {
 
+
+
         // 빠르게 인덱스만으로 대상 id 값들을 구해온다.
         List<Integer> ids = queryFactory
                 .select(post.id)
@@ -96,6 +102,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
             //반환 코드 개선 필요.
             return null;
         }
+
         QBean<PostPaginationDto> projection = createPostPaginationProjection();
         List<PostPaginationDto> results = queryFactory
                 .select(projection)
@@ -149,41 +156,101 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public void bulkInsert(List<Post> posts) {
+    public void bulkInsert(List<Post> posts){
+        int count = posts.size();
+        //bulkInsert( posts, null);
+        _bulkInsert(posts.iterator(), (long)count,null);
+    }
+
+
+    public void bulkInsert(Long counts, LongFunction<Post> entityGenerator, BatchProcessor logicPerBatch) {
+        Stream<Post> postStream = Stream.iterate(0L, n -> n + 1) // Long 타입 인덱스 생성
+                .map(entityGenerator::apply)    // 각 인덱스에 대해 entityGenerator 적용
+                .limit(counts);          // counts 만큼만 제한
+
+        _bulkInsert(postStream.iterator(), counts, logicPerBatch);
+    }
+
+    void _bulkInsert(Iterator<Post> postIterator, Long count ,BatchProcessor logicPerBatch){
+        final int batchSize = 4000;
+        // 'id' 필드는 생략.
+        // 'board', 'author', 'voter'는 외래 키 관계를 적절히 처리해야함.
+        String sql = "INSERT INTO post(title, content, comment_Count, create_date, modify_Date, board_id) " +
+                "VALUES (?,?,?,?,?,?)";
+        int endBatch = (int)((count + batchSize - 1) / batchSize);
+        for(int i = 0; i < endBatch; i++) {
+            long start = (long)i * batchSize;
+            long end = Math.min(count, ((long)i + 1) * batchSize);
+
+            long startTime = System.currentTimeMillis();
+            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int j) throws SQLException {
+                    Post post = postIterator.next();
+                    ps.setString(1, post.getTitle());
+                    ps.setString(2, post.getContent());
+                    ps.setInt(3, 0); // 예시로 0 설정
+                    ps.setTimestamp(4, Timestamp.valueOf(post.getCreateDate()));
+                    ps.setDate(5, null);
+                    if (post.getBoard() == null) {
+                        ps.setNull(6, Types.INTEGER); // board_id에 null 설정
+                    } else {
+                        ps.setInt(6, post.getBoard().getId()); // board_id에 값 설정
+                    }
+                }
+                @Override
+                public int getBatchSize() {
+                    return (int)(end-start);
+                }
+            });
+            if (logicPerBatch != null)
+                logicPerBatch.process(i+1, endBatch, batchSize ,i == endBatch - 1, System.currentTimeMillis() - startTime);
+        }
+    }
+
+    @Override
+    public void bulkInsert(List<Post> posts, BatchProcessor logicPerBatch) {
 
         // 'id' 필드는 생략.
         // 'board', 'author', 'voter'는 외래 키 관계를 적절히 처리해야함.
         String sql = "INSERT INTO post(title, content, comment_Count, create_date, modify_Date, board_id) " +
                 "VALUES (?,?,?,?,?,?)";
 
-        int batchSize = 500;
-        IntStream.range(0, (posts.size() + batchSize - 1) / batchSize)
-                .forEach(i -> {
-                    int start = i * batchSize;
-                    int end = Math.min(posts.size(), (i + 1) * batchSize);
-                    List<Post> batchList = posts.subList(start, end);
-                    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-                        @Override
-                        public void setValues(PreparedStatement ps, int j) throws SQLException {
-                            Post post = batchList.get(j);
-                            ps.setString(1, post.getTitle());
-                            ps.setString(2, post.getContent());
-                            ps.setInt(3, 0); // 예시로 0 설정
-                            ps.setTimestamp(4, Timestamp.valueOf(post.getCreateDate()));
-                            ps.setDate(5, null);
-                            if (post.getBoard() == null) {
-                                ps.setNull(6, Types.INTEGER); // board_id에 null 설정
-                            } else {
-                                ps.setInt(6, post.getBoard().getId()); // board_id에 값 설정
-                            }
-                        }
+        int batchSize = 4000;
+        /*IntStream.range(0, (posts.size() + batchSize - 1) / batchSize)
+                .forEach(i -> {*/
+        int endBatch = (posts.size() + batchSize - 1) / batchSize;
+        for(int i = 0; i < endBatch; i++) {
+            int start = i * batchSize;
+            int end = Math.min(posts.size(), (i + 1) * batchSize);
+            List<Post> batchList = posts.subList(start, end);
 
-                        @Override
-                        public int getBatchSize() {
-                            return batchList.size();
-                        }
-                    });
-                });
+            long startTime = System.currentTimeMillis();
+            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int j) throws SQLException {
+                    Post post = batchList.get(j);
+                    ps.setString(1, post.getTitle());
+                    ps.setString(2, post.getContent());
+                    ps.setInt(3, 0); // 예시로 0 설정
+                    ps.setTimestamp(4, Timestamp.valueOf(post.getCreateDate()));
+                    ps.setDate(5, null);
+                    if (post.getBoard() == null) {
+                        ps.setNull(6, Types.INTEGER); // board_id에 null 설정
+                    } else {
+                        ps.setInt(6, post.getBoard().getId()); // board_id에 값 설정
+                    }
+                }
+                @Override
+                public int getBatchSize() {
+                    return batchList.size();
+                }
+            });
+
+            if(logicPerBatch != null)
+                logicPerBatch.process(i+1, endBatch, batchSize ,i == endBatch - 1, System.currentTimeMillis() - startTime);
+        }
+                /*});*/
 
     }
 

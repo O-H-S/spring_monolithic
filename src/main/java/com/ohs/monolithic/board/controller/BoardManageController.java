@@ -10,6 +10,7 @@ import com.ohs.monolithic.utils.IncludeExecutionTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,10 +40,13 @@ public class BoardManageController {
     @IncludeExecutionTime
     @GetMapping("/{id}")
     public String showBoard(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
+        System.out.println("----------------------------------------");
 
-        //Page<Post> paging = this.pService.getList(page, id);
         Page< PostPaginationDto> paging = this.pService.getListWithCovering(page,id);
+
+
         Board curBoard = this.bService.getBoard(id);
+
         for (PostPaginationDto post : paging) {
             //System.out.println(post.getCommentList().get(0));
         }
@@ -69,6 +73,9 @@ public class BoardManageController {
 
         return "redirect:/";
     }
+
+
+
 
     /*@PostMapping("/write/{id}")
     public String writeComment(Model model, @PathVariable("id") Integer id, @RequestParam String content){

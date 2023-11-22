@@ -77,7 +77,33 @@
               <!-- 제출 버튼 -->
               <button type="submit" class="btn btn-primary">저장</button>
             </form>
+
+            <form id="bulkInsertForm" action="/api/posts" method="post">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <!-- Bulk Insert에 필요한 포스트 제목 입력 필드 -->
+              <div class="mb-3">
+                <label for="bulkPostTitle" class="form-label">포스트 제목</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+              </div>
+              <!-- Bulk Insert에 필요한 포스트 개수 입력 필드 -->
+              <div class="mb-3">
+                <label for="bulkPostCount" class="form-label">포스트 개수</label>
+                <input type="number" class="form-control" id="count" name="count" required>
+              </div>
+              <!-- Bulk Insert 제출 버튼 -->
+              <button type="submit" class="btn btn-secondary">Bulk Insert</button>
+            </form>
+
+
+
+
           </div>
+
+
+
+
+
+
         </div>
       </div>
     </div>
