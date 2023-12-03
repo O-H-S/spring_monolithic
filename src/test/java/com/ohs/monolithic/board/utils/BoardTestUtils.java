@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board;
+package com.ohs.monolithic.board.utils;
 
 
 import com.ohs.monolithic.board.domain.Board;
@@ -22,6 +22,16 @@ public class BoardTestUtils {
                         .description("Test Desc. " + i)
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public static Board createBoardSimple(Integer id, String title){
+        return Board.builder()
+                .id(id)
+                .title(title)
+                .createDate(LocalDateTime.now()) // 각각의 보드에 다른 생성 시간을 부여
+                .postCount(0L)
+                .description("simple")
+                .build();
     }
 
     public static List<Post> bulkInsert(PostWriteService writeService, Integer boardID, int count){
