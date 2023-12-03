@@ -2,15 +2,12 @@ package com.ohs.monolithic.board.controller;
 
 
 import com.ohs.monolithic.board.domain.Board;
-import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.utils.IncludeExecutionTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,21 +15,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+/*
+    HTML, Template 반환하는 컨트롤러(클라이언트가 브라우저에서 요청하는 경우)
+*/
 @RequiredArgsConstructor
 @RequestMapping("/board")
 @Controller
-public class BoardManageController {
-    final BoardManageService bService;
+public class BoardController {
+    final BoardService bService;
     final PostReadService pService;
 
-    //  http://localhost:8080/board/create?title=abc&desc=dc
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/create")
     @ResponseBody
-    public String createBoard(@RequestParam String title, @RequestParam String desc){
+    public String createBoard(@RequestParam(defaultValue = "") String title, @RequestParam(defaultValue = "") String desc){
         bService.createBoard(title, desc);
         return "created";
     }
@@ -40,16 +36,10 @@ public class BoardManageController {
     @IncludeExecutionTime
     @GetMapping("/{id}")
     public String showBoard(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
-        System.out.println("----------------------------------------");
 
-        Page< PostPaginationDto> paging = this.pService.getListWithCovering(page,id);
-
+        Page<PostPaginationDto> paging = this.pService.getListWithCovering(page,id);
 
         Board curBoard = this.bService.getBoard(id);
-
-        for (PostPaginationDto post : paging) {
-            //System.out.println(post.getCommentList().get(0));
-        }
 
         model.addAttribute("title", curBoard.getTitle());
         model.addAttribute("desc", curBoard.getDescription());
@@ -60,7 +50,6 @@ public class BoardManageController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    //@PatchMapping("/me/admin")
     @PostMapping("/{id}/title")
     public String titleChange(@AuthenticationPrincipal UserDetails user, @PathVariable("id") Integer id, @RequestParam String boardTitle){
 
@@ -68,24 +57,7 @@ public class BoardManageController {
         target.setTitle(boardTitle);
         bService.save(target);
 
-        System.out.println(id.toString());
-        //System.out.println(boardTitle);
-
         return "redirect:/";
     }
-
-
-
-
-    /*@PostMapping("/write/{id}")
-    public String writeComment(Model model, @PathVariable("id") Integer id, @RequestParam String content){
-        Post post = this.pReadService.getPost(id);
-        cService.create(post, content);
-        return String.format("redirect:/post/detail/%s", id);
-
-    }*/
-
-
-
 
 }

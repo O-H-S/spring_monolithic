@@ -63,8 +63,18 @@ dependencies {
 	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
-	// 이 스타터는 JUnit, AssertJ, Hamcrest, Mockito와 같은 주요 테스트 라이브러리를 포함하
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	// 이 스타터는 JUnit, AssertJ, Hamcrest, Mockito와 같은 주요 테스트 라이브러리를 포함
+	testImplementation("org.springframework.boot:spring-boot-starter-test"){
+		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+	}
+		// spring-boot-starter-test는 suite 관련 의존성은 포함하지 않음.
+		//(수동으로 추가하기, 버전은 External Libraries에서 기존 추가된 org.junit.platform의 다른 아티팩트와 같은걸로 지정한다)
+		testImplementation("org.junit.platform:junit-platform-suite-api:1.9.3")
+		testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:1.9.3")
+
+		testImplementation ("org.springframework.security:spring-security-test") // 시큐리티 관련 기능을 테스트하기 위함.
+
+
 	testImplementation("com.h2database:h2")
 }
 
