@@ -1,0 +1,129 @@
+
+
+
+bootJar {
+    archiveFileName = 'app.jar'
+}
+
+/* kotlin dsl
+tasks.bootJar {
+    archiveFileName.set("app.jar")
+}*/
+
+
+/*ssh.settings {
+    knownHosts = allowAnyHosts
+    // 중간자 공격 위험
+}*/
+
+tasks.register("deployDockerImage") {
+    dependsOn 'exportDockerImage'
+    String hostProp = project.property('EC2_HOST')
+    String userProp = project.property('EC2_USER')
+    def pemFile = file("${project.rootDir}/${project.property('EC2_SSH_PEM')}")
+    def ec2Server = remotes {
+        ec2Server {
+            host = hostProp
+            user = userProp
+            identity = pemFile
+        }
+    }
+
+    //def sourceFile = project.rootDir.resolve("./build/docker/appImage.tar")
+    def sourceFile = file("${project.rootDir}/build/docker/appImage.tar")
+    doLast {
+        ssh.run{
+            session(ec2Server){
+                put from: sourceFile, into: "./"
+
+                execute 'sudo docker load -i appImage.tar'
+
+                execute 'sudo docker stop web-server || true'
+                execute 'sudo docker rm web-server || true'
+                execute 'sudo docker run -d -p 443:443 --name web-server com.ohs/app:latest'
+                //execute 'sudo docker logs web-server-container'
+
+
+            }
+        }
+    }
+}
+
+
+
+docker {
+
+    //name = "${project.group}/app:${project.version}"
+    name = "${project.group}/app:latest"
+    files 'build/libs/app.jar'
+}
+
+dockerPrepare{
+    dependsOn bootJar
+}
+
+tasks.register('exportDockerImage', Exec) {
+    dependsOn 'docker'
+    // Docker image name
+    //def imageName = "${project.group}/app:${project.version}"
+    def imageName = "${project.group}/app:latest"
+    // Path to save file
+    def outputFile = new File(project.rootDir, './build/docker/appImage.tar')
+
+    // Execute command
+    commandLine 'docker', 'save', '-o', outputFile, imageName
+
+    doFirst {
+        println "Saving Docker image $imageName to $outputFile"
+    }
+
+    doLast {
+        println "Docker image saved to $outputFile"
+    }
+}
+
+/*tasks.dockerPrepare.configure {
+    dependsOn("${project.rootDir}\\build\\libs\\app.jar")
+}*/
+
+
+
+/*tasks.register('buildAndDeploy') {
+    dependsOn 'bootJar'
+    dependsOn 'docker'
+    dependsOn 'exportDockerImage'
+    dependsOn 'deployDockerImage'
+    //tasks.findByName('publish').mustRunAfter 'build'
+}*/
+
+
+/* kotlin dsl
+    tasks.register("exportDockerImage", Exec::class) {
+    // Docker 이미지 이름
+    val imageName = "${project.group}/app:${project.version}"
+    // 저장할 파일 경로
+    val outputFile = project.rootDir.resolve("./build/docker/appImage.tar")
+
+    // 명령 실행
+    commandLine("docker", "save", "-o", outputFile, imageName)
+
+    doFirst {
+        println("Saving Docker image $imageName to $outputFile")
+    }
+
+    doLast {
+        println("Docker image saved to $outputFile")
+    }
+}*/
+
+
+
+/* kotlin dsl
+docker {
+    name ="${project.group}/app:${project.version}"
+    files("build/libs/app.jar")
+
+    // Dockerfile이 프로젝트 루트에 있지 않은 경우, 위치를 지정할 수 있습니다.
+    // dockerfile(file("path/to/Dockerfile"))
+}
+*/
