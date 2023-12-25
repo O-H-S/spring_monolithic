@@ -1,0 +1,67 @@
+
+// https://jonnyzzz.com/blog/2022/05/23/gradle-kts-reuse/
+configurations {
+    /*compileOnly {
+        extendsFrom(configurations.annotationProcessor.get())
+    }*/
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    create("asciidoctorExt")
+}
+
+dependencies {
+
+    /* kotlin dsl
+    add("asciidoctorExt","org.springframework.restdocs:spring-restdocs-asciidoctor")
+    testImplementation ("org.springframework.restdocs:spring-restdocs-mockmvc")
+    */
+
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+}
+
+
+
+
+ext.snippetsDir = file('build/generated-snippets')
+
+test {
+    outputs.dir snippetsDir
+    finalizedBy 'asciidoctor'
+}
+
+tasks.register('copyDocs', Copy) {
+    dependsOn 'asciidoctor'
+    from file('build/docs/asciidoc')
+    into file('src/main/resources/static/docs')
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn 'test'
+    finalizedBy 'copyDocs'
+}
+
+/* kotlin
+val snippetsDir by extra { file("build/generated-snippets") }
+
+tasks.test {
+	outputs.dir(snippetsDir)
+	finalizedBy("asciidoctor")
+}
+
+tasks.register("copyDocs", Copy::class) {
+	dependsOn(tasks.asciidoctor)
+	from(file("build/docs/asciidoc"))
+	into(file("src/main/resources/static/docs"))
+}
+
+
+tasks.asciidoctor {
+	inputs.dir(snippetsDir)
+	configurations("asciidoctorExt")
+	dependsOn(tasks.test)
+	finalizedBy(tasks.getByName("copyDocs"))
+}*/
