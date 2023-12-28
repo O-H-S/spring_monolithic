@@ -1,0 +1,53 @@
+= Post API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+[[anchor-post-bulk]]
+== 게시글 bulk insert(테스트 메소드)
+=== 권장
+Request
+include::{snippets}/boards/create-succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/boards/create-succeeded-recommended/http-response.adoc[]
+
+
+=== 성공
+
+
+==== 어드민이 존재하는 게시판 ID에 유효한 form을 입력하면 성공
+Request
+include::{snippets}/posts/{board}/bulk-succeeded-normal/http-request.adoc[]
+Response
+include::{snippets}/posts/{board}/bulk-succeeded-normal/http-response.adoc[]
+
+
+
+
+=== 실패
+
+==== body에 form 누락되면 실패
+Request
+include::{snippets}/posts/{board}/bulk-failed-notform/http-request.adoc[]
+Response
+include::{snippets}/posts/{board}/bulk-failed-notform/http-response.adoc[]
+
+==== 어드민이 아니면 실패
+Request
+include::{snippets}/posts/{board}/bulk-failed-permission/http-request.adoc[]
+Response
+include::{snippets}/posts/{board}/bulk-failed-permission/http-response.adoc[]
+
+==== form 검증에 실패하면 실패
+Request
+include::{snippets}/posts/{board}/bulk-failed-notverified/http-request.adoc[]
+Response
+include::{snippets}/posts/{board}/bulk-failed-notverified/http-response.adoc[]
+
+==== 게시판이 존재하지 않으면 실패
+Request
+include::{snippets}/posts/{board}/bulk-failed-nonboard/http-request.adoc[]
+Response
+include::{snippets}/posts/{board}/bulk-failed-nonboard/http-response.adoc[]

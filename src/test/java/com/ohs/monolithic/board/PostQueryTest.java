@@ -4,9 +4,10 @@ package com.ohs.monolithic.board;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
+import com.ohs.monolithic.board.utils.BoardTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ public class PostQueryTest {
     private PostWriteService postWriteService;
 
     @Autowired
-    private BoardManageService boardManageService;
+    private BoardService boardService;
 
     //static int targetPage = 30000-2;
     //static int targetPage = 10000-2;
@@ -41,7 +42,7 @@ public class PostQueryTest {
     public void queryWithOffsetMethod(){ //
 
         //given
-        BoardResponse testBoard = boardManageService.createBoard("test", "for test");
+        BoardResponse testBoard = boardService.createBoard("test", "for test");
         BoardTestUtils.bulkInsert(postWriteService, testBoard.getId(), postCount);
 
 
@@ -56,7 +57,7 @@ public class PostQueryTest {
         //SimpleJpaRepository의 구현에서는 Count 쿼리가 추가된다. (전체 게시글 수를 알아야하기 때문에)
 
         //then
-        assertThat(boardManageService.getPostCount(testBoard.getId())).as("추가한 개수가 맞는지 확인(캐시)").isEqualTo(postCount);
+        assertThat(boardService.getPostCount(testBoard.getId())).as("추가한 개수가 맞는지 확인(캐시)").isEqualTo(postCount);
         //assertThat(postReadService.calculateCount(testBoard.getId())).as("추가한 개수가 맞는지 확인").isEqualTo(postCount);
     }
 
@@ -67,7 +68,7 @@ public class PostQueryTest {
     public void queryWithoutCounting(){ //
 
         //given
-        BoardResponse testBoard = boardManageService.createBoard("test", "for test");
+        BoardResponse testBoard = boardService.createBoard("test", "for test");
         BoardTestUtils.bulkInsert(postWriteService, testBoard.getId(), postCount);
         System.out.println("--------------");
 
@@ -78,11 +79,11 @@ public class PostQueryTest {
         //System.out.println(results.getNumberOfElements());
         //System.out.println(results.toList().get(0).getId());
         System.out.println("queryWithoutCounting() 호출: 실행 시간 = " + (System.currentTimeMillis() - startTime) + "ms");
-        System.out.println(boardManageService.getPostCount(testBoard.getId()));
+        System.out.println(boardService.getPostCount(testBoard.getId()));
         //SimpleJpaRepository의 구현에서는 Count 쿼리가 추가된다. (전체 게시글 수를 알아야하기 때문에)
 
         //then
-        assertThat(boardManageService.getPostCount(testBoard.getId())).as("추가한 개수가 맞는지 확인(캐시)").isEqualTo(postCount);
+        assertThat(boardService.getPostCount(testBoard.getId())).as("추가한 개수가 맞는지 확인(캐시)").isEqualTo(postCount);
         assertThat(postReadService.calculateCount(testBoard.getId())).as("추가한 개수가 맞는지 확인").isEqualTo(postCount);
     }
 
@@ -92,7 +93,7 @@ public class PostQueryTest {
     public void queryWithCoveringIndex(){ //
 
         //given
-        BoardResponse testBoard = boardManageService.createBoard("test", "for test");
+        BoardResponse testBoard = boardService.createBoard("test", "for test");
         //for(int i = 0; i < 3; i++)
             BoardTestUtils.bulkInsert(postWriteService, testBoard.getId(), postCount);
         System.out.println("--------------");
@@ -104,7 +105,7 @@ public class PostQueryTest {
         //System.out.println(results.getNumberOfElements());
         //System.out.println(results.toList().get(0).getId());
         System.out.println("queryWithCoveringIndex() 호출: 실행 시간 = " + (System.currentTimeMillis() - startTime) + "ms");
-        System.out.println(boardManageService.getPostCount(testBoard.getId()));
+        System.out.println(boardService.getPostCount(testBoard.getId()));
         //SimpleJpaRepository의 구현에서는 Count 쿼리가 추가된다. (전체 게시글 수를 알아야하기 때문에)
 
         //then
@@ -118,7 +119,7 @@ public class PostQueryTest {
     public void queryWithoutOffset(){ //
 
         //given
-        BoardResponse testBoard = boardManageService.createBoard("test", "for test");
+        BoardResponse testBoard = boardService.createBoard("test", "for test");
         //for(int i = 0; i < 3; i++)
         BoardTestUtils.bulkInsert(postWriteService, testBoard.getId(), postCount);
         System.out.println("--------------");
@@ -133,7 +134,7 @@ public class PostQueryTest {
         //System.out.println(results.getNumberOfElements());
         //System.out.println(results.toList().get(0).getId());
         System.out.println("queryWithoutOffset() 호출: 실행 시간 = " + (System.currentTimeMillis() - startTime) + "ms");
-        System.out.println(boardManageService.getPostCount(testBoard.getId()));
+        System.out.println(boardService.getPostCount(testBoard.getId()));
         //SimpleJpaRepository의 구현에서는 Count 쿼리가 추가된다. (전체 게시글 수를 알아야하기 때문에)
 
         //then
