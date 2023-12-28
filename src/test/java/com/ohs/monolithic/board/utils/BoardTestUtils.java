@@ -25,12 +25,16 @@ public class BoardTestUtils {
     }
 
     public static Board createBoardSimple(Integer id, String title){
+        return createBoardSimple(id, title, "Test Description");
+    }
+
+    public static Board createBoardSimple(Integer id, String title, String desc){
         return Board.builder()
                 .id(id)
                 .title(title)
                 .createDate(LocalDateTime.now()) // 각각의 보드에 다른 생성 시간을 부여
                 .postCount(0L)
-                .description("simple")
+                .description(desc)
                 .build();
     }
 

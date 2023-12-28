@@ -1,0 +1,161 @@
+package com.ohs.monolithic.board.integration;
+
+
+import com.nimbusds.jose.shaded.gson.Gson;
+import com.nimbusds.jose.shaded.gson.JsonObject;
+import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.dto.BoardCreationForm;
+import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.repository.BoardRepository;
+import com.ohs.monolithic.board.service.BoardService;
+import com.ohs.monolithic.board.utils.BoardTestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureRestDocs
+@AutoConfigureMockMvc
+@Tag("base")
+@Tag("integrate")
+public class BoardManageIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private BoardService boardService;
+    @Autowired
+    private BoardRepository boardRepository;
+    private Gson gson; // json 직렬화,역직렬화
+
+
+
+    @BeforeEach
+    public void init() {
+
+        gson = new Gson();
+
+    }
+    @Test
+    @DisplayName("POST /api/boards: desc가 생략된 요청도 가능하다 - 201  ")
+    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    public void createBoard_0() throws Exception {
+        //given
+
+        // when
+        JsonObject formObject = new JsonObject();
+        formObject.addProperty("title", "test title");
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/boards")
+                        .with(csrf())
+                        .content(formObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isCreated());
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    }
+
+    @Test
+    @DisplayName("POST /api/boards: 성공 - 201  ")
+    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    public void createBoard_1() throws Exception {
+        //given
+
+        // when
+        BoardCreationForm form = BoardCreationForm.builder()
+                .title("Test Title")
+                .desc("Test Description")
+                .build();
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/boards")
+                        .with(csrf())
+                        .content(gson.toJson(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+
+        );
+
+        // then
+        result.andExpect(status().isCreated());
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        result.andDo(document("boards/create-succeeded-recommended",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+    }
+
+
+    @Test
+    @DisplayName("GET /api/boards: 전체 게시판 조회 - 200  ")
+    public void getBoards_0() throws Exception {
+        //given
+        boardService.createBoard("자유", "자유 게시판 설명");
+        boardService.createBoard("건의", "건의 게시판 설명");
+        // when
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/api/boards")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print());
+
+        // then
+        result.andExpect(status().isOk());
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        result.andDo(document("boards/get-succeeded-recommended",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+
+    }
+
+    @Test
+    @DisplayName("GET /api/boards/{id}: 특정 게시판 조회 - 200  ")
+    public void getBoard_0() throws Exception {
+        //given
+        boardService.createBoard("자유", "자유 게시판 설명");
+        boardService.createBoard("건의", "건의 게시판 설명");
+        // when
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/api/boards/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print());
+
+        // then
+        result.andExpect(status().isOk());
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        result.andDo(document("boards/{id}/get-succeeded-recommended",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+
+    }
+
+
+}

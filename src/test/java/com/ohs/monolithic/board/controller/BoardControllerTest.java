@@ -1,9 +1,8 @@
 package com.ohs.monolithic.board.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
-import com.ohs.monolithic.board.controller.BoardController;
 import com.ohs.monolithic.board.domain.Board;
-import com.ohs.monolithic.board.exception.BoardException;
+import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 //@ExtendWith(MockitoExtension.class)
 
+@AutoConfigureRestDocs
 @WebMvcTest(BoardController.class)
 @EnableMethodSecurity(prePostEnabled = true)
 @Tag("base")
@@ -82,6 +83,9 @@ public class BoardControllerTest {
     @DisplayName("GET /board/create : title, desc가 제공되지 않아도, 공백으로 생성 가능. - 200 ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void createBoard_1() throws Exception {
+
+
+
         // given, when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -135,7 +139,7 @@ public class BoardControllerTest {
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void changeBoardTitle_2() throws Exception {
 
-        when(bService.getBoard(1)).thenThrow(BoardException.class);
+        when(bService.getBoard(1)).thenThrow(BoardNotFoundException.class);
 
         // given, when
         ResultActions result = mockMvc.perform(
@@ -155,7 +159,7 @@ public class BoardControllerTest {
     public void changeBoardTitle_3() throws Exception {
 
         // given
-        when(bService.getBoard(1)).thenThrow(BoardException.class);
+        when(bService.getBoard(1)).thenThrow(BoardNotFoundException.class);
 
         //, when
         ResultActions result = mockMvc.perform(
