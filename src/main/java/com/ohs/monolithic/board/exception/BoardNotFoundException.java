@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BoardException extends RuntimeException {
+public class BoardNotFoundException extends RuntimeException {
 
-    public BoardException(String message) {
+    public Integer id;
+    public BoardNotFoundException(Integer id, String message) {
         super(message);
+        this.id = id;
     }
     /*private final BoardErrorResult errorResult;*/
 

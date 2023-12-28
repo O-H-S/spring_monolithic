@@ -3,7 +3,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.exception.BoardException;
+import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
-public class BoardManageService {
+public class BoardService {
     final BoardRepository bRepo;
     private ConcurrentHashMap<Integer, Long> postCountCache;
     public void registerPostCountCache(ConcurrentHashMap<Integer, Long> cache){
@@ -48,6 +48,7 @@ public class BoardManageService {
     public BoardResponse createBoard(String title, String desc){
 
 
+
         Board newBoard = Board.builder()
                         .title(title)
                         .createDate(LocalDateTime.now())
@@ -55,13 +56,17 @@ public class BoardManageService {
                         .postCount(0L)
                         .build();
 
+
         Board resultBoard =  bRepo.save(newBoard);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
-            public void beforeCommit(boolean readOnly) {
-                postCountCache.putIfAbsent(resultBoard.getId(), 0L);
+            public void afterCompletion(int status) {
+                if(status == STATUS_ROLLED_BACK)
+                    postCountCache.remove(resultBoard.getId());
             }
         });
+        postCountCache.putIfAbsent(resultBoard.getId(), 0L);
+
 
 
         return BoardResponse.builder()
@@ -75,6 +80,14 @@ public class BoardManageService {
     public List<Board> getBoardsRaw() {
         return bRepo.findAll();
     }
+
+    @Transactional(readOnly = true)
+    public List<BoardResponse> getBoardsReadOnly(boolean includeTitle, boolean includeDesc){
+        List<BoardResponse> result = bRepo.getAllBoards(includeTitle, includeDesc);
+        result.forEach(x -> x.setPostCounts(this.getPostCount(x.getId())));
+        return result;
+    }
+    @Transactional(readOnly = true)
     public List<BoardResponse> getBoards(){
 
         List<BoardResponse> results = new ArrayList<>();
@@ -84,26 +97,48 @@ public class BoardManageService {
                             .id(board.getId())
                             .title(board.getTitle())
                             .description(board.getDescription())
-                            .postCounts(this.getPostCount(board.getId()))
+                            .postCounts(
+                                    this.getPostCount(board.getId())
+                            )
                             .build());}
 
         );
         return results;
     }
-    public Board getBoard(Integer id){
+    public Board getBoard(Integer id) throws BoardNotFoundException {
         if(id == null || id < 0){
-            throw new BoardException("올바르지 않은 ID 형식 입니다.");
+            throw new BoardNotFoundException(id , "올바르지 않은 ID 형식 입니다.");
         }
         Long count = postCountCache.get(id);
         if(count == null)
-            throw new BoardException("존재하지 않은 게시판입니다.");
+            throw new BoardNotFoundException(id, "존재하지 않는 게시판입니다.");
         return bRepo.findById(id).get();
     }
-    public Boolean isExist(Integer id){
+
+    @Transactional(readOnly = true)
+    public BoardResponse getBoardReadOnly(Integer id) throws BoardNotFoundException {
+        assertBoardExists(id);
+
+        Board target = bRepo.findById(id).get();
+        return BoardResponse.fromEntity(target, postCountCache.get(id));
+    }
+
+
+    public Boolean isExist(Integer id) throws IllegalArgumentException {
         if (id == null || id < 0) {
-            return false;
+            throw new IllegalArgumentException("올바르지 않은 Board id 입니다.");
         }
         return postCountCache.containsKey(id);
+    }
+
+    public void assertBoardExists(Integer id){
+        try {
+            if (!isExist(id)) {
+                throw new BoardNotFoundException(id, "존재하지 않는 게시판입니다.");
+            }
+        }catch (Exception e){
+            throw new BoardNotFoundException(id, "올바르지 않은 포맷입니다.");
+        }
     }
 
     public void save(Board target) {

@@ -1,18 +1,28 @@
 package com.ohs.monolithic.board.dto;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.ohs.monolithic.board.domain.Board;
+import lombok.*;
 
 
 // record 개념 정리 후, 리팩토링하기.
 @Getter
+@Setter
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor(force = true) // querydsl에서 매핑할때 기본 생성자 필요함.
 public class BoardResponse {
-    public final Integer id;
-    public final String title;
-    public final String description;
-    public final Long postCounts;
+    public Integer id;
+    public String title;
+    public String description;
+    public Long postCounts;
+
+    public static BoardResponse fromEntity(Board board, Long postCounts) {
+        return BoardResponse.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .description(board.getDescription())
+                .postCounts(postCounts)
+                .build();
+    }
 }

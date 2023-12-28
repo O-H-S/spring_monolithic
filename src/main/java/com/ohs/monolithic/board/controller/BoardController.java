@@ -25,12 +25,14 @@ public class BoardController {
     final BoardService bService;
     final PostReadService pService;
 
+
+    // Test 코드 작성됨.
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/create")
-    @ResponseBody
+    //@ResponseBody
     public String createBoard(@RequestParam(defaultValue = "") String title, @RequestParam(defaultValue = "") String desc){
         bService.createBoard(title, desc);
-        return "created";
+        return "redirect:/";
     }
 
     @IncludeExecutionTime

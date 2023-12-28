@@ -30,7 +30,7 @@ public class Board {
     private Integer id;
 
 
-    @Column(length = 200)
+    @Column(length = 250)
     private String title;
 
     @Column(columnDefinition = "TEXT")
