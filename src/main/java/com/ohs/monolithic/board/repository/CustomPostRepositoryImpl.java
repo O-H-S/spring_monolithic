@@ -1,9 +1,7 @@
 package com.ohs.monolithic.board.repository;
 
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
-import com.ohs.monolithic.board.domain.Board;
-import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.domain.QPost;
+import com.ohs.monolithic.board.domain.*;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.user.Account;
 import com.ohs.monolithic.utils.JdbcOperationsRepository;
@@ -14,16 +12,20 @@ import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.print.DocFlavor;
 import java.sql.*;
@@ -36,21 +38,26 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.ohs.monolithic.board.domain.QPost.post;
+import static com.ohs.monolithic.board.domain.QPostLike.postLike;
+import static com.ohs.monolithic.board.domain.QPostView.postView;
 import static com.ohs.monolithic.user.QAccount.account;
 
 
 @Repository
-
+//@RequiredArgsConstructor
 public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implements CustomPostRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final EntityManager em;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final JPAQueryFactory queryFactory;
-    public CustomPostRepositoryImpl(JdbcTemplate template, NamedParameterJdbcTemplate namedTemplate, JPAQueryFactory qF) {
+    public CustomPostRepositoryImpl(JdbcTemplate template, NamedParameterJdbcTemplate namedTemplate, JPAQueryFactory qF,
+                                    EntityManager entityManager) {
         super(Post.class);
         jdbcTemplate = template;
         namedParameterJdbcTemplate = namedTemplate;
         queryFactory = qF;
+        this.em = entityManager;
     }
 
     //@Override
@@ -100,7 +107,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
 
         if (CollectionUtils.isEmpty(ids)) {
             //반환 코드 개선 필요.
-            return null;
+            return Page.empty(pageable);
         }
 
         QBean<PostPaginationDto> projection = createPostPaginationProjection();
@@ -130,6 +137,67 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
         return posts;
     }
 
+    @Override
+    public PostLike findPostLike(Integer postID, Long memberID) {
+
+        PostLike like = queryFactory.selectFrom(postLike)
+                .where(
+                        postLike.post.id.eq(postID),
+                        postLike.user.id.eq(memberID)
+                )
+                .fetchOne();
+        return like;
+    }
+
+    @Transactional
+    @Override
+    public PostLike savePostLike(PostLike postLike) {
+
+        Assert.notNull(postLike, "Entity must not be null");
+        if (postLike.getId() == null) {
+            em.persist(postLike);
+            return postLike;
+        } else {
+            return em.merge(postLike);
+        }
+        /*if (entityInformation.isNew(entity)) {
+            em.persist(entity);
+            return entity;
+        } else {
+            return em.merge(entity);
+        }*/
+    }
+
+    @Override
+    public PostView findPostView(Integer postID, Long memberID) {
+        PostView view = queryFactory.selectFrom(postView)
+                .where(
+                        postView.post.id.eq(postID),
+                        postView.user.id.eq(memberID)
+                )
+                .fetchOne();
+        return view;
+    }
+
+    @Transactional
+    @Override
+    public PostView savePostView(PostView postView) {
+
+        Assert.notNull(postView, "Entity must not be null");
+        if (postView.getId() == null) {
+            em.persist(postView);
+            return postView;
+        } else {
+            return em.merge(postView);
+        }
+        /*if (entityInformation.isNew(entity)) {
+            em.persist(entity);
+            return entity;
+        } else {
+            return em.merge(entity);
+        }*/
+    }
+
     // Projections.fields를 사용하는 부분을 별도의 메소드로 분리
     private QBean<PostPaginationDto> createPostPaginationProjection() {
         // as의 용도 : 가독성, 결과 재사용(참조), DTO와 매핑,
@@ -139,7 +207,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
                 account.id.as("userId"),
                 account.username.as("userName"),
                 post.createDate,
-                post.commentCount);
+                post.commentCount, post.likeCount, post.viewCount);
     }
 
     private BooleanExpression ltPostId(Integer postID) {
@@ -164,6 +232,10 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
 
 
     public void bulkInsert(Long counts, LongFunction<Post> entityGenerator, BatchProcessor logicPerBatch) {
+        if (entityGenerator == null) {
+            throw new IllegalArgumentException("entityGenerator must not be null");
+        }
+
         Stream<Post> postStream = Stream.iterate(0L, n -> n + 1) // Long 타입 인덱스 생성
                 .map(entityGenerator::apply)    // 각 인덱스에 대해 entityGenerator 적용
                 .limit(counts);          // counts 만큼만 제한
@@ -171,7 +243,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
         _bulkInsert(postStream.iterator(), counts, logicPerBatch);
     }
 
-    void _bulkInsert(Iterator<Post> postIterator, Long count ,BatchProcessor logicPerBatch){
+    void _bulkInsert(Iterator<Post> postIterator, Long count, BatchProcessor logicPerBatch){
         final int batchSize = 4000;
         // 'id' 필드는 생략.
         // 'board', 'author', 'voter'는 외래 키 관계를 적절히 처리해야함.

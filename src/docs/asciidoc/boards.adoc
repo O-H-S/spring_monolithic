@@ -1,0 +1,85 @@
+= Board API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+[[anchor-get]]
+== 전체 게시판 조회
+=== 권장
+Request
+include::{snippets}/boards/get-succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/boards/get-succeeded-recommended/http-response.adoc[]
+
+
+=== 성공
+==== 파라미터가 누락 되어도 가능
+Request
+include::{snippets}/boards/get-succeeded-withoutparam/http-request.adoc[]
+Response
+include::{snippets}/boards/get-succeeded-withoutparam/http-response.adoc[]
+
+==== 파라미터로 조회 범위 설정 가능
+Request
+include::{snippets}/boards/get-succeeded-withparam/http-request.adoc[]
+Response
+include::{snippets}/boards/get-succeeded-withparam/http-response.adoc[]
+
+==== 게시판이 존재하지 않아도 body 포함하여 응답.
+Request
+include::{snippets}/boards/get-succeeded-emptyboards/http-request.adoc[]
+Response
+include::{snippets}/boards/get-succeeded-emptyboards/http-response.adoc[]
+
+=== 실패
+
+
+[[anchor-getbyid]]
+== 특정 게시판 조회
+=== 권장
+Request
+include::{snippets}/boards/{id}/get-succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/boards/{id}/get-succeeded-recommended/http-response.adoc[]
+
+
+
+
+
+
+
+[[anchor-post]]
+== 게시판 생성
+=== 권장
+Request
+include::{snippets}/boards/create-succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/boards/create-succeeded-recommended/http-response.adoc[]
+
+
+=== 성공
+
+
+==== 일부 파라미터가 누락 되어도 가능
+Request
+include::{snippets}/boards/create-succeeded-withoutparam/http-request.adoc[]
+Response
+include::{snippets}/boards/create-succeeded-withoutparam/http-response.adoc[]
+
+
+
+
+=== 실패
+
+==== 일반 유저는 게시판 생성 불가
+Request
+include::{snippets}/boards/create-failed-permission/http-request.adoc[]
+Response
+include::{snippets}/boards/create-failed-permission/http-response.adoc[]
+
+
+
+
+
