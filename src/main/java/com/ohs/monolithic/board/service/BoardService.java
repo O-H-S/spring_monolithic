@@ -14,6 +14,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -44,6 +45,8 @@ public class BoardService {
         bRepo.saveAll(boards);
     }
 
+
+
     @Transactional
     public BoardResponse createBoard(String title, String desc){
 
@@ -73,6 +76,36 @@ public class BoardService {
                 .id(resultBoard.getId()).title(resultBoard.getTitle()).description(resultBoard.getDescription()).build();
     }
 
+
+    // Test Exist
+    @Transactional
+    public void deleteBoard(Integer id){
+        Long oldCount = -1L;
+        try{
+            Board target = getBoard(id);
+            //Long oldCount = postCountCache.getOrDefault(id,0L);
+            oldCount = postCountCache.remove(id);
+            /*TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    if(status == STATUS_ROLLED_BACK) {
+                        postCountCache.put(id, oldCount);
+                    }
+                }
+            });*/
+            target.setPostCount(oldCount);
+            target.setDeleted(true);
+            bRepo.save(target);
+        }
+        catch(Exception e){
+            if(oldCount > -1)
+                postCountCache.put(id, oldCount);
+            throw e;
+        }
+        //bRepo.deleteBoard(id);
+
+    }
+
     public Long getPostCount(Integer id) {
         Long count = postCountCache.get(id);
         return count;
@@ -87,7 +120,14 @@ public class BoardService {
         result.forEach(x -> x.setPostCounts(this.getPostCount(x.getId())));
         return result;
     }
+
     @Transactional(readOnly = true)
+    public List<BoardResponse> getBoardsReadOnly(){
+        return getBoardsReadOnly(true, true);
+    }
+
+
+    @Transactional
     public List<BoardResponse> getBoards(){
 
         List<BoardResponse> results = new ArrayList<>();
@@ -112,7 +152,12 @@ public class BoardService {
         Long count = postCountCache.get(id);
         if(count == null)
             throw new BoardNotFoundException(id, "존재하지 않는 게시판입니다.");
-        return bRepo.findById(id).get();
+        try{
+            return bRepo.findById(id).get();
+        }
+        catch (Exception e) {
+            throw new BoardNotFoundException(id, "internal error");
+        }
     }
 
     @Transactional(readOnly = true)

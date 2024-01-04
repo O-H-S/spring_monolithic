@@ -50,4 +50,24 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('There has been a problem with your fetch operation:', error));
     });
 
+    document.getElementById('deleteBoardBtn').addEventListener('click', function() {
+        const boardId = document.getElementById('boardId').value;
+        if (confirm("Are you sure you want to delete this board?")) {
+            fetch(`/api/boards/${boardId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_csrf"]').value
+                }
+            }).then(response => {
+                if(response.ok) {
+                    // Handle successful deletion
+                    console.log("Board deleted successfully");
+                } else {
+                    // Handle failure
+                    console.error("Failed to delete board");
+                }
+            });
+        }
+    });
+
 });

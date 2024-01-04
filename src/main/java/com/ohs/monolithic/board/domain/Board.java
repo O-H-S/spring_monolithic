@@ -3,10 +3,7 @@ package com.ohs.monolithic.board.domain;
 
 import com.ohs.monolithic.board.domain.Post;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,26 +22,33 @@ import java.util.List;
 public class Board {
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // GenerationType.SEQUENCE 와 차이점 공부하기.
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY) // GenerationType.SEQUENCE 와 차이점 공부하기.
+  private Integer id;
 
 
-    @Column(length = 250)
-    private String title;
+  @Setter
+  @Column(length = 250)
+  private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+  @Setter
+  @Column(columnDefinition = "TEXT")
+  private String description;
 
-    @Column(nullable = true)
-    private Long postCount;
+  @Setter
+  @Column(nullable = true)
+  private Long postCount;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Post> posts;
+  @OneToMany(fetch = FetchType.LAZY)
+  private List<Post> posts;
 
-    private LocalDateTime createDate;
+  private LocalDateTime createDate;
 
-    // 공부하고 도입해보기.
+  @Setter
+  @Builder.Default
+  private Boolean deleted = Boolean.FALSE;
+
+  // 공부하고 도입해보기.
     /*@CreationTimestamp
     @Column(nullable = false, length = 20, updatable = false)
     private LocalDateTime createdAt;
@@ -54,21 +58,8 @@ public class Board {
     private LocalDateTime updatedAt;*/
 
 
+  public void setCreateData(LocalDateTime now) {
+    createDate = now;
+  }
 
-    public void setTitle(String title) {
-        this.title = title;
-
-    }
-
-    public void setCreateData(LocalDateTime now) {
-        createDate = now;
-    }
-
-    public void setDescription(String desc) {
-        description = desc;
-    }
-
-    public void setPostCount(Long count) {
-        postCount = count;
-    }
 }

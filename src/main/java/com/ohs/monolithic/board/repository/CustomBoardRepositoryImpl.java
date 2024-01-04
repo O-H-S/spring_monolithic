@@ -24,6 +24,7 @@ public class CustomBoardRepositoryImpl extends QuerydslRepositorySupport impleme
 
     }
 
+    // Test exists
     @Override
     public List<BoardResponse> getAllBoards(boolean includeTitle, boolean includeDesc) {
 
@@ -44,9 +45,26 @@ public class CustomBoardRepositoryImpl extends QuerydslRepositorySupport impleme
         List<BoardResponse> boards = queryFactory
                 .select(projection)
                 .from(board)
+                .where(board.deleted.eq(false))
                 .fetch(); // 조회
 
 
         return boards;
+    }
+
+    // Test exists
+    @Override
+    public void deleteBoard(Integer boardID) {
+        long deletedCount = queryFactory
+                .update(board)
+                .where(board.id.eq(boardID))
+                .set(board.deleted, true)
+                .execute();
+
+        // Optionally, you can check the affectedRows to see if the update was successful
+        if (deletedCount == 0) {
+
+            /*throw new EntityNotFoundException("Board not found with ID: " + boardID);*/
+        }
     }
 }

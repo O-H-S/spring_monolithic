@@ -44,9 +44,13 @@ include::{snippets}/boards/{id}/get-succeeded-recommended/http-request.adoc[]
 Response
 include::{snippets}/boards/{id}/get-succeeded-recommended/http-response.adoc[]
 
-
-
-
+[[anchor-deletebyid]]
+== 특정 게시판 삭제
+=== 권장
+Request
+include::{snippets}/boards/{id}/delete-succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/boards/{id}/delete-succeeded-recommended/http-response.adoc[]
 
 
 
