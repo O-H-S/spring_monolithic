@@ -1,0 +1,42 @@
+
+
+= API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== link:/[Back to the Home]
+
+---
+
+NOTE: (*) 표시는 생략 가능한 데이터를 뜻합니다 +
+자세한 정보는 각 Description를 클릭하면 확인할 수 있습니다.
+
+== Board
+ 게시판 관련 데이터(제목, 설명, 게시글 수 등등..)에 대한 API 입니다.
+
+
+[options="header", cols="1,2,2,3"]
+|===
+| Method | URL | Input | Description
+| GET | `/api/boards` | (*)query  | link:boards.html#anchor-get[전체 게시판 조회]
+| GET | `/api/boards/{id}` | path  | link:boards.html#anchor-getbyid[특정 게시판 조회]
+| DELETE | `/api/boards/{id}` | path  | link:boards.html#anchor-deletebyid[특정 게시판 삭제]
+| POST | `/api/boards` | body |link:boards.html#anchor-post[게시판 생성]
+|===
+
+== Post
+[options="header", cols="1,2,2,3"]
+|===
+| Method | URL | Input | Description
+
+| POST | `/api/posts/{boardID}/bulk` | path, body |link:posts.html#anchor-post-bulk[Bulk Insert]
+|===
+
+
+
+
+
+== Member

@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -80,7 +81,7 @@ public class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("GET /board/create : title, desc가 제공되지 않아도, 공백으로 생성 가능. - 200 ")
+    @DisplayName("GET /board/create : title, desc가 제공되지 않아도, 공백으로 생성 가능. 메인 페이지로 리다이렉트 - 3xx ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void createBoard_1() throws Exception {
 
@@ -94,7 +95,7 @@ public class BoardControllerTest {
                         //.param("desc", "dc")
         );
         // then
-        result.andExpect(status().isOk());
+        result.andExpect(status().is3xxRedirection()).andDo(print());
     }
 
 

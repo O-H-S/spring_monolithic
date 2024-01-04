@@ -2,21 +2,18 @@ package com.ohs.monolithic.board.repository;
 
 
 
-import com.ohs.monolithic.QuerydslConfig;
+import com.ohs.monolithic.configuration.QuerydslConfig;
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 
 @DataJpaTest
@@ -109,6 +106,30 @@ class BoardRepositoryTest {
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(0);
         //assertThat(board_result.getId() == board2_result.getId()).isEqualTo(false);
+    }
+
+
+    @Test
+    @DisplayName("deleteBoard(Integer)) : 게시판 soft delete")
+    public void deleteBoard_partial(){
+        // given
+        // 기존에 게시판들이 존재한다.
+        Board board_result = boardRepository.save(
+                BoardTestUtils.createBoardSimple(null, "자유", "자유 게시판 설명")
+        );
+        Board board_result2 = boardRepository.save(
+                BoardTestUtils.createBoardSimple(null, "건의", "건의 게시판 설명")
+        );
+
+        //when
+
+        boardRepository.deleteBoard(board_result.getId());
+
+        //then
+        List<BoardResponse> boards = boardRepository.getAllBoards(false, false);
+        assertThat(boards).hasSize(1);
+        //boardRepository.findAll()
+
     }
 
 }

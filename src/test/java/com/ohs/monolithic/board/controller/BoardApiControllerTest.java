@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -244,6 +244,74 @@ class BoardApiControllerTest {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
 
+    }
+
+    /*================================================================================
+        특정 게시판 삭제
+   ================================================================================*/
+
+    @Test
+    @DisplayName("DELETE /api/boards/{id} : 어드민이 아니면 실패 - 403 ")
+    @WithMockUser(username = "hyeonsu", authorities = "USER")
+    public void deleteBoard_0() throws Exception {
+        // given, when
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/api/boards/1")
+                        .with(csrf())
+        ).andDo(print());
+
+        // then
+        result.andExpect(status().isForbidden());
+        result.andDo(document("boards/{id}/delete-failed-notpermission",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+
+    }
+
+    @Test
+    @DisplayName("DELETE /api/boards/{id} : 해당 게시판이 존재하지 않으면 실패 - 404 ")
+    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    public void deleteBoard_1() throws Exception {
+        // given, when
+
+        doThrow(new BoardNotFoundException(1, "Not exists")).when(bService).deleteBoard(anyInt());
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/api/boards/1")
+                        .with(csrf())
+        ).andDo(print());
+
+        // then
+        result.andExpect(status().isNotFound());
+        result.andDo(document("boards/{id}/delete-failed-notfound",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+
+    }
+
+    @Test
+    @DisplayName("DELETE /api/boards/{id} : 게시판이 존재하고, 어드민이면 성공- 200 ")
+    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    public void deleteBoard_2() throws Exception {
+        // given, when
+
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/api/boards/1")
+                        .with(csrf())
+        ).andDo(print());
+
+        // then
+        result.andExpect(status().isOk());
+        result.andDo(document("boards/{id}/delete-succeed-",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+
+        verify(bService).deleteBoard(1);
     }
 
 

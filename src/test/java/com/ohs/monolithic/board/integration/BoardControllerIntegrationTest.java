@@ -3,12 +3,10 @@ package com.ohs.monolithic.board.integration;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
-import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.service.BoardService;
-import com.ohs.monolithic.board.utils.BoardTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -16,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,8 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -38,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Tag("base")
 @Tag("integrate")
-public class BoardManageIntegrationTest {
+public class BoardControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -156,6 +151,33 @@ public class BoardManageIntegrationTest {
                 preprocessResponse(prettyPrint())));
 
     }
+
+    @Test
+    @DisplayName("DELETE /api/boards/{id}: 특정 게시판 삭제 - 200  ")
+    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    public void deleteBoard_0() throws Exception {
+        //given
+        BoardResponse target = boardService.createBoard("자유", "자유 게시판 설명");
+        boardService.createBoard("건의", "건의 게시판 설명");
+        // when
+
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/api/boards/" + target.getId().toString())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print());
+
+        // then
+
+        result.andExpect(status().isOk());
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        result.andDo(document("boards/{id}/delete-succeeded-recommended",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+
+    }
+
 
 
 }

@@ -1,9 +1,8 @@
 package com.ohs.monolithic;
 
-import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,22 +18,22 @@ import java.util.Map;
 @Controller
 public class MainController {
 
-    final BoardManageService bService;
-    final PostReadService pService;
+  final BoardService bService;
+  final PostReadService pService;
 
-    @GetMapping("/")
-    public String index(Model model) {
+  @GetMapping("/")
+  public String index(Model model) {
 
-        List<BoardResponse> boards = bService.getBoards();
-        Map<Integer, List<PostPaginationDto>> boardToLatestPosts = new HashMap<>();
+    List<BoardResponse> boards = bService.getBoardsReadOnly(true, false);
+    Map<Integer, List<PostPaginationDto>> boardToLatestPosts = new HashMap<>();
 
-        for (BoardResponse board : boards) {
-            boardToLatestPosts.put(board.getId(),  pService.getListWithoutOffset(null, board.getId(), 5));
-        }
-
-        model.addAttribute("boards", boards);
-        model.addAttribute("boardToLatestPosts", boardToLatestPosts);
-
-        return "index";
+    for (BoardResponse board : boards) {
+      boardToLatestPosts.put(board.getId(), pService.getListWithoutOffset(null, board.getId(), 5));
     }
+
+    model.addAttribute("boards", boards);
+    model.addAttribute("boardToLatestPosts", boardToLatestPosts);
+
+    return "index";
+  }
 }
