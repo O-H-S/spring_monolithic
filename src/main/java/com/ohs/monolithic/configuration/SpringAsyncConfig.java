@@ -1,4 +1,4 @@
-package com.ohs.monolithic;
+package com.ohs.monolithic.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,6 @@ public class SpringAsyncConfig {
 
     @Bean(name = "bulkInsertTaskExecutor")
     public Executor bulkInsertTaskExecutor() {
-
         SimpleAsyncTaskExecutor taskExecutor =  new SimpleAsyncTaskExecutor();
         taskExecutor.setThreadNamePrefix("BulkInsertExecutor-"); // 디버깅 or 로깅 용도
         return taskExecutor;

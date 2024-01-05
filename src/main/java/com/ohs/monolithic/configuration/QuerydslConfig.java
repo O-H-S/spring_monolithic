@@ -1,4 +1,4 @@
-package com.ohs.monolithic;
+package com.ohs.monolithic.configuration;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

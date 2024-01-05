@@ -1,4 +1,4 @@
-package com.ohs.monolithic;
+package com.ohs.monolithic.configuration;
 
 import com.ohs.monolithic.utils.ExecutionTimeInterceptor;
 import lombok.RequiredArgsConstructor;
