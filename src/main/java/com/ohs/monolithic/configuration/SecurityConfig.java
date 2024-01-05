@@ -1,6 +1,5 @@
-package com.ohs.monolithic;
+package com.ohs.monolithic.configuration;
 
-import com.ohs.monolithic.user.oauth2.OAuth2LoginConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +12,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 @Configuration
+/*@EnableWebSecurity(debug = true)*/
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
