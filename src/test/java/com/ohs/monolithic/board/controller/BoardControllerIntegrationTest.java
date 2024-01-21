@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.integration;
+package com.ohs.monolithic.board.controller;
 
 
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -7,10 +7,8 @@ import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.service.BoardService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,13 +42,20 @@ public class BoardControllerIntegrationTest {
     private BoardRepository boardRepository;
     private Gson gson; // json 직렬화,역직렬화
 
-
+    @Autowired
+    BoardIntegrationTestHelper initializer;
 
     @BeforeEach
     public void init() {
 
         gson = new Gson();
 
+    }
+
+
+    @AfterEach
+    public void release(){
+        initializer.release();
     }
     @Test
     @DisplayName("POST /api/boards: desc가 생략된 요청도 가능하다 - 201  ")
@@ -134,12 +139,16 @@ public class BoardControllerIntegrationTest {
     public void getBoard_0() throws Exception {
         //given
         boardService.createBoard("자유", "자유 게시판 설명");
-        boardService.createBoard("건의", "건의 게시판 설명");
+        BoardResponse target = boardService.createBoard("건의", "건의 게시판 설명");
+
+
+
+
         // when
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/boards/1")
+                        .get("/api/boards/" + target.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON)
         ).andDo(print());
 

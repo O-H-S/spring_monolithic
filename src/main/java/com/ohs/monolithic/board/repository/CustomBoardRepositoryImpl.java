@@ -45,7 +45,8 @@ public class CustomBoardRepositoryImpl extends QuerydslRepositorySupport impleme
         List<BoardResponse> boards = queryFactory
                 .select(projection)
                 .from(board)
-                .where(board.deleted.eq(false))
+                //.where(board.deleted.eq(false))
+                .where(board.deleted.ne(true))
                 .fetch(); // 조회
 
 
