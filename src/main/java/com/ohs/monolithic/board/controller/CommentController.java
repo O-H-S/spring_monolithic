@@ -64,7 +64,7 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String commentModify(CommentForm answerForm, @PathVariable("id") Integer id, Principal principal) {
+    public String commentModify(CommentForm answerForm, @PathVariable("id") Long id, Principal principal) {
         Comment answer = this.cService.getComment(id);
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
@@ -77,7 +77,7 @@ public class CommentController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String commentrModify(@Valid CommentForm answerForm, BindingResult bindingResult,
-                               @PathVariable("id") Integer id, Principal principal) {
+                               @PathVariable("id") Long id, Principal principal) {
         if (bindingResult.hasErrors()) {
             return "comment_form";
         }
@@ -91,7 +91,7 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String commentDelete(Principal principal, @PathVariable("id") Integer id) {
+    public String commentDelete(Principal principal, @PathVariable("id") Long id) {
         Comment answer = this.cService.getComment(id);
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
@@ -100,13 +100,13 @@ public class CommentController {
         return String.format("redirect:/post/detail/%s", answer.getPost().getId());
     }
 
-    @PreAuthorize("isAuthenticated()")
+    /*@PreAuthorize("isAuthenticated()")
     @GetMapping("/vote/{id}")
     public String answerVote(Principal principal, @PathVariable("id") Integer id) {
         Comment comment = this.cService.getComment(id);
         Account siteUser = this.accountService.getAccount(principal.getName());
         this.cService.vote(comment, siteUser);
         return String.format("redirect:/post/detail/%s", comment.getPost().getId());
-    }
+    }*/
 
 }
