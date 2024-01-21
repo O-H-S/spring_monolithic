@@ -4,7 +4,11 @@ package com.ohs.monolithic.board.domain;
 import com.ohs.monolithic.user.Account;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -12,53 +16,52 @@ import java.util.Set;
 
 @Entity
 @Getter
+@NoArgsConstructor
+@Table(name = "comment", indexes = {
+        //@Index(name = "idx_board_id", columnList = "board_id", unique = true), // for counting posts of board(redundant)
+        @Index(name = "idx_comment_post_id_create_date", columnList = "post_id, create_date DESC"), // for quering posts
+
+})
 public class Comment {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계: 하나의 Post에 여러 댓글
     @JoinColumn(name = "post_id")
     private Post post;
 
-/*    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;*/
-
+    @Setter
     @Column(length = 200, columnDefinition = "TEXT")
     private String content;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     private Account author;
 
-    @ManyToMany
-    private Set<Account> voter;
-
+    @Setter
+    @Column(name = "create_date")
     private LocalDateTime createDate;
+    @Setter
     private LocalDateTime modifyDate;
 
-    public void setContent(String content) {
+    @Setter
+    private Long likeCount;
+
+    @Builder/*(builderClassName = "ByPrimitive", builderMethodName = "ByPrimitive")*/
+    public Comment(Post post, String content, Account author, LocalDateTime createDate){
+        if(createDate == null) createDate = LocalDateTime.now();
+
+        this.post = post;
         this.content = content;
-
+        this.author = author;
+        this.likeCount = 0L;
+        this.createDate = createDate;
+        this.modifyDate = this.createDate;
     }
 
-    public void setCreateDate(LocalDateTime now) {
-        createDate = now;
 
-    }
-
-    public void setPost(Post target) {
-        post = target;
-
-    }
-
-    public void setAuthor(Account account) {
-        this.author = account;
-
-    }
-
-    public void setModifyDate(LocalDateTime now) {
-        this.modifyDate = now;
-    }
 }

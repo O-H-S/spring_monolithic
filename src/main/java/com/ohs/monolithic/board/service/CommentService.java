@@ -35,16 +35,26 @@ public class CommentService {
         return  cRepo.findAllByPost(com);
     }
 
+    @Transactional(readOnly = true)
+    public List<Comment> getCommentsReadOnly(Integer postID){
+
+        Post com = em.getReference(Post.class, postID);
+
+        return cRepo.findAllByPostWithUser(com);
+    }
+
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void create(Post post, String content, Account account) {
+    public Comment create(Post post, String content, Account account) {
         pRepo.updateCommentCount(post.getId(), 1);
 
-        Comment answer = new Comment();
-        answer.setContent(content);
-        answer.setCreateDate(LocalDateTime.now());
-        answer.setPost(post);
-        answer.setAuthor(account);
-        cRepo.save(answer);
+        Comment newComment = Comment.builder()
+                .author(account)
+                .post(post)
+                .content(content)
+                .build();
+        cRepo.save(newComment);
+        return newComment;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -56,12 +66,12 @@ public class CommentService {
 
 
 
-    public Comment getComment(Integer id) {
+    public Comment getComment(Long id) {
         Optional<Comment> answer = this.cRepo.findById(id);
         if (answer.isPresent()) {
             return answer.get();
         } else {
-            throw new DataNotFoundException("answer not found");
+            throw new DataNotFoundException("entity(comment) not found");
         }
     }
 
@@ -71,10 +81,7 @@ public class CommentService {
         this.cRepo.save(answer);
     }
 
-    public void vote(Comment answer, Account siteUser) {
-        answer.getVoter().add(siteUser);
-        this.cRepo.save(answer);
-    }
+
 
 
 
