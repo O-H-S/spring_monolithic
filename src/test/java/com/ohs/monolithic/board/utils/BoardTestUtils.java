@@ -39,7 +39,7 @@ public class BoardTestUtils {
             .title(title)
             .description(desc)
             .build();
-    setEntityID(newBoard, "id", 1L);
+    setEntityID(newBoard, "id", id);
     return newBoard;
   }
 
@@ -70,6 +70,8 @@ public class BoardTestUtils {
     Post simplePost = Post.builder()
             .author(simpleAccount)
             .board(simepleBoard)
+            .title("test")
+            .content("test")
             .build();
     setEntityID(simplePost, "id", 1);
 
