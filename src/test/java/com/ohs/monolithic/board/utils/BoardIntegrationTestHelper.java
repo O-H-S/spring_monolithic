@@ -3,10 +3,7 @@ package com.ohs.monolithic.board.utils;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.repository.BoardRepository;
-import com.ohs.monolithic.board.repository.CommentLikeRepository;
-import com.ohs.monolithic.board.repository.CommentRepository;
-import com.ohs.monolithic.board.repository.PostRepository;
+import com.ohs.monolithic.board.repository.*;
 import com.ohs.monolithic.board.service.*;
 import com.ohs.monolithic.user.Account;
 import com.ohs.monolithic.user.AccountRepository;
@@ -43,6 +40,8 @@ public class BoardIntegrationTestHelper {
   AccountRepository accountRepository;
   @Autowired
   BoardRepository boardRepository;
+  @Autowired
+  PostViewRepository postViewRepository;
 
   public Triple<BoardResponse, Account, Post> InitDummy_BoardAccountPost()
   {
@@ -60,11 +59,16 @@ public class BoardIntegrationTestHelper {
   //public List<Account> InitDummy_WriteComment(Post targetPost, Integer c)
 
   public void release(){
+
+    // 외래키 제약으로 인해, delete의 순서가 중요하다. (에러 발생함)
+    // TODO : trancate 명령어 사용하기.
+    postViewRepository.deleteAll();
     commentLikeRepository.deleteAll();
     commentRepository.deleteAll();
     postRepository.deleteAll();
     accountRepository.deleteAll();
     boardRepository.deleteAll();
+
   }
 
 

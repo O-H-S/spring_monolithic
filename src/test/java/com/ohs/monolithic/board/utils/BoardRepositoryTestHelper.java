@@ -12,6 +12,9 @@ import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
 import com.ohs.monolithic.user.AccountRepository;
 import com.ohs.monolithic.user.UserRole;
+
+import groovy.lang.Tuple;
+import groovy.lang.Tuple3;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+
+// Service 레이어를 거치지 않고, DB 데이터 자체의 환경을 구현하기 위함.
 @Component
 @Transactional
 public class BoardRepositoryTestHelper {
@@ -35,6 +40,7 @@ public class BoardRepositoryTestHelper {
   @Autowired
   public CommentLikeRepository commentLikeRepository;
 
+
   int dummyMemberCount;
   int dummyBoardCount;
   int dummyPostCount;
@@ -45,6 +51,14 @@ public class BoardRepositoryTestHelper {
     dummyBoardCount = 0;
     dummyPostCount = 0;
     dummyCommentCount = 0;
+  }
+
+  public Tuple3<Post, Account, Board> createPostAccountBoard(){
+    Board board = establishBoard();
+    Account acc = establishMember();
+    Post post = writePostTo(board,acc);
+
+    return Tuple.tuple(post, acc, board);
   }
 
   public Account establishMember() {
