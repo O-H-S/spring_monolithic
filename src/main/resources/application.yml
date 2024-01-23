@@ -8,15 +8,19 @@ spring:
   #JPA
   jpa:
     show_sql: true
-    #open-in-view: false
+    open-in-view: false
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
     properties:
      hibernate:
+        jdbc.batch_size: 1000
+        #order_inserts: true
+        #order_updates: true
         format_sql: true
         #show_sql: true
         #highlight_sql: true
+        #use_sql_comments: true
     #defer-datasource-initialization: true
 logging:
   level:
@@ -24,10 +28,10 @@ logging:
       springframework:
         orm:
           jpa: DEBUG
+
       hibernate:
         type:
           descriptor:
             sql: trace
-      #springframework:
-      #  security: DEBUG
+
 
