@@ -19,6 +19,4 @@ public interface CustomPostRepository extends JdbcOperationsRepository<PostRepos
     PostLike findPostLike(Integer postID, Long memberID);
     PostLike savePostLike(PostLike postLike);
 
-    PostView findPostView(Integer postID, Long memberID);
-    PostView savePostView(PostView postView);
 }

@@ -58,7 +58,7 @@ public class PostWriteController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
     public String postModify(PostForm postForm, @PathVariable("id") Integer id, Principal principal) {
-        Post post = this.readService.getPost(id);
+        Post post = this.readService.getPost(id, true);
         if(!post.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
@@ -74,7 +74,7 @@ public class PostWriteController {
         if (bindingResult.hasErrors()) {
             return "post_form";
         }
-        Post post = this.readService.getPost(id);
+        Post post = this.readService.getPost(id, true);
         if (!post.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
