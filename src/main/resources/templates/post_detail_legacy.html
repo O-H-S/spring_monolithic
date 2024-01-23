@@ -2,31 +2,31 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-<title layout:fragment="title" th:text="${response.title}">
+<title layout:fragment="title" th:text="${post.title}">
 
 </title>
 
 <div layout:fragment="content" class="container my-3">
 
-    <a th:href="@{|/board/${response.boardID}|}" class="btn btn-secondary my-3">
+    <a th:href="@{|/board/${boardID}|}" class="btn btn-secondary my-3">
         <i class="fas fa-arrow-left"></i> 목록
     </a>
 
     <!-- 질문 -->
-    <h2 class="border-bottom py-2" th:text="${response.title}"></h2>
+    <h2 class="border-bottom py-2" th:text="${post.title}"></h2>
     <div class="card my-3">
         <div class="card-body">
-            <div th:utext="${response.content}"></div>
+            <div th:utext="${post.content}"></div>
             <div class="d-flex justify-content-end">
-                <div th:if="${response.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                <div th:if="${post.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
-                    <div th:text="${#temporals.format(response.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:text="${#temporals.format(post.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2">
-                        <span th:if="${response.authorID != null}" th:text="${response.authorName}"></span>
+                        <span th:if="${post.author != null}" th:text="${post.author.username}"></span>
                     </div>
-                    <div th:text="${#temporals.format(response.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
             </div>
 
@@ -34,30 +34,30 @@
 
             <div class="my-3">
                 <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-                   th:data-uri="@{|/post/vote/${response.id}|}">
+                   th:data-uri="@{|/post/vote/${post.id}|}">
                     추천
-                    <span class="badge rounded-pill bg-success" th:text="${response.likeCount}"></span>
+                    <span class="badge rounded-pill bg-success" th:text="${post.likeCount}"></span>
                 </a>
 
-                <a th:href="@{|/post/modify/${response.id}|}" class="btn btn-sm btn-outline-secondary"
+                <a th:href="@{|/post/modify/${post.id}|}" class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
-                   th:if="${response.authorID != null and #authentication.getPrincipal().getUsername() == response.authorName}"
+                   th:if="${post.author != null and #authentication.getPrincipal().getUsername() == post.author.username}"
                    th:text="수정"></a>
             </div>
 
             <!--data-uri 속성은 자바스크립트에서 클릭 이벤트 발생시 this.dataset.uri와 같이 사용하여 그 값을 얻을 수 있다.-->
-            <a href="javascript:void(0);" th:data-uri="@{|/post/delete/${response.id}|}"
+            <a href="javascript:void(0);" th:data-uri="@{|/post/delete/${post.id}|}"
                class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
-               th:if="${response.authorID != null and #authentication.getPrincipal().getUsername() == response.authorName}"
+               th:if="${post.author != null and #authentication.getPrincipal().getUsername() == post.author.username}"
                th:text="삭제"></a>
 
         </div>
     </div>
     <!-- 답변의 갯수 표시 -->
     <h5 class="border-bottom my-3 py-2"
-        th:text="|${#lists.size(comments)}개의 답변이 있습니다.|"></h5>
+        th:text="|${#lists.size(commentList)}개의 답변이 있습니다.|"></h5>
     <!-- 답변 반복 시작 -->
-    <div class="card my-3" th:each="comment : ${comments}">
+    <div class="card my-3" th:each="comment : ${commentList}">
         <a th:id="|comment_${comment.id}|"></a>
         <div class="card-body">
             <div class="card-text" style="white-space: pre-line;" th:text="${comment.content}"></div>
@@ -69,7 +69,7 @@
                 <div class="badge bg-light text-dark p-2 text-start">
 
                     <div class="mb-2">
-                        <span th:if="${comment.writer != null}" th:text="${comment.writer}"></span>
+                        <span th:if="${comment.author != null}" th:text="${comment.author.username}"></span>
                     </div>
                     <div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
@@ -85,18 +85,18 @@
 
                 <a th:href="@{|/comment/modify/${comment.id}|}" class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
-                   th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
+                   th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}"
                    th:text="수정"></a>
                 <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"
                    class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
-                   th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
+                   th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}"
                    th:text="삭제"></a>
             </div>
         </div>
     </div>
     <!-- 답변 반복 끝  -->
     <!-- 답변 작성 -->
-    <form th:action="@{|/comment/write/${response.id}|}" th:object="${commentForm}"  method="post" class="my-3">
+    <form th:action="@{|/comment/write/${post.id}|}" th:object="${commentForm}"  method="post" class="my-3">
 
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>

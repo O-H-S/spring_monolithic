@@ -168,36 +168,6 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
         }*/
     }
 
-    @Override
-    public PostView findPostView(Integer postID, Long memberID) {
-        PostView view = queryFactory.selectFrom(postView)
-                .where(
-                        postView.post.id.eq(postID),
-                        postView.user.id.eq(memberID)
-                )
-                .fetchOne();
-        return view;
-    }
-
-    @Transactional
-    @Override
-    public PostView savePostView(PostView postView) {
-
-        Assert.notNull(postView, "Entity must not be null");
-        if (postView.getId() == null) {
-            em.persist(postView);
-            return postView;
-        } else {
-            return em.merge(postView);
-        }
-        /*if (entityInformation.isNew(entity)) {
-            em.persist(entity);
-            return entity;
-        } else {
-            return em.merge(entity);
-        }*/
-    }
-
     // Projections.fields를 사용하는 부분을 별도의 메소드로 분리
     private QBean<PostPaginationDto> createPostPaginationProjection() {
         // as의 용도 : 가독성, 결과 재사용(참조), DTO와 매핑,

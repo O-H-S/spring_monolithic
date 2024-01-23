@@ -16,14 +16,18 @@ public class PostPaginationDto{
     String userName;
     LocalDateTime createDate;
     Integer commentCount;
-
+    Long likeCount;
+    Long viewCount;
     @QueryProjection
-    public PostPaginationDto(Integer _id, String _title, Long _userId, String _userName, LocalDateTime _createDate, Integer _commentCount){
+    public PostPaginationDto(Integer _id, String _title, Long _userId, String _userName, LocalDateTime _createDate
+            , Integer _commentCount, Long _likeCount, Long _viewCount){
         id = _id;
         title = _title;
         userId = _userId;
         userName = _userName;
         createDate = _createDate;
         commentCount = _commentCount;
+        likeCount = _likeCount;
+        viewCount = _viewCount;
     }
 }

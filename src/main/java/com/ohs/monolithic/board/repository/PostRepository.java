@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.domain.PostLike;
 import com.ohs.monolithic.utils.JdbcOperationsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,14 +21,16 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Integer>, CustomPostRepository {
 
-
+    
     //@EntityGraph(attributePaths = { "author.address"}) 이런식으로 중첩된 동작 가능.
     //  Integer id가 실제로 어떤 엔터티를 찾을지 결정하는 기준이 됩니
     //  다??
 
-    @EntityGraph(attributePaths = {"author", "commentList"}, type = EntityGraph.EntityGraphType.LOAD)
-    // Eager Loading이 적용
-    Optional<Post> findWithCommentListById(Integer id);
+
+
+    @EntityGraph(attributePaths = {"board", "author"}, type = EntityGraph.EntityGraphType.LOAD)
+    @Query("SELECT p FROM Post p WHERE p.id = :id")
+    Optional<Post> findWithAuthorAndBoard(@Param("id") Integer id);
 
     //Post findById(Integer id, LockModeType lockModeType);
 
@@ -53,6 +56,12 @@ public interface PostRepository extends JpaRepository<Post, Integer>, CustomPost
     @Query("UPDATE Post p SET p.commentCount = p.commentCount + (:delta) WHERE p.id = :postId")
     //@Lock(LockModeType.PESSIMISTIC_READ)
     void updateCommentCount(Integer postId, Integer delta);
+
+    @Modifying
+    //@Transactional
+    @Query("UPDATE Post p SET p.viewCount = p.viewCount + (:delta) WHERE p.id = :postId")
+        //@Lock(LockModeType.PESSIMISTIC_READ)
+    void updateViewCount(Integer postId, Integer delta);
 
     @Modifying
     @Query("UPDATE Post p SET p.commentCount = (SELECT COUNT(c) FROM Comment c WHERE c.post = p) WHERE p.id = :postId")

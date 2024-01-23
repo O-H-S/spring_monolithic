@@ -3,9 +3,12 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.domain.PostView;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
+import com.ohs.monolithic.user.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,15 +31,23 @@ import java.util.Optional;
 @Service
 public class PostReadService {
     private final PostRepository repository;
-    private final BoardManageService bService;
+    private final PostViewService postViewService;
+    private final BoardService bService;
 
     @PersistenceContext
     EntityManager em;
 
-
-    public List<Post> getAll(Integer boardID){
-        Board boardReference = em.getReference(Board.class, boardID);
-        return repository.findAllAsCompleteByBoard(boardReference);
+    @Transactional(readOnly = true)
+    public PostDetailResponse readPost(Integer postID, Account viewer){
+        Post targetPost = getPost(postID, true);
+        if(viewer != null)
+            // 조회수 카운팅 트랜잭션이 실패하더라도 게시글을 반환한다.
+            try {
+                postViewService.view(targetPost, viewer); // 독립된 트랜잭션
+            }catch (Exception e){
+                System.out.println("Error updating post view count. : " + e.toString());
+            }
+        return PostDetailResponse.of(targetPost);
     }
 
     public Post getPost(Integer id){
@@ -43,12 +55,12 @@ public class PostReadService {
     }
 
     // Java 메서드에서 기본값을 직접 지정하는 것은 불가능합니다.
-    public Post getPost(Integer id, Boolean relatedData ) {
 
+    public Post getPost(Integer id, Boolean relatedData ) {
 
         Optional<Post> question = null;
         if (relatedData)
-            question = this.repository.findWithCommentListById(id);
+            question = this.repository.findWithAuthorAndBoard(id);
         else{
             question = this.repository.findById(id);
         }
@@ -59,6 +71,7 @@ public class PostReadService {
         }
     }
 
+    // test method
     @Transactional
     public Page<Post> getListLegacy(int page, Integer boardID) {
         Board boardReference = em.getReference(Board.class, boardID);
@@ -67,7 +80,7 @@ public class PostReadService {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return this.repository.findAllByBoard(pageable, boardReference);
     }
-
+    // test method
     @Transactional
     public Page<Post> getListWithoutCounting(int page, Integer boardID) {
         Board boardReference = em.getReference(Board.class, boardID);
@@ -102,19 +115,11 @@ public class PostReadService {
         return this.repository.findAllByBoard(pageable, boardReference);
     }*/
 
-   @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void test(){
-        repository.findByTitle("testTitle");
-
-   }
-
-
 
    @Transactional(readOnly = true)
-    public Long calculateCount(Integer id) {
-        return repository.countByBoardId(id);
+    public Long calculateCount(Integer boardId) {
+        return repository.countByBoardId(boardId);
     }
-
 
 }
 

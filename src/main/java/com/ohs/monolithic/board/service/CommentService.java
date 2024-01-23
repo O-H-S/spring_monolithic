@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
@@ -41,6 +42,12 @@ public class CommentService {
         Post com = em.getReference(Post.class, postID);
 
         return cRepo.findAllByPostWithUser(com);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentPaginationDto> getCommentsAsPage(Integer postID, Account viewer){
+        Post targetPost = em.getReference(Post.class, postID);
+        return cRepo.getCommentsByPost(targetPost, viewer);
     }
 
 

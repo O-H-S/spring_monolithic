@@ -52,7 +52,7 @@ public class PostWriteService {
 
 
 
-    private final BoardManageService boardService;
+    private final BoardService boardService;
 
     @Transactional
     public Post create(Integer boardID ,String subject, String content, Account user) {
@@ -64,13 +64,14 @@ public class PostWriteService {
             }
         });
         boardService.incrementPostCount(boardID);
-        Post q = new Post();
+
         Board boardReference = em.getReference(Board.class, boardID);
-        q.setBoard(boardReference);
-        q.setTitle(subject);
-        q.setContent(content);
-        q.setCreateDate(LocalDateTime.now());
-        q.setAuthor(user);
+        Post q = Post.builder()
+                .board(boardReference)
+                .author(user)
+                .title(subject)
+                .content(content)
+                .build();
         return this.pRepo.save(q);
 
     }
