@@ -3,17 +3,21 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.dto.CommentForm;
 import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,21 +33,6 @@ public class CommentService {
     EntityManager em;
 
 
-    public List<Comment> getComments(Integer postID){
-
-        Post com = em.getReference(Post.class, postID);
-
-        return  cRepo.findAllByPost(com);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Comment> getCommentsReadOnly(Integer postID){
-
-        Post com = em.getReference(Post.class, postID);
-
-        return cRepo.findAllByPostWithUser(com);
-    }
-
     @Transactional(readOnly = true)
     public List<CommentPaginationDto> getCommentsAsPage(Integer postID, Account viewer){
         Post targetPost = em.getReference(Post.class, postID);
@@ -51,7 +40,7 @@ public class CommentService {
     }
 
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     public Comment create(Post post, String content, Account account) {
         pRepo.updateCommentCount(post.getId(), 1);
 
@@ -61,14 +50,63 @@ public class CommentService {
                 .content(content)
                 .build();
         cRepo.save(newComment);
+
         return newComment;
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void delete(Comment answer) {
-        pRepo.updateCommentCount(answer.getPost().getId(), -1);
-        this.cRepo.delete(answer);
+    @Transactional
+    public Comment createByID(Integer postId, String content, Long accountId) {
+        Post post = em.getReference(Post.class, postId);
+        Account account = em.getReference(Account.class, accountId);
+        pRepo.updateCommentCount(postId, 1);
+
+        Comment newComment = Comment.builder()
+                .author(account)
+                .post(post)
+                .content(content)
+                .build();
+        cRepo.save(newComment);
+
+        return newComment;
     }
+
+
+
+
+    @Transactional
+    public void deleteCommentBy(Long commentId, Account operator)  {
+
+        Comment targetComment = cRepo.getComment(commentId);
+        if(targetComment == null){
+            throw new DataNotFoundException("존재하지 않는 댓글입니다.");
+        }
+
+        if (!targetComment.getAuthor().getId().equals(operator.getId())) {
+            throw new RuntimeException("댓글 삭제 권한이 없습니다");
+        }
+
+        targetComment.setDeleted(Boolean.TRUE);
+        cRepo.save(targetComment);
+        pRepo.updateCommentCount(targetComment.getPost().getId(), -1);
+    }
+
+    @Transactional
+    public void modifyCommentBy(Long commentId, Account operator, CommentForm form)  {
+
+        Comment targetComment = cRepo.getComment(commentId);
+        if(targetComment == null){
+            throw new DataNotFoundException("존재하지 않는 댓글입니다.");
+        }
+
+        if (!targetComment.getAuthor().getId().equals(operator.getId())) {
+            throw new RuntimeException("댓글 수정 권한이 없습니다");
+        }
+
+        targetComment.setContent(form.getContent());
+        targetComment.setModifyDate(LocalDateTime.now());
+        cRepo.save(targetComment);
+    }
+
 
 
 
@@ -82,11 +120,6 @@ public class CommentService {
         }
     }
 
-    public void modify(Comment answer, String content) {
-        answer.setContent(content);
-        answer.setModifyDate(LocalDateTime.now());
-        this.cRepo.save(answer);
-    }
 
 
 

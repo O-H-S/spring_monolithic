@@ -53,68 +53,178 @@
 
         </div>
     </div>
-    <!-- 답변의 갯수 표시 -->
+
+
+    <!-- 댓글 개수  -->
     <h5 class="border-bottom my-3 py-2"
-        th:text="|${#lists.size(comments)}개의 답변이 있습니다.|"></h5>
-    <!-- 답변 반복 시작 -->
-    <div class="card my-3" th:each="comment : ${comments}">
-        <a th:id="|comment_${comment.id}|"></a>
+        th:text="|댓글 (${#lists.size(comments)}개)|"></h5>
+
+
+    <!-- 댓글들 나열 -->
+    <div class="card my-3" th:each="comment : ${comments}" th:id="|comment_${comment.id}|">
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${comment.content}"></div>
-            <div class="d-flex justify-content-end">
-                <div th:if="${comment.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
-                    <div class="mb-2">modified at</div>
-                    <div th:text="${#temporals.format(comment.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
-                </div>
-                <div class="badge bg-light text-dark p-2 text-start">
 
-                    <div class="mb-2">
-                        <span th:if="${comment.writer != null}" th:text="${comment.writer}"></span>
+
+            <div th:id="|comment-view-group_${comment.id}|">
+
+                <div class="card-text" style="white-space: pre-line;" th:text="${comment.content}" th:id="|content-view_${comment.id}|"></div>
+
+                <div class="d-flex justify-content-end">
+                    <div th:if="${comment.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                        <div class="mb-2">modified at</div>
+                        <div th:text="${#temporals.format(comment.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
                     </div>
-                    <div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div class="badge bg-light text-dark p-2 text-start">
+
+                        <div class="mb-2">
+                            <span th:if="${comment.writer != null}" th:text="${comment.writer}"></span>
+                        </div>
+                        <div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                </div>
+                <!-- 수정 & 삭제 버튼 -->
+                <div class="comment-actions">
+                    <!-- 수정 버튼 -->
+                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary"
+                       sec:authorize="isAuthenticated()"
+                       th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
+                       th:onclick="|editComment(${comment.id})|" th:text="수정"></a>
+
+                    <!--<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                       th:data-uri="@{|/comment/vote/${comment.id}|}">
+                        추천
+                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(comment.voter)}"></span>
+                    </a>-->
+
+                    <a href="javascript:void(0);"
+                       th:data-uri="@{|/api/comments/${comment.id}|}"
+                       th:data-id="${comment.id}"
+                       class="delete btn btn-sm btn-outline-secondary"
+                       sec:authorize="isAuthenticated()"
+                       th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
+                       onclick="deleteComment(this)"
+                       th:text="삭제"></a>
                 </div>
             </div>
-            <div class="my-3">
 
-
-                <!--<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-                   th:data-uri="@{|/comment/vote/${comment.id}|}">
-                    추천
-                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(comment.voter)}"></span>
-                </a>-->
-
-                <a th:href="@{|/comment/modify/${comment.id}|}" class="btn btn-sm btn-outline-secondary"
-                   sec:authorize="isAuthenticated()"
-                   th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
-                   th:text="수정"></a>
-                <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"
-                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
-                   th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
-                   th:text="삭제"></a>
+            <!-- 숨겨진 수정 화면 그룹화 -->
+            <div th:id="|comment-edit-group_${comment.id}|" class="my-3 d-none">
+                <textarea class="form-control" th:id="|content-edit_${comment.id}|" th:text="${comment.content}"  rows="10"></textarea>
+                <!-- 변경 & 취소 버튼 -->
+                <button class="btn btn-primary" th:onclick="|updateComment(${comment.id})|">변경</button>
+                <button class="btn btn-secondary" th:onclick="|cancelEdit(${comment.id})|">취소</button>
             </div>
+
+
+
         </div>
     </div>
-    <!-- 답변 반복 끝  -->
-    <!-- 답변 작성 -->
-    <form th:action="@{|/comment/write/${response.id}|}" th:object="${commentForm}"  method="post" class="my-3">
+
+    <!-- 새로운 댓글 작성 -->
+    <form th:action="@{|/post/${response.id}/comments|}" th:object="${commentForm}"  method="post" class="my-3">
 
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>
         <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10"></textarea>
-        <input type="submit" value="답변등록" class="btn btn-primary my-2">
+        <input type="submit" value="등록" class="btn btn-primary my-2">
     </form>
 </div>
 
 <script layout:fragment="script" type='text/javascript'>
-    const delete_elements = document.getElementsByClassName("delete");
-    Array.from(delete_elements).forEach(function(element) {
-        element.addEventListener('click', function() {
-            if(confirm("정말로 삭제하시겠습니까?")) {
-                location.href = this.dataset.uri;
-            };
-        });
-    });
+    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    function editComment(commentId) {
+        var viewGroup = document.getElementById('comment-view-group_' + commentId);
+        var editGroup = document.getElementById('comment-edit-group_' + commentId);
 
+        // 기존 댓글 내용 숨기기
+        viewGroup.style.display = 'none';
+        // 편집 가능한 영역 표시
+        editGroup.classList.remove('d-none');
+    }
+
+    function cancelEdit(commentId) {
+
+        var viewGroup = document.getElementById('comment-view-group_' + commentId);
+        var editGroup = document.getElementById('comment-edit-group_' + commentId);
+
+        // 편집 가능한 영역 숨기기
+        editGroup.classList.add('d-none'); // 수정 화면을 다시 숨깁니다.
+        // 기존 댓글 내용 표시
+        viewGroup.style.display = 'block';
+    }
+
+    // updateComment 함수는 서버에 변경 사항을 전송하는 로직을 포함해야 함
+    function updateComment(commentId) {
+        var content = document.getElementById('content-edit_' + commentId).value;
+
+        // AJAX 요청
+        fetch('/api/comments/' + commentId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            // CSRF 토큰 추가
+            },
+            credentials: 'include', // 쿠키 포함
+            body: JSON.stringify({ content: content })
+        })
+            .then(response =>{
+                if(response.ok) {
+                    // 변경된 내용 기존 text 변경
+                    document.getElementById('content-view_' + commentId).textContent = content;
+                    // 성공 처리 로직
+                    cancelEdit(commentId);
+                }
+                else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch((error) => {
+                console.error('댓글 변경 중 오류가 발생했습니다:', error);
+                alert('댓글 변경에 실패했습니다: ' + error);
+            });
+
+    }
+
+
+
+    function deleteComment(element) {
+        var url = element.getAttribute('data-uri');
+        var commentId = element.getAttribute('data-id');
+
+
+        if (!confirm('댓글을 삭제하시겠습니까?')) {
+            return;
+        }
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+                // CSRF 토큰 추가
+            },
+            credentials: 'include' // 쿠키 포함
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('댓글이 성공적으로 삭제되었습니다.');
+                    var commentElement = document.getElementById('comment_' + commentId);
+                    if (commentElement) {
+                        commentElement.parentNode.removeChild(commentElement);
+                    }
+
+
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('삭제 중 오류가 발생했습니다:', error);
+                alert('댓글 삭제에 실패했습니다: ' + error);
+            });
+    }
     const recommend_elements = document.getElementsByClassName("recommend");
     Array.from(recommend_elements).forEach(function(element) {
         element.addEventListener('click', function() {

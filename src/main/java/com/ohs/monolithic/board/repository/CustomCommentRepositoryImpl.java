@@ -35,13 +35,14 @@ public class CustomCommentRepositoryImpl extends QuerydslRepositorySupport imple
     List<Long> ids = queryFactory
             .select(comment.id)
                     .from(comment)
-                            .where(comment.post.id.eq(post.getId()))
+                            .where(comment.deleted.isFalse(), comment.post.id.eq(post.getId()))
                                     .orderBy(comment.createDate.desc())
                                             .fetch();
     if(ids.isEmpty()){
       return Collections.emptyList();
     }
     //Projections.constructor 인자들의 순서가 중요함. (DTO 생성자 변경시 수정필요)
+    //Projections.fields는 순서 상관 없음. 이름으로 판별
 
     BooleanExpression likedExpression = viewer != null
             ? commentLike.member.id.eq(viewer.getId()).and(commentLike.valid.eq(true))

@@ -19,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "comment", indexes = {
         //@Index(name = "idx_board_id", columnList = "board_id", unique = true), // for counting posts of board(redundant)
-        @Index(name = "idx_comment_post_id_create_date", columnList = "post_id, create_date DESC"), // for quering posts
+        @Index(name = "idx_comment_deleted_post_id_create_date", columnList = "deleted , post_id, create_date DESC"), // for quering posts
 
 })
 public class Comment {
@@ -51,6 +51,10 @@ public class Comment {
     @Setter
     private Long likeCount;
 
+    @Setter
+    @Column(nullable = false)
+    private Boolean deleted;
+
     @Builder/*(builderClassName = "ByPrimitive", builderMethodName = "ByPrimitive")*/
     public Comment(Post post, String content, Account author, LocalDateTime createDate){
         if(createDate == null) createDate = LocalDateTime.now();
@@ -61,6 +65,7 @@ public class Comment {
         this.likeCount = 0L;
         this.createDate = createDate;
         this.modifyDate = this.createDate;
+        this.deleted = Boolean.FALSE;
     }
 
 

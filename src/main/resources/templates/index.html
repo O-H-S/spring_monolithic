@@ -45,7 +45,7 @@
               <ul class="list-group list-group-flush">
                 <li th:each="post : ${boardToLatestPosts.get(board.id)}" class="list-group-item">
                   <!-- Changed text color to darker shade -->
-                  <a class="text-dark text-decoration-none" th:href="@{|/post/detail/${post.id}|}" th:text="${post.title}"></a>
+                  <a class="text-dark text-decoration-none" th:href="@{|/post/${post.id}|}" th:text="${post.title}"></a>
                 </li>
               </ul>
             </div>
