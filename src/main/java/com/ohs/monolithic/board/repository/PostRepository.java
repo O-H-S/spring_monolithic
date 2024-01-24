@@ -5,6 +5,7 @@ import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostLike;
 import com.ohs.monolithic.utils.JdbcOperationsRepository;
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,27 +27,26 @@ public interface PostRepository extends JpaRepository<Post, Integer>, CustomPost
     //  Integer id가 실제로 어떤 엔터티를 찾을지 결정하는 기준이 됩니
     //  다??
 
-
-
     @EntityGraph(attributePaths = {"board", "author"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT p FROM Post p WHERE p.id = :id")
+    @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
     Optional<Post> findWithAuthorAndBoard(@Param("id") Integer id);
+
+
+    @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
+    Optional<Post> findById(@Param("id") Integer id);
+
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
+    Optional<Post> findByIdWithReadLock(@Param("id") Integer id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
+    Optional<Post> findByIdWithWriteLock(@Param("id") Integer id);
 
     //Post findById(Integer id, LockModeType lockModeType);
 
-    Post findByTitle(String title);
-    Post findByTitleLike(String title); // 입력 예시 :  %sbb%
-    Post findByTitleAndContent(String title, String content);
 
-    List<Post> findAllByBoard(Board board);
-    @EntityGraph(attributePaths = {"commentList"})
-    List<Post> findAllAsCompleteByBoard(Board board);
-
-    List<Post> findByBoardOrderByCreateDateDesc(Board board, Pageable pageable);
-
-    // @EntityGraph(attributePaths = {"commentList"}, type = EntityGraph.EntityGraphType.LOAD)
-    // 일대다 관계에서는 불가능한듯? 아니면, list<post> 형태에서 불가능한듯?
-    Page<Post> findAll(Pageable pageable);
+    // legacy
     Page<Post> findAllByBoard(Pageable pageable, Board board);
 
 

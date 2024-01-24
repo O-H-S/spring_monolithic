@@ -99,7 +99,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
         List<Integer> ids = queryFactory
                 .select(post.id)
                 .from(post)
-                .where(post.board.id.eq(board.getId()))
+                .where(post.deleted.isFalse(), post.board.id.eq(board.getId()))
                 .orderBy(post.createDate.desc())
                 .limit(pageable.getPageSize()) // 지정된 사이즈만큼
                 .offset(pageable.getOffset()) // 지정된 페이지 위치에서
@@ -128,7 +128,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
                 .select(createPostPaginationProjection())
                 .from(post).leftJoin(post.author, account)
                 .where(
-                        post.board.id.eq(board.getId()), ltPostId(baseID)
+                        post.deleted.isFalse(), post.board.id.eq(board.getId()), ltPostId(baseID)
                 )
                 .orderBy(post.createDate.desc()) // 최신순으로
                 //.orderBy(qPost.id.desc())

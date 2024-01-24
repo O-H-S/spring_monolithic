@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 public class PostCountCacheRegistrationTest {
 
     @Mock
-    private BoardManageService boardService;
+    private BoardService boardService;
     @Mock
     private PostReadService postReadService;
 

@@ -19,8 +19,8 @@ import java.util.Set;
 @NoArgsConstructor //
 @Table(name = "post", indexes = {
         //@Index(name = "idx_board_id", columnList = "board_id", unique = true), // for counting posts of board(redundant)
-        @Index(name = "idx_post_board_id_create_date", columnList = "board_id, create_date DESC", unique = false), // for quering posts
-        @Index(name = "idx_post_authoer_id_create_date", columnList = "author_id, create_date DESC", unique = false ) // for quering posts
+        @Index(name = "idx_post_deleted_board_id_create_date", columnList = "deleted, board_id, create_date DESC", unique = false), // for quering posts
+        @Index(name = "idx_post_deleted_author_id_create_date", columnList = "deleted, author_id, create_date DESC", unique = false ) // for quering posts
 
 })
 public class Post {
@@ -34,6 +34,13 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Account author;
+
+    @Setter
+    private Boolean deleted;
 
 
     @Setter
@@ -62,9 +69,7 @@ public class Post {
         }
     }*/
 
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Account author;
+
 
 
     @Setter
@@ -108,6 +113,7 @@ public class Post {
         this.commentCount = 0;
         this.viewCount = 0L;
         this.likeCount = 0L;
+        this.deleted = Boolean.FALSE;
     }
 
 
