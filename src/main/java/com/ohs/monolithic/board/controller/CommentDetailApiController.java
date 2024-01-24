@@ -11,6 +11,7 @@ import com.ohs.monolithic.user.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,8 +42,10 @@ public class CommentDetailApiController {
     Account voter = accountService.getAccount(currentUser.getName());
     Comment target = commentService.getComment(commentID);
 
-    Boolean changed = commentLikeService.likeComment(target, voter);
-    return ResponseEntity.status(HttpStatus.OK).body(Map.of("changed", changed));
+    Pair<Boolean, Long> result = commentLikeService.likeCommentEx(target, voter);
+    Long count = result.getFirst() ? result.getSecond()+1L :result.getSecond();
+    return ResponseEntity.status(HttpStatus.OK).body(Map.of("changed", result.getFirst(),
+            "count", count));
   }
 
   // 통합 테스트 존재
@@ -53,8 +56,10 @@ public class CommentDetailApiController {
     Account voter = accountService.getAccount(currentUser.getName());
     Comment target = commentService.getComment(commentID);
 
-    Boolean changed = commentLikeService.unlikeComment(target, voter);
-    return ResponseEntity.status(HttpStatus.OK).body(Map.of("changed", changed));
+    Pair<Boolean, Long> result = commentLikeService.unlikeCommentEx(target, voter);
+    Long count = result.getFirst() ? result.getSecond()-1L :result.getSecond();
+    return ResponseEntity.status(HttpStatus.OK).body(Map.of("changed", result.getFirst(),
+            "count", count));
   }
 
   @PreAuthorize("isAuthenticated()")
