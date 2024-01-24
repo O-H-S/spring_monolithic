@@ -65,41 +65,49 @@
         <div class="card-body">
 
 
+            <!-- Comment View -->
             <div th:id="|comment-view-group_${comment.id}|">
+                <!-- Comment Text -->
+                <div class="card-text mb-3" style="white-space: pre-line;" th:text="${comment.content}" th:id="|content-view_${comment.id}|"></div>
 
-                <div class="card-text" style="white-space: pre-line;" th:text="${comment.content}" th:id="|content-view_${comment.id}|"></div>
-
-                <div class="d-flex justify-content-end">
-                    <div th:if="${comment.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
-                        <div class="mb-2">modified at</div>
-                        <div th:text="${#temporals.format(comment.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                <!-- Comment Meta Information -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <small class="text-muted">
+                            <span th:if="${comment.writer != null}" th:text="${comment.writer}"></span>,
+                            <span th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></span>
+                        </small>
                     </div>
-                    <div class="badge bg-light text-dark p-2 text-start">
-
-                        <div class="mb-2">
-                            <span th:if="${comment.writer != null}" th:text="${comment.writer}"></span>
-                        </div>
-                        <div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:if="${comment.modifyDate != null}" class="text-muted">
+                        <small>(modified at
+                            <span th:text="${#temporals.format(comment.modifyDate, 'yyyy-MM-dd HH:mm')}"></span>)
+                        </small>
                     </div>
                 </div>
-                <!-- 수정 & 삭제 버튼 -->
-                <div class="comment-actions">
-                    <!-- 수정 버튼 -->
-                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary"
+
+                <!-- Action Buttons -->
+                <div class="comment-actions d-flex justify-content-end">
+
+                    <!-- Like Button -->
+                    <button class="btn btn-sm me-2"
+                            th:classappend="${comment.getLiked()} ? 'btn-success' : 'btn-outline-success'"
+                            th:onclick="|likeComment(${comment.id})|"
+                            th:id="|like-btn_${comment.id}|"
+                            th:attr="liked=${comment.getLiked()}">
+                        추천 <span  th:id="|like-count_${comment.id}|" th:text="${comment.getLikeCount()}">0</span>
+                    </button>
+
+                    <!-- Edit Button -->
+                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-2"
                        sec:authorize="isAuthenticated()"
                        th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
                        th:onclick="|editComment(${comment.id})|" th:text="수정"></a>
 
-                    <!--<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-                       th:data-uri="@{|/comment/vote/${comment.id}|}">
-                        추천
-                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(comment.voter)}"></span>
-                    </a>-->
-
+                    <!-- Delete Button -->
                     <a href="javascript:void(0);"
                        th:data-uri="@{|/api/comments/${comment.id}|}"
                        th:data-id="${comment.id}"
-                       class="delete btn btn-sm btn-outline-secondary"
+                       class="btn btn-sm btn-outline-danger"
                        sec:authorize="isAuthenticated()"
                        th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
                        onclick="deleteComment(this)"
@@ -107,11 +115,10 @@
                 </div>
             </div>
 
-            <!-- 숨겨진 수정 화면 그룹화 -->
+            <!-- Edit Comment Section -->
             <div th:id="|comment-edit-group_${comment.id}|" class="my-3 d-none">
-                <textarea class="form-control" th:id="|content-edit_${comment.id}|" th:text="${comment.content}"  rows="10"></textarea>
-                <!-- 변경 & 취소 버튼 -->
-                <button class="btn btn-primary" th:onclick="|updateComment(${comment.id})|">변경</button>
+                <textarea class="form-control mb-2" th:id="|content-edit_${comment.id}|" th:text="${comment.content}" rows="5"></textarea>
+                <button class="btn btn-primary me-2" th:onclick="|updateComment(${comment.id})|">변경</button>
                 <button class="btn btn-secondary" th:onclick="|cancelEdit(${comment.id})|">취소</button>
             </div>
 
@@ -225,6 +232,128 @@
                 alert('댓글 삭제에 실패했습니다: ' + error);
             });
     }
+    // 댓글 추천
+
+    function updateLikeButton(commentId, liked, count){
+        var buttonId = 'like-btn_' + commentId;
+        var button = document.getElementById(buttonId);
+        var buttonLiked = button.getAttribute('liked')  === 'true';
+
+        var likeCountSpan = button.querySelector('span'); // 버튼 내부의 span 요소를 찾습니다.
+
+
+        if(buttonLiked !== liked){
+            // liked 매개변수의 값에 따라 클래스와 'liked' 속성을 업데이트합니다.
+            if (liked) {
+
+                button.classList.add('btn-success');
+                button.classList.remove('btn-outline-success');
+                button.setAttribute('liked', 'true');
+            } else {
+                button.classList.add('btn-outline-success');
+                button.classList.remove('btn-success');
+                button.setAttribute('liked', 'false');
+            }
+        }
+
+        if(count != null){
+            document.getElementById("like-count_" + commentId).textContent = count;
+        }
+    }
+
+    function likeComment(commentId){
+        var buttonId = 'like-btn_' + commentId;
+        var button = document.getElementById(buttonId);
+        var isLiked = button.getAttribute('liked')  === 'true';  // boolean 타입으로 변경
+
+
+
+        if(!isLiked){
+
+            if (!confirm('이 댓글을 추천 하시겠습니까?')) {
+                return;
+            }
+
+            fetch("/api/comments/"+commentId +"/commentLikes", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                    // CSRF 토큰 추가
+                },
+                credentials: 'include' // 쿠키 포함
+            }).then(response => {
+                if (response.ok) {
+                    response.json().then(
+                        data=>{
+                            console.log(data["count"]);
+                            updateLikeButton(commentId, true, data["count"])
+                            if(data["changed"]) {
+                                alert('댓글을 추천 하였습니다.');
+                            }
+                            else
+                                alert('이미 추천 하였습니다.')
+
+                        }
+
+                    )
+
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+                .catch(error => {
+                    console.error('추천 중 오류가 발생했습니다:', error);
+                    alert('댓글 추천에 실패했습니다: ' + error);
+                });
+
+        }
+        else{
+            if (!confirm('추천을 취소 하시겠습니까?')) {
+                return;
+            }
+
+            fetch("/api/comments/"+commentId +"/commentLikes", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                    // CSRF 토큰 추가
+                },
+                credentials: 'include' // 쿠키 포함
+            }).then(response => {
+                if (response.ok) {
+                    response.json().then(
+                        data=>{
+                            console.log(data.toString());
+                            updateLikeButton(commentId, false, data["count"])
+                            if(data["changed"]) {
+                                alert('추천을 취소 하였습니다.');
+                            }
+                            else
+                                alert('이미 취소 하였습니다.')
+
+                        }
+                    )
+
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+                .catch(error => {
+                    console.error('댓글 추천 취소 오류가 발생했습니다:', error);
+                    alert('추천 취소에 실패했습니다: ' + error);
+                });
+
+        }
+
+
+    }
+
+
+
+
+    // Post 추천
     const recommend_elements = document.getElementsByClassName("recommend");
     Array.from(recommend_elements).forEach(function(element) {
         element.addEventListener('click', function() {

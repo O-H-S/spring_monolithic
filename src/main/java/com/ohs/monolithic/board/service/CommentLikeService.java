@@ -7,6 +7,7 @@ import com.ohs.monolithic.board.repository.CommentLikeRepository;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.user.Account;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,13 @@ public class CommentLikeService {
     return Boolean.TRUE;
   }
 
+  @Transactional
+  public Pair<Boolean, Long> likeCommentEx(Comment comment, Account member){
+    Boolean result = this.likeComment(comment, member);
+    return Pair.of(result, comment.getLikeCount());
+  }
+
+
   // Test Exists(Itegration), 동시성 테스트 필요
   @Transactional
   public Boolean unlikeComment(Comment comment, Account member) {
@@ -65,8 +73,16 @@ public class CommentLikeService {
       }
     }
     return Boolean.FALSE;
-
   }
+
+  @Transactional
+  public Pair<Boolean, Long> unlikeCommentEx(Comment comment, Account member){
+    Boolean result = this.unlikeComment(comment, member);
+    return Pair.of(result, comment.getLikeCount());
+  }
+
+
+
 
 
 }
