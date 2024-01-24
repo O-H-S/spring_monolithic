@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
-
+// 게시글 작성과 관련된 웹 컨트롤러
 @RequiredArgsConstructor
 @RequestMapping("/post")
 @Controller
@@ -82,16 +82,7 @@ public class PostWriteController {
         return String.format("redirect:/post/detail/%s", id);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/delete/{id}")
-    public String questionDelete(Principal principal, @PathVariable("id") Integer id) {
-        Post post = this.readService.getPost(id);
-        if (!post.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-        }
-        this.writeService.delete(post);
-        return "redirect:/";
-    }
+
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/vote/{id}")
@@ -99,6 +90,15 @@ public class PostWriteController {
         Post post = this.readService.getPost(id);
         Account siteUser = this.accountService.getAccount(principal.getName());
         this.writeService.vote(post, siteUser);
+        return String.format("redirect:/post/detail/%s", id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/unvote/{id}")
+    public String postUnvote(Principal principal, @PathVariable("id") Integer id) {
+        Post post = this.readService.getPost(id);
+        Account siteUser = this.accountService.getAccount(principal.getName());
+        this.writeService.unvote(post, siteUser);
         return String.format("redirect:/post/detail/%s", id);
     }
 

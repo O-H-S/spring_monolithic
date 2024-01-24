@@ -30,15 +30,47 @@ public class BoardService {
 
   public void incrementPostCount(Integer boardId) {
     postCountCache.compute(boardId, (key, count) -> count == null ? 1 : count + 1);
+
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCompletion(int status) {
+        if(status == STATUS_ROLLED_BACK)
+          postCountCache.compute(boardId, (key, count) -> count != null ? count - 1L : null);
+      }
+    });
+
   }
 
   public void incrementPostCount(Integer boardId, int delta) {
+
     postCountCache.compute(boardId, (key, count) -> count == null ? delta : count + delta);
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCompletion(int status) {
+        if(status == STATUS_ROLLED_BACK) {
+          System.out.println("rollback");
+          postCountCache.compute(boardId, (key, count) -> count != null ? count - delta : 0L);
+        }
+      }
+    });
+
   }
 
   public void decrementPostCount(Integer boardId) {
     postCountCache.computeIfPresent(boardId, (key, count) -> count > 1 ? count - 1 : null);
+
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCompletion(int status) {
+        if(status == STATUS_ROLLED_BACK)
+          postCountCache.computeIfPresent(boardId, (key, count) -> count + 1L);
+      }
+    });
+
+
   }
+
+
 
   public void savePostCounts() {
 

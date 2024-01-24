@@ -3,20 +3,21 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.domain.PostLike;
+import com.ohs.monolithic.board.domain.PostView;
 import com.ohs.monolithic.board.dto.BulkInsertResponse;
+import com.ohs.monolithic.board.exception.BoardNotFoundException;
+import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
 import com.ohs.monolithic.utils.JdbcOperationsRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongFunction;
 
 
@@ -56,13 +56,7 @@ public class PostWriteService {
 
     @Transactional
     public Post create(Integer boardID ,String subject, String content, Account user) {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCompletion(int status) {
-                if(status == STATUS_ROLLED_BACK)
-                    boardService.decrementPostCount(boardID);
-            }
-        });
+
         boardService.incrementPostCount(boardID);
 
         Board boardReference = em.getReference(Board.class, boardID);
@@ -77,15 +71,7 @@ public class PostWriteService {
     }
 
     private void _createAll(Integer boardID, List<Post> posts, LongFunction<Post> entityGenerator, Long counts, JdbcOperationsRepository.BatchProcessor logicPerBatch){
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCompletion(int status) {
-                if(status == STATUS_ROLLED_BACK) {
-                    System.out.println("rollback");
-                    boardService.incrementPostCount(boardID, -counts.intValue());
-                }
-            }
-        });
+
         boardService.incrementPostCount(boardID, counts.intValue());
         //System.out.println(String.format("%d, %d", posts.size(), boardService.getPostCount(boardID)));
         Board boardReference = em.getReference(Board.class, boardID);
@@ -152,32 +138,105 @@ public class PostWriteService {
     }
 
 
+
     @Transactional
-    public void delete(Post post) {
-        Optional<Post> entity = pRepo.findById(post.getId());
-        if(entity.isEmpty())
-            return;
-
-        Integer boardId = entity.get().getId();
+    public void delete(Integer id){
+        Post target = getPostWithWriteLock(id); // s-lock을 걸면, 동시에 삭제할 때 post count가 불일치할 가능성이 존재함.
+        Integer boardId = target.getBoard().getId();
         boardService.decrementPostCount(boardId);
-        // 트랜잭션 커밋 시 실행될 콜백
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCompletion(int status) {
-                if(status == STATUS_ROLLED_BACK)
-                    boardService.incrementPostCount(boardId);
-            }
-        });
+        target.setDeleted(Boolean.TRUE);
+        pRepo.save(target);
+    }
 
-        pRepo.delete(post);
+    @Transactional
+    public void deleteBy(Integer id, Account operator){
+        Post targetPost = getPost(id);
+        if (!targetPost.getAuthor().getId().equals(operator.getId())) {
+            throw new RuntimeException("댓글 삭제 권한이 없습니다");
+        }
+        delete(id);
     }
 
 
 
-
+    @Transactional
     public void vote(Post post, Account siteUser) {
-        post.getVoter().add(siteUser);
-        this.pRepo.save(post);
+        PostLike like = pRepo.findPostLike(post.getId(), siteUser.getId());
+        // 최초로 추천을 누른 경우
+        if(like == null){
+            like = PostLike.builder()
+                    .post(post)
+                    .user(siteUser)
+                    .valid(true)
+                    .createDate(LocalDateTime.now())
+                    .updateDate(LocalDateTime.now())
+                    .build();
+
+
+
+            post.changeLikeCount(1);
+            pRepo.savePostLike(like);
+            pRepo.save(post);
+            return;
+            //like 새로 생성.
+        }
+
+        // 추천을 취소 했었지만, 다시 추천을 누른 경우.
+        if(!like.getValid()){
+
+            like.setValid(true);
+            like.setUpdateDate(LocalDateTime.now());
+            post.changeLikeCount(1);
+
+            pRepo.savePostLike(like);
+            pRepo.save(post);
+
+
+            //this.pRepo.save(post);
+        }
+
+        //post
+        //post.getVoter().add(siteUser);
+
     }
+
+    @Transactional
+    public void unvote(Post post, Account siteUser) {
+        PostLike like = pRepo.findPostLike(post.getId(), siteUser.getId());
+        // 추천한 적이 없으면 무시한다.
+        if(like == null){
+            return;
+        }
+
+        // 추천 했었지만, 취소하려는 경우.
+        if(like.getValid()){
+            like.setValid(false);
+            like.setUpdateDate(LocalDateTime.now());
+            post.changeLikeCount(-1);
+            pRepo.savePostLike(like);
+            pRepo.save(post);
+        }
+    }
+
+    Post getPost(Integer id) {
+        if(id == null || id < 0)
+            throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
+
+        Optional<Post> postOp = pRepo.findById(id);
+        if(postOp.isEmpty())
+            throw new DataNotFoundException("존재하지 않는 게시물입니다");
+        return postOp.get();
+    }
+
+    Post getPostWithWriteLock(Integer id) {
+        if(id == null || id < 0)
+            throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
+
+        Optional<Post> postOp = pRepo.findByIdWithWriteLock(id);
+        if(postOp.isEmpty())
+            throw new DataNotFoundException("존재하지 않는 게시물입니다");
+        return postOp.get();
+    }
+
 
 }
