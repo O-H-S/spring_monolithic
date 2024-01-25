@@ -11,14 +11,17 @@
                     <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
                     <a class="nav-link" sec:authorize="hasAuthority('USER')" href="#" data-bs-toggle="modal" data-bs-target="#adminLoginModal">Admin 로그인</a>
                     <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
+
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/signup}">회원가입</a>
                 </li>
+                <a class="nav-link" th:href="@{/docs/index.html}">API</a>
             </ul>
 
             <div class="navbar-nav">
-                <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-danger me-2">Admin</button>
+                <!--<button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-danger me-2">Admin</button>-->
+                <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#adminManagementModal">Admin</button>
             </div>
 
             <div sec:authorize="isAuthenticated()" class="dropdown">
@@ -58,6 +61,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Admin Management Modal -->
+    <div class="modal fade" id="adminManagementModal" tabindex="-1" aria-labelledby="adminManagementModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adminManagementModalLabel">관리</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Place the link here -->
+                    <a href="/board/create" class="btn btn-primary">게시판 생성</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 </nav>
