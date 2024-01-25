@@ -2,8 +2,9 @@ package com.ohs.monolithic.board;
 
 
 import com.ohs.monolithic.board.domain.Board;
-import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
+import com.ohs.monolithic.board.utils.BoardTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

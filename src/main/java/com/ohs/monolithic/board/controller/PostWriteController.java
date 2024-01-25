@@ -32,42 +32,47 @@ public class PostWriteController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/write/{id}")
     public String showWriteWindow(Model model, PostForm postForm, @PathVariable("id") Integer boardID){
-        model.addAttribute("board", boardID);
+        model.addAttribute("targetPostId", null);
+        model.addAttribute("targetBoardId", boardID);
         return "post_form";
     }
 
-    // @PreAuthorize("isAuthenticated()") 애너테이션이 붙은 메서드는 로그인이 필요한 메서드를 의미한다.
-    // 만약 @PreAuthorize("isAuthenticated()") 애너테이션이 적용된 메서드가 로그아웃 상태에서 호출되면 로그인 페이지로 이동된다.
-    @PreAuthorize("isAuthenticated()")
+    //legacy
+    /*@PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/write/{id}")
     public String showWriteWindow(Model model, @PathVariable("id") Integer boardID,
                                   @Valid PostForm postForm, BindingResult bindingResult, Principal principal) {
 
         Account userAccount = this.accountService.getAccount(principal.getName());
-        /*BindingResult 매개변수는 항상 @Valid 매개변수 바로 뒤에 위치해야 한다.
-        만약 2개의 매개변수의 위치가 정확하지 않다면 @Valid만 적용이 되어 입력값 검증 실패 시 400 오류가 발생한다.*/
+        *//*BindingResult 매개변수는 항상 @Valid 매개변수 바로 뒤에 위치해야 한다.
+        만약 2개의 매개변수의 위치가 정확하지 않다면 @Valid만 적용이 되어 입력값 검증 실패 시 400 오류가 발생한다.*//*
 
         if (bindingResult.hasErrors()) {
             return "post_form";
         }
-        writeService.create(boardID, postForm.getSubject(), postForm.getContent(), userAccount);
+        writeService.create(boardID, postForm, userAccount);
         model.addAttribute("board", boardID);
         return String.format("redirect:/board/%d", boardID); // 질문 저장후 질문목록으로 이동
     }
-
+*/
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String postModify(PostForm postForm, @PathVariable("id") Integer id, Principal principal) {
+    public String postModify(Model model, PostForm postForm, @PathVariable("id") Integer id, Principal principal) {
+        // 리팩토링 대상, postService에 위임하기.
         Post post = this.readService.getPost(id, true);
         if(!post.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         postForm.setSubject(post.getTitle());
         postForm.setContent(post.getContent());
+
+        model.addAttribute("targetPostId", id);
+        model.addAttribute("targetBoardId", post.getBoard().getId());
         return "post_form";
     }
 
-    @PreAuthorize("isAuthenticated()")
+    // legacy
+    /*@PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String questionModify(@Valid PostForm postForm, BindingResult bindingResult,
                                  Principal principal, @PathVariable("id") Integer id) {
@@ -80,7 +85,7 @@ public class PostWriteController {
         }
         this.writeService.modify(post, postForm.getSubject(), postForm.getContent());
         return String.format("redirect:/post/detail/%s", id);
-    }
+    }*/
 
 
 

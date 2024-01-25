@@ -1,7 +1,7 @@
 package com.ohs.monolithic.board;
 
 import com.ohs.monolithic.board.domain.Board;
-import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PostCountCacheRegister implements ApplicationRunner {
 
     //private final BoardRepository boardRepository;
-    private final BoardManageService boardService;
+    private final BoardService boardService;
     private final PostReadService postService;
 
     @Override
@@ -28,14 +28,23 @@ public class PostCountCacheRegister implements ApplicationRunner {
         List<Board> boards = boardService.getBoardsRaw();
 
         boards.forEach(board -> {
-            Long postCount = board.getPostCount();
-            if (postCount == null) {
-                postCount = postService.calculateCount(board.getId());
+            if(board.getDeleted() == null) // 기존 데이터 호환성 위해
+            {
+                board.setDeleted(false);
+                boardService.save(board);
             }
-            postCountMap.put(board.getId(), postCount);
+
+            if(!board.getDeleted()) {
+                Long postCount = board.getPostCount();
+                if (postCount == null) {
+                    postCount = postService.calculateCount(board.getId());
+                }
+                postCountMap.put(board.getId(), postCount);
+            }
+
         });
 
-        postCountMap.forEach((id, count) -> System.out.println("Board ID: " + id + ", Init Post Count: " + count));
+        postCountMap.forEach((id, count) -> System.out.println("- Board ID: " + id + ", Init Post Count: " + count));
         boardService.registerPostCountCache(postCountMap);
 
     }

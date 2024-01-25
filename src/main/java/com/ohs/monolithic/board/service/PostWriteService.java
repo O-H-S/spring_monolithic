@@ -6,6 +6,7 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostLike;
 import com.ohs.monolithic.board.domain.PostView;
 import com.ohs.monolithic.board.dto.BulkInsertResponse;
+import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
@@ -55,7 +56,7 @@ public class PostWriteService {
     private final BoardService boardService;
 
     @Transactional
-    public Post create(Integer boardID ,String subject, String content, Account user) {
+    public Post create(Integer boardID, PostForm form, Account user) {
 
         boardService.incrementPostCount(boardID);
 
@@ -63,8 +64,8 @@ public class PostWriteService {
         Post q = Post.builder()
                 .board(boardReference)
                 .author(user)
-                .title(subject)
-                .content(content)
+                .title(form.getSubject())
+                .content(form.getContent())
                 .build();
         return this.pRepo.save(q);
 
@@ -130,6 +131,7 @@ public class PostWriteService {
 
     }
 
+    // legacy
     public void modify(Post post, String title, String content) {
         post.setTitle(title);
         post.setContent(content);
@@ -137,6 +139,25 @@ public class PostWriteService {
         this.pRepo.save(post);
     }
 
+    @Transactional
+    public void modifyBy(Integer id, Account operator, PostForm form){
+        // 현재는 form 검증 로직이 컨트롤러에 있어서 상관없지만, 다른 곳에서 이 메소드를 사용한다면 누가 검증?
+        Post targetPost = getPostWithReadLock(id);
+        if (!targetPost.getAuthor().getId().equals(operator.getId())) {
+            throw new RuntimeException("게시글 수정 권한이 없습니다");
+        }
+
+        targetPost.setTitle(form.getSubject());
+        targetPost.setContent(form.getContent());
+        targetPost.setModifyDate(LocalDateTime.now());
+        pRepo.save(targetPost);
+        // save시 변경된 필드만 업데이트 되나 확인 필요함.
+        // 만약 전체를 다 update 시킨다면, 동시에 발생할 수 있는 다른 트랜잭션들과 commentCount, viewCount, likeCount의 값에 불일치가 발생.
+        // 변경된 필드(title, content)만 업데이트 시킨다면, 문제가 진짜 없을지 생각해보기.
+        // 기본적인 동작은 변경된 컬럼이 하나라도 존재하면(dirty check), 모든 컬럼 update 시킨다.
+        // 그러나 @DynamicUpdate를 사용하면 달라짐. (트레이드 오프 존재함)
+        // 우선 읽기락으로, Count 값들이 변경되지 못하도록 함.
+    }
 
 
     @Transactional
@@ -152,7 +173,7 @@ public class PostWriteService {
     public void deleteBy(Integer id, Account operator){
         Post targetPost = getPost(id);
         if (!targetPost.getAuthor().getId().equals(operator.getId())) {
-            throw new RuntimeException("댓글 삭제 권한이 없습니다");
+            throw new RuntimeException("게시글 삭제 권한이 없습니다");
         }
         delete(id);
     }
@@ -233,6 +254,16 @@ public class PostWriteService {
             throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
 
         Optional<Post> postOp = pRepo.findByIdWithWriteLock(id);
+        if(postOp.isEmpty())
+            throw new DataNotFoundException("존재하지 않는 게시물입니다");
+        return postOp.get();
+    }
+
+    Post getPostWithReadLock(Integer id) {
+        if(id == null || id < 0)
+            throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
+
+        Optional<Post> postOp = pRepo.findByIdWithReadLock(id);
         if(postOp.isEmpty())
             throw new DataNotFoundException("존재하지 않는 게시물입니다");
         return postOp.get();

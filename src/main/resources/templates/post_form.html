@@ -4,9 +4,11 @@
   </th:block>
 
   <div layout:fragment="content" class="container">
-    <h5 class="my-3 border-bottom pb-2">질문등록</h5>
-    <form th:object="${postForm}" method="post">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <h5 class="my-3 border-bottom pb-2" th:text="${targetPostId == null} ? '게시글 등록' : '게시글 수정'"></h5>
+    <form id="postForm" th:object="${postForm}" method="post">
+      <input type="hidden" id="targetPostId" th:value="${targetPostId}" th:data-target-post-id="${targetPostId}"/>
+      <input type="hidden" id="targetBoardId" th:value="${targetBoardId}" th:data-target-board-id="${targetBoardId}"/>
+      <!--<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
       <div th:replace="~{form_errors :: formErrorsFragment}"></div>
       <div class="mb-3">
         <label for="subject" class="form-label">제목</label>
@@ -17,15 +19,79 @@
         <!--<textarea th:field="*{content}" class="form-control" rows="10"></textarea>-->
         <textarea name="content" id="editor" th:text="*{content}" ></textarea>
 
-
-
-
       </div>
       <input type="submit" value="저장하기" class="btn btn-primary my-2">
     </form>
 
+    <script layout:fragment="script" type='text/javascript'>
+      var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+      var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
+      document.getElementById('postForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // 폼 데이터 수집
+        var targetPostId = document.getElementById('targetPostId').getAttribute('data-target-post-id');
+        var targetBoardId = parseInt( document.getElementById('targetBoardId').getAttribute('data-target-board-id'));
+        var isNewPost = targetPostId == null;
+        console.log(targetBoardId)
+        console.log(isNewPost)
+        var requestUrl = isNewPost ? "/api/posts" : '/api/posts/' + targetPostId;
+        var requestMethod = isNewPost ? 'POST' : 'PUT';
+
+        // PostForm 객체 생성
+        var formData = {
+          subject: document.querySelector('#postForm [name="subject"]').value,
+          content:CKEDITOR.instances.editor.getData(),
+          boardId: targetBoardId
+        };
+
+
+        // Fetch API를 사용하여 서버에 POST 요청 전송
+        fetch(requestUrl, {
+          method: requestMethod,
+          headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+          },
+          credentials: 'include', // 쿠키 포함
+          body: JSON.stringify(formData)  // JSON 형식으로 변환
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    // 응답이 성공적이지 않은 경우 오류를 던집니다.
+                    throw response.text().then(text => { throw new Error(text); });
+                  }
+                  // 성공 메시지 표시
+                  const message = isNewPost ? "게시물이 성공적으로 작성 되었습니다." : "게시물이 성공적으로 수정 되었습니다.";
+                  alert(message);
+
+                  // 응답에 body가 있으면 JSON으로 파싱
+                  if (response.headers.get("content-length") !== "0") {
+                    return response.json();
+                  } else {
+                    return null;
+                  }
+                })
+                .then(data => {
+                  console.log(data);
+
+                  // 적절한 페이지로 리디렉션
+                  const postId = data && 'id' in data ? data.id : targetPostId;
+                  window.location.href = `/post/${postId}`;
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  // 사용자에게 오류 메시지 표시
+                  alert(error);
+                });
+      });
+
+
+    </script>
     <script>
+
+
       CKEDITOR.replace('editor', {
         extraPlugins: ['colorbutton', 'font'],
         toolbar: [
@@ -36,6 +102,13 @@
         ],
         height: 400
       });
+
+
+
+
+
+
+
     </script>
   </div>
 </html>
