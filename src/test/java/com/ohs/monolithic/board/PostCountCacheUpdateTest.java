@@ -3,20 +3,17 @@ package com.ohs.monolithic.board;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.board.service.BoardManageService;
+import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostWriteService;
 import com.ohs.monolithic.board.service.PostReadService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -36,14 +33,14 @@ public class PostCountCacheUpdateTest {
     private PostRepository postRepository;
 
     @Autowired
-    private BoardManageService boardManageService;
+    private BoardService boardService;
 
     @Test
     @DisplayName("비동기적 Post 생성 후, Cache 값과 실제 데이터베이스의 Post 레코드 수가 일치해야한다.")
     public void testCountCache() throws InterruptedException {
 
         // given
-        BoardResponse board =  boardManageService.createBoard("test", "test");
+        BoardResponse board =  boardService.createBoard("test", "test");
        // BoardResponse board2 =  boardManageService.createBoard("test2", "test");
 
 
@@ -61,7 +58,7 @@ public class PostCountCacheUpdateTest {
 
                 //List<Post> createdPosts = Collections.synchronizedList(new ArrayList<>());
                 for (int j = 0; j < postsPerBoardToCreate; j++) {
-                    Post post = postWriteService.create(board.getId(), "abc", "abc", null);
+                    Post post = postWriteService.create(board.getId(), PostForm.builder().content("abc").subject("abc").build(), null);
                     //System.out.println( String.format("%d", threadIndex));
                     //createdPosts.add(post);
                 }
@@ -75,7 +72,7 @@ public class PostCountCacheUpdateTest {
             throw new RuntimeException("테스트 실행 시간 초과");
         }
 
-        System.out.println(boardManageService.getPostCount(board.getId()));
+        System.out.println(boardService.getPostCount(board.getId()));
         System.out.println(postReadService.calculateCount(board.getId()));
 
         // 10개의 쓰레드가 비동기적으로 각각 N개의 Post를 board에 create하고

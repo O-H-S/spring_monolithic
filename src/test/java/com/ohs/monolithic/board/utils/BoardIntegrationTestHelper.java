@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.utils;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.repository.*;
 import com.ohs.monolithic.board.service.*;
 import com.ohs.monolithic.user.Account;
@@ -51,7 +52,7 @@ public class BoardIntegrationTestHelper {
   public Triple<BoardResponse, Account, Post> InitDummy_BoardAccountPost(String boardTitle, String userName, String postTitle) {
     BoardResponse newBoard = boardService.createBoard(boardTitle,"Test");
     Account newUser = accountService.create(userName, "abc@naver.com", "blah blah");
-    Post post = postWriteService.create(newBoard.getId(), postTitle, "blah blah", newUser);
+    Post post = postWriteService.create(newBoard.getId(), PostForm.builder().subject("abc").content("abc").build() , newUser);
 
     return new Triple<>(newBoard, newUser, post);
   }
