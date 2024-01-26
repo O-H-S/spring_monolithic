@@ -16,7 +16,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT cl FROM PostLike cl WHERE cl.post.id = :postId AND cl.user = :member")
-  Optional<PostLike> findPostLikeWithLock(Integer postId, Account member);
+  Optional<PostLike> findPostLikeWithLock(Long postId, Account member);
 
   Boolean existsByPostAndUserAndValidIsTrue(Post post, Account member);
 

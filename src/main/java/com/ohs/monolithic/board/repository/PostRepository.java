@@ -20,7 +20,7 @@ import java.util.Optional;
 
 
 
-public interface PostRepository extends JpaRepository<Post, Integer>, CustomPostRepository {
+public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository {
 
     
     //@EntityGraph(attributePaths = { "author.address"}) 이런식으로 중첩된 동작 가능.
@@ -29,19 +29,19 @@ public interface PostRepository extends JpaRepository<Post, Integer>, CustomPost
 
     @EntityGraph(attributePaths = {"board", "author"}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
-    Optional<Post> findWithAuthorAndBoard(@Param("id") Integer id);
+    Optional<Post> findWithAuthorAndBoard(@Param("id") Long id);
 
 
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
-    Optional<Post> findById(@Param("id") Integer id);
+    Optional<Post> findById(@Param("id") Long id);
 
     @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
-    Optional<Post> findByIdWithReadLock(@Param("id") Integer id);
+    Optional<Post> findByIdWithReadLock(@Param("id") Long id);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
-    Optional<Post> findByIdWithWriteLock(@Param("id") Integer id);
+    Optional<Post> findByIdWithWriteLock(@Param("id") Long id);
 
     //Post findById(Integer id, LockModeType lockModeType);
 
@@ -55,23 +55,23 @@ public interface PostRepository extends JpaRepository<Post, Integer>, CustomPost
     //@Transactional
     @Query("UPDATE Post p SET p.commentCount = p.commentCount + (:delta) WHERE p.id = :postId")
     //@Lock(LockModeType.PESSIMISTIC_READ)
-    void updateCommentCount(Integer postId, Integer delta);
+    void updateCommentCount(Long postId, Integer delta);
 
     @Modifying
     //@Transactional
     @Query("UPDATE Post p SET p.viewCount = p.viewCount + (:delta) WHERE p.id = :postId")
         //@Lock(LockModeType.PESSIMISTIC_READ)
-    void updateViewCount(Integer postId, Integer delta);
+    void updateViewCount(Long postId, Integer delta);
 
 
     @Modifying
     @Query("UPDATE Post p SET p.likeCount = p.likeCount + (:delta) WHERE p.id = :postId")
-    void addLikeCount(Integer postId, Long delta);
+    void addLikeCount(Long postId, Long delta);
 
 
     @Modifying
     @Query("UPDATE Post p SET p.commentCount = (SELECT COUNT(c) FROM Comment c WHERE c.post = p) WHERE p.id = :postId")
-    void refreshCommentCount(@Param("postId") Integer postId);
+    void refreshCommentCount(@Param("postId") Long postId);
 
     Long countByBoardId(Integer boardId);
 }

@@ -32,7 +32,7 @@ public class PostLikeService {
   // Test Exists(Itegration), 동시성 테스트 필요
 
   @Transactional(readOnly = true)
-  public Boolean doesLikePost(Integer postId, Long memberId){
+  public Boolean doesLikePost(Long postId, Long memberId){
 
     return postLikeRepository.existsByPostAndUserAndValidIsTrue(
             em.getReference(Post.class, postId),
@@ -42,7 +42,7 @@ public class PostLikeService {
 
 
   @Transactional
-  public Boolean likePost(Integer postId, Account member) {
+  public Boolean likePost(Long postId, Account member) {
     //commentLikeRepository.findB
     Optional<PostLike> postLikeOp = postLikeRepository.findPostLikeWithLock(postId, member);
     if (postLikeOp.isPresent()) {
@@ -69,7 +69,7 @@ public class PostLikeService {
   }
 
   @Transactional
-  public Pair<Boolean, Long> likePostEx(Integer postId, Account member){
+  public Pair<Boolean, Long> likePostEx(Long postId, Account member){
     Boolean result = this.likePost(postId, member);
     Optional<Post> post = this.postRepository.findById(postId);
     return Pair.of(result, post.get().getLikeCount());
@@ -78,7 +78,7 @@ public class PostLikeService {
 
 
   @Transactional
-  public Boolean unlikePost(Integer postId, Account member) {
+  public Boolean unlikePost(Long postId, Account member) {
     //commentLikeRepository.findB
     Optional<PostLike> postLikeOp = postLikeRepository.findPostLikeWithLock(postId, member);
     if (postLikeOp.isPresent()) {
@@ -94,7 +94,7 @@ public class PostLikeService {
   }
 
   @Transactional
-  public Pair<Boolean, Long> unlikePostEx(Integer postId, Account member){
+  public Pair<Boolean, Long> unlikePostEx(Long postId, Account member){
     Boolean result = this.unlikePost(postId, member);
     Optional<Post> post = this.postRepository.findById(postId);
     return Pair.of(result, post.get().getLikeCount());

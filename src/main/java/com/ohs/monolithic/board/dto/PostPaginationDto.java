@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PostPaginationDto{
 
-    Integer id;
+    Long id;
     String title;
     Long userId;
     String userName;
@@ -19,7 +19,7 @@ public class PostPaginationDto{
     Long likeCount;
     Long viewCount;
     @QueryProjection
-    public PostPaginationDto(Integer _id, String _title, Long _userId, String _userName, LocalDateTime _createDate
+    public PostPaginationDto(Long _id, String _title, Long _userId, String _userName, LocalDateTime _createDate
             , Integer _commentCount, Long _likeCount, Long _viewCount){
         id = _id;
         title = _title;

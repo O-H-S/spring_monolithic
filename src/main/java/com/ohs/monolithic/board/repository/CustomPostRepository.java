@@ -14,9 +14,9 @@ import java.util.List;
 public interface CustomPostRepository extends JdbcOperationsRepository<PostRepository, Post> {
     Page<Post> selectAllByBoard(Pageable pageable, Board board, Long allCounts);
     Page<PostPaginationDto> selectAllByBoardWithCovering(Pageable pageable, Board board, Long allCounts);
-    List<PostPaginationDto> selectNextByBoard(Integer baseID, Board board, Integer size);
+    List<PostPaginationDto> selectNextByBoard(Long baseID, Board board, Integer size);
 
-    PostLike findPostLike(Integer postID, Long memberID);
+    PostLike findPostLike(Long postID, Long memberID);
     PostLike savePostLike(PostLike postLike);
 
 }

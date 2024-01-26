@@ -57,7 +57,7 @@ public class PostWriteController {
 */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String postModify(Model model, PostForm postForm, @PathVariable("id") Integer id, Principal principal) {
+    public String postModify(Model model, PostForm postForm, @PathVariable("id") Long id, Principal principal) {
         // 리팩토링 대상, postService에 위임하기.
         Post post = this.readService.getPost(id, true);
         if(!post.getAuthor().getUsername().equals(principal.getName())) {

@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public class PostDetailResponse {
-  public Integer id;
+  public Long id;
   public Integer boardID;
   public Long authorID;
   public Boolean mine;
