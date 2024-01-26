@@ -39,7 +39,7 @@ public class PostReadService {
     EntityManager em;
 
     @Transactional(readOnly = true)
-    public PostDetailResponse readPost(Integer postID, Account viewer){
+    public PostDetailResponse readPost(Long postID, Account viewer){
         Post targetPost = getPost(postID, true);
         Boolean isLiked = Boolean.FALSE;
         Boolean isMine = Boolean.FALSE;
@@ -58,13 +58,13 @@ public class PostReadService {
         return PostDetailResponse.of(targetPost, isMine, isLiked);
     }
 
-    public Post getPost(Integer id){
+    public Post getPost(Long id){
         return this.getPost(id, false);
     }
 
     // Java 메서드에서 기본값을 직접 지정하는 것은 불가능합니다.
 
-    public Post getPost(Integer id, Boolean relatedData ) {
+    public Post getPost(Long id, Boolean relatedData ) {
 
         Optional<Post> question = null;
         if (relatedData)
@@ -108,7 +108,7 @@ public class PostReadService {
     }
 
     @Transactional
-    public List<PostPaginationDto> getListWithoutOffset(Integer baseID, Integer boardID, Integer count) {
+    public List<PostPaginationDto> getListWithoutOffset(Long baseID, Integer boardID, Integer count) {
         Board boardReference = em.getReference(Board.class, boardID);
         return this.repository.selectNextByBoard(baseID, boardReference, count);
     }

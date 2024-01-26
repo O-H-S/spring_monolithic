@@ -126,7 +126,7 @@ public class PostQueryTest {
 
         //when
         long startTime = System.currentTimeMillis();
-        List<PostPaginationDto> results = postReadService.getListWithoutOffset(250, testBoard.getId(), 10);
+        List<PostPaginationDto> results = postReadService.getListWithoutOffset(250L, testBoard.getId(), 10);
         System.out.println(results.size());
         System.out.println(results.get(0).getId());
         //System.out.println(results.get(9).getId());

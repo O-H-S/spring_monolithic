@@ -60,7 +60,7 @@ class PostDetailControllerTest {
   public void getPostDetail() throws Exception {
     // given , when
     when(accountService.getAccount("testUser")).thenReturn(null);
-    when(postReadService.readPost(1, null)).thenReturn(
+    when(postReadService.readPost(1L, null)).thenReturn(
             dummyResponse()
     );
 
@@ -82,7 +82,7 @@ class PostDetailControllerTest {
 
   PostDetailResponse dummyResponse(){
     PostDetailResponse response = new PostDetailResponse();
-    response.id = 1;
+    response.id = 1L;
     response.boardID = 1;
     response.authorID = 1L;
     response.authorName = "author";

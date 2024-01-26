@@ -34,7 +34,7 @@ public class CommentService {
 
 
     @Transactional(readOnly = true)
-    public List<CommentPaginationDto> getCommentsAsPage(Integer postID, Account viewer){
+    public List<CommentPaginationDto> getCommentsAsPage(Long postID, Account viewer){
         Post targetPost = em.getReference(Post.class, postID);
         return cRepo.getCommentsByPost(targetPost, viewer);
     }
@@ -55,7 +55,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment createByID(Integer postId, String content, Long accountId) {
+    public Comment createByID(Long postId, String content, Long accountId) {
         Post post = em.getReference(Post.class, postId);
         Account account = em.getReference(Account.class, accountId);
         pRepo.updateCommentCount(postId, 1);

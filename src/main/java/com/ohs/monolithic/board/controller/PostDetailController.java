@@ -33,7 +33,7 @@ public class PostDetailController {
 
 
     @GetMapping("/{id}")
-    public String getPostDetail(Model model, @PathVariable("id") Integer id, Principal currentUser){
+    public String getPostDetail(Model model, @PathVariable("id") Long id, Principal currentUser){
 
         Account viewer = currentUser != null ? accountService.getAccount(currentUser.getName()) : null;
 
@@ -44,7 +44,7 @@ public class PostDetailController {
     // legacy, 댓글 관련 요청은 모두 RESTful api로 처리할 예정.
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/comments")
-    public String writeComment( Model model, @PathVariable("id") Integer id,
+    public String writeComment( Model model, @PathVariable("id") Long id,
                                @Valid CommentForm commentForm, BindingResult bindingResult, Principal currentUser){
         Account viewer =  accountService.getAccount(currentUser.getName());
 
@@ -55,12 +55,12 @@ public class PostDetailController {
 
         commentService.createByID(id, commentForm.getContent(), viewer.getId());
         //baseModelMapping(model, id, viewer, new CommentForm());
-        return "redirect:/post/{%d}".formatted(id);
+        return String.format("redirect:/post/%d", id);
     }
 
 
 
-    void baseModelMapping(Model model, Integer id, Account viewer, CommentForm commentForm)
+    void baseModelMapping(Model model, Long id, Account viewer, CommentForm commentForm)
     {
 
         PostDetailResponse response = this.readService.readPost(id, viewer);

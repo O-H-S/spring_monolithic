@@ -39,7 +39,7 @@ public class PostApiController {
 
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> deletePost(Principal currentUser, @PathVariable("id") Integer id) {
+  public ResponseEntity<?> deletePost(Principal currentUser, @PathVariable("id") Long id) {
 
     Account operator = accountService.getAccount(currentUser.getName());
     writeService.deleteBy(id, operator);
@@ -62,7 +62,7 @@ public class PostApiController {
 
   @PreAuthorize("isAuthenticated()")
   @PutMapping("/{id}")
-  public ResponseEntity<?> updatePost(Principal currentUser, @PathVariable("id") Integer id, @RequestBody @Valid PostForm postForm) {
+  public ResponseEntity<?> updatePost(Principal currentUser, @PathVariable("id") Long id, @RequestBody @Valid PostForm postForm) {
 
     Account operator = accountService.getAccount(currentUser.getName());
     writeService.modifyBy(id, operator, postForm);
@@ -97,7 +97,7 @@ public class PostApiController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/{id}/postLikes")
-  public ResponseEntity<?> likePost(Principal currentUser, @PathVariable("id") Integer id) {
+  public ResponseEntity<?> likePost(Principal currentUser, @PathVariable("id") Long id) {
 
     Account voter = accountService.getAccount(currentUser.getName());
     Pair<Boolean, Long> result = postLikeService.likePostEx(id, voter);
@@ -108,7 +108,7 @@ public class PostApiController {
 
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/{id}/postLikes")
-  public ResponseEntity<?> unlikePost(Principal currentUser, @PathVariable("id") Integer id) {
+  public ResponseEntity<?> unlikePost(Principal currentUser, @PathVariable("id") Long id) {
 
     Account voter = accountService.getAccount(currentUser.getName());
     Pair<Boolean, Long> result = postLikeService.unlikePostEx(id, voter);

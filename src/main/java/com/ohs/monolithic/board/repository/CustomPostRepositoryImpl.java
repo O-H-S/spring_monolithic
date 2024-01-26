@@ -96,7 +96,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
 
 
         // 빠르게 인덱스만으로 대상 id 값들을 구해온다.
-        List<Integer> ids = queryFactory
+        List<Long> ids = queryFactory
                 .select(post.id)
                 .from(post)
                 .where(post.deleted.isFalse(), post.board.id.eq(board.getId()))
@@ -123,7 +123,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public List<PostPaginationDto> selectNextByBoard(Integer baseID, Board board, Integer size) {
+    public List<PostPaginationDto> selectNextByBoard(Long baseID, Board board, Integer size) {
         List<PostPaginationDto> posts = queryFactory
                 .select(createPostPaginationProjection())
                 .from(post).leftJoin(post.author, account)
@@ -138,7 +138,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public PostLike findPostLike(Integer postID, Long memberID) {
+    public PostLike findPostLike(Long postID, Long memberID) {
 
         PostLike like = queryFactory.selectFrom(postLike)
                 .where(
@@ -180,7 +180,7 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
                 post.commentCount, post.likeCount, post.viewCount);
     }
 
-    private BooleanExpression ltPostId(Integer postID) {
+    private BooleanExpression ltPostId(Long postID) {
         if (postID == null) {
             return null; // BooleanExpression 자리에 null이 반환되면 조건문에서 자동으로 제거된다
         }

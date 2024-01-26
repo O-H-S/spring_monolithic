@@ -140,7 +140,7 @@ public class PostWriteService {
     }
 
     @Transactional
-    public void modifyBy(Integer id, Account operator, PostForm form){
+    public void modifyBy(Long id, Account operator, PostForm form){
         // 현재는 form 검증 로직이 컨트롤러에 있어서 상관없지만, 다른 곳에서 이 메소드를 사용한다면 누가 검증?
         Post targetPost = getPostWithReadLock(id);
         if (!targetPost.getAuthor().getId().equals(operator.getId())) {
@@ -161,7 +161,7 @@ public class PostWriteService {
 
 
     @Transactional
-    public void delete(Integer id){
+    public void delete(Long id){
         Post target = getPostWithWriteLock(id); // s-lock을 걸면, 동시에 삭제할 때 post count가 불일치할 가능성이 존재함.
         Integer boardId = target.getBoard().getId();
         boardService.decrementPostCount(boardId);
@@ -170,7 +170,7 @@ public class PostWriteService {
     }
 
     @Transactional
-    public void deleteBy(Integer id, Account operator){
+    public void deleteBy(Long id, Account operator){
         Post targetPost = getPost(id);
         if (!targetPost.getAuthor().getId().equals(operator.getId())) {
             throw new RuntimeException("게시글 삭제 권한이 없습니다");
@@ -181,7 +181,7 @@ public class PostWriteService {
 
 
 
-    Post getPost(Integer id) {
+    Post getPost(Long id) {
         if(id == null || id < 0)
             throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
 
@@ -191,7 +191,7 @@ public class PostWriteService {
         return postOp.get();
     }
 
-    Post getPostWithWriteLock(Integer id) {
+    Post getPostWithWriteLock(Long id) {
         if(id == null || id < 0)
             throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
 
@@ -201,7 +201,7 @@ public class PostWriteService {
         return postOp.get();
     }
 
-    Post getPostWithReadLock(Integer id) {
+    Post getPostWithReadLock(Long id) {
         if(id == null || id < 0)
             throw new IllegalArgumentException("올바르지 않은 post id 값입니다.");
 
