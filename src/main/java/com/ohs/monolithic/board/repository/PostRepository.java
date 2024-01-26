@@ -63,6 +63,12 @@ public interface PostRepository extends JpaRepository<Post, Integer>, CustomPost
         //@Lock(LockModeType.PESSIMISTIC_READ)
     void updateViewCount(Integer postId, Integer delta);
 
+
+    @Modifying
+    @Query("UPDATE Post p SET p.likeCount = p.likeCount + (:delta) WHERE p.id = :postId")
+    void addLikeCount(Integer postId, Long delta);
+
+
     @Modifying
     @Query("UPDATE Post p SET p.commentCount = (SELECT COUNT(c) FROM Comment c WHERE c.post = p) WHERE p.id = :postId")
     void refreshCommentCount(@Param("postId") Integer postId);

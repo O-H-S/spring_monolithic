@@ -33,15 +33,24 @@
 
 
             <div class="my-3">
-                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-                   th:data-uri="@{|/post/vote/${response.id}|}">
-                    추천
-                    <span class="badge rounded-pill bg-success" th:text="${response.likeCount}"></span>
-                </a>
+
+                <button class="btn btn-sm me-2"
+                        th:classappend="${response.liked} ? 'btn-success' : 'btn-outline-success'"
+                        th:attr="liked=${response.liked}"
+                        th:onclick="|likePost(${response.id})|"
+                        id = "like-btn_post">
+
+                    추천 <span  id="like-count_post" th:text="${response.likeCount}">0</span>
+                </button>
+
+
+
+
+
 
                 <a th:href="@{|/post/modify/${response.id}|}" class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
-                   th:if="${response.authorID != null and #authentication.getPrincipal().getUsername() == response.authorName}"
+                   th:if="${response.mine}"
                    th:text="수정"></a>
             </div>
 
@@ -52,7 +61,7 @@
                th:attr="boardId=${response.boardID}"
                class="delete btn btn-sm btn-outline-secondary"
                sec:authorize="isAuthenticated()"
-               th:if="${response.authorID != null and #authentication.getPrincipal().getUsername() == response.authorName}"
+               th:if="${response.mine}"
                onclick="deletePost(this)"
                th:text="삭제"></a>
 
@@ -398,17 +407,122 @@
     }
 
 
+    function updatePostLikeButton(postId, liked, count){
+        var buttonId = 'like-btn_post';
+        var button = document.getElementById(buttonId);
+        var buttonLiked = button.getAttribute('liked')  === 'true';
+
+        var likeCountSpan = button.querySelector('span'); // 버튼 내부의 span 요소를 찾습니다.
 
 
-    // Post 추천
-    const recommend_elements = document.getElementsByClassName("recommend");
-    Array.from(recommend_elements).forEach(function(element) {
-        element.addEventListener('click', function() {
-            if(confirm("정말로 추천하시겠습니까?")) {
-                location.href = this.dataset.uri;
-            };
-        });
-    });
+        if(buttonLiked !== liked){
+            // liked 매개변수의 값에 따라 클래스와 'liked' 속성을 업데이트합니다.
+            if (liked) {
+
+                button.classList.add('btn-success');
+                button.classList.remove('btn-outline-success');
+                button.setAttribute('liked', 'true');
+            } else {
+                button.classList.add('btn-outline-success');
+                button.classList.remove('btn-success');
+                button.setAttribute('liked', 'false');
+            }
+        }
+
+        if(count != null){
+            document.getElementById("like-count_post").textContent = count;
+        }
+    }
+
+
+    function likePost(postId){
+        var buttonId = 'like-btn_post'
+        var button = document.getElementById(buttonId);
+        var isLiked = button.getAttribute('liked')  === 'true';  // boolean 타입으로 변경
+
+
+
+        if(!isLiked){
+
+            if (!confirm('이 댓글을 추천 하시겠습니까?')) {
+                return;
+            }
+
+            fetch("/api/posts/"+postId +"/postLikes", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                    // CSRF 토큰 추가
+                },
+                credentials: 'include' // 쿠키 포함
+            }).then(response => {
+                if (response.ok) {
+                    response.json().then(
+                        data=>{
+                            console.log(data["count"]);
+                            updatePostLikeButton(postId, true, data["count"])
+                            if(data["changed"]) {
+                                alert('게시글을 추천 하였습니다.');
+                            }
+                            else
+                                alert('이미 추천 하였습니다.')
+
+                        }
+
+                    )
+
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+                .catch(error => {
+                    console.error('추천 중 오류가 발생했습니다:', error);
+                    alert('게시글 추천에 실패했습니다: ' + error);
+                });
+
+        }
+        else{
+            if (!confirm('추천을 취소 하시겠습니까?')) {
+                return;
+            }
+
+            fetch("/api/posts/"+postId +"/postLikes", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                    // CSRF 토큰 추가
+                },
+                credentials: 'include' // 쿠키 포함
+            }).then(response => {
+                if (response.ok) {
+                    response.json().then(
+                        data=>{
+                            console.log(data.toString());
+                            updatePostLikeButton(postId, false, data["count"])
+                            if(data["changed"]) {
+                                alert('추천을 취소 하였습니다.');
+                            }
+                            else
+                                alert('이미 취소 하였습니다.')
+
+                        }
+                    )
+
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+                .catch(error => {
+                    console.error('게시글 추천 취소 오류가 발생했습니다:', error);
+                    alert('추천 취소에 실패했습니다: ' + error);
+                });
+
+        }
+
+
+    }
 
 
 </script>

@@ -89,30 +89,4 @@ public class PostWriteController {
 
 
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/vote/{id}")
-    public String postVote(Principal principal, @PathVariable("id") Integer id) {
-        Post post = this.readService.getPost(id);
-        Account siteUser = this.accountService.getAccount(principal.getName());
-        this.writeService.vote(post, siteUser);
-        return String.format("redirect:/post/detail/%s", id);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/unvote/{id}")
-    public String postUnvote(Principal principal, @PathVariable("id") Integer id) {
-        Post post = this.readService.getPost(id);
-        Account siteUser = this.accountService.getAccount(principal.getName());
-        this.writeService.unvote(post, siteUser);
-        return String.format("redirect:/post/detail/%s", id);
-    }
-
-    /*@GetMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id) {
-        Post post = this.readService.getPost(id);
-        model.addAttribute("post", post);
-        return "post_detail";
-    }
-*/
-
 }

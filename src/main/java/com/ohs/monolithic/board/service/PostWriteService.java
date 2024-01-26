@@ -180,64 +180,6 @@ public class PostWriteService {
 
 
 
-    @Transactional
-    public void vote(Post post, Account siteUser) {
-        PostLike like = pRepo.findPostLike(post.getId(), siteUser.getId());
-        // 최초로 추천을 누른 경우
-        if(like == null){
-            like = PostLike.builder()
-                    .post(post)
-                    .user(siteUser)
-                    .valid(true)
-                    .createDate(LocalDateTime.now())
-                    .updateDate(LocalDateTime.now())
-                    .build();
-
-
-
-            post.changeLikeCount(1);
-            pRepo.savePostLike(like);
-            pRepo.save(post);
-            return;
-            //like 새로 생성.
-        }
-
-        // 추천을 취소 했었지만, 다시 추천을 누른 경우.
-        if(!like.getValid()){
-
-            like.setValid(true);
-            like.setUpdateDate(LocalDateTime.now());
-            post.changeLikeCount(1);
-
-            pRepo.savePostLike(like);
-            pRepo.save(post);
-
-
-            //this.pRepo.save(post);
-        }
-
-        //post
-        //post.getVoter().add(siteUser);
-
-    }
-
-    @Transactional
-    public void unvote(Post post, Account siteUser) {
-        PostLike like = pRepo.findPostLike(post.getId(), siteUser.getId());
-        // 추천한 적이 없으면 무시한다.
-        if(like == null){
-            return;
-        }
-
-        // 추천 했었지만, 취소하려는 경우.
-        if(like.getValid()){
-            like.setValid(false);
-            like.setUpdateDate(LocalDateTime.now());
-            post.changeLikeCount(-1);
-            pRepo.savePostLike(like);
-            pRepo.save(post);
-        }
-    }
 
     Post getPost(Integer id) {
         if(id == null || id < 0)

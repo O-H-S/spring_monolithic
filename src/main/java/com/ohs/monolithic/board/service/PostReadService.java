@@ -32,6 +32,7 @@ import java.util.Optional;
 public class PostReadService {
     private final PostRepository repository;
     private final PostViewService postViewService;
+    private final PostLikeService postLikeService;
     private final BoardService bService;
 
     @PersistenceContext
@@ -40,14 +41,21 @@ public class PostReadService {
     @Transactional(readOnly = true)
     public PostDetailResponse readPost(Integer postID, Account viewer){
         Post targetPost = getPost(postID, true);
-        if(viewer != null)
+        Boolean isLiked = Boolean.FALSE;
+        Boolean isMine = Boolean.FALSE;
+        if(viewer != null) {
             // 조회수 카운팅 트랜잭션이 실패하더라도 게시글을 반환한다.
             try {
                 postViewService.view(targetPost, viewer); // 독립된 트랜잭션
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("Error updating post view count. : " + e.toString());
             }
-        return PostDetailResponse.of(targetPost);
+
+            isLiked = postLikeService.doesLikePost(postID, viewer.getId());
+            isMine = viewer.getId().equals( targetPost.getAuthor().getId());
+        }
+
+        return PostDetailResponse.of(targetPost, isMine, isLiked);
     }
 
     public Post getPost(Integer id){
