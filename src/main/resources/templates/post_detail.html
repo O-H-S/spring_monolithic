@@ -152,45 +152,25 @@
 </div>
 
 <script layout:fragment="script" type='text/javascript'>
-    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-    function deletePost(element) {
-        var url = element.getAttribute('data-uri');
-        var postId = element.getAttribute('data-id');
-        var boardId =  element.getAttribute('boardId');
-
+    async function deletePost(element) {
         if (!confirm('게시글을 삭제하시겠습니까?')) {
             return;
         }
 
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-                // CSRF 토큰 추가
-            },
-            credentials: 'include' // 쿠키 포함
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('게시글이 성공적으로 삭제되었습니다.');
-                    window.location.href = '/board/' + boardId;
+        var url = element.getAttribute('data-uri');
+        var boardId = element.getAttribute('boardId');
 
-
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-            .catch(error => {
-                console.error('삭제 중 오류가 발생했습니다:', error);
-                alert('게시글 삭제에 실패했습니다: ' + error);
-            });
+        const response = await fetchWithCSRF(url, 'DELETE');
+        if (response && response.ok) {
+            alert('게시글이 성공적으로 삭제되었습니다.');
+            window.location.href = '/board/' + boardId;
+        }
+        else{
+            console.error('삭제 중 오류가 발생했습니다:', await response.text());
+            alert('게시글 삭제에 실패했습니다: ' + await response.text());
+        }
     }
-
-
-
 
 
 
@@ -215,44 +195,49 @@
         viewGroup.style.display = 'block';
     }
 
-    // updateComment 함수는 서버에 변경 사항을 전송하는 로직을 포함해야 함
-    function updateComment(commentId) {
+
+    async function updateComment(commentId) {
         var content = document.getElementById('content-edit_' + commentId).value;
 
-        // AJAX 요청
-        fetch('/api/comments/' + commentId, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            // CSRF 토큰 추가
-            },
-            credentials: 'include', // 쿠키 포함
-            body: JSON.stringify({ content: content })
-        })
-            .then(response =>{
-                if(response.ok) {
-                    // 변경된 내용 기존 text 변경
-                    document.getElementById('content-view_' + commentId).textContent = content;
-                    // 성공 처리 로직
-                    cancelEdit(commentId);
-                }
-                else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-            .catch((error) => {
-                console.error('댓글 변경 중 오류가 발생했습니다:', error);
-                alert('댓글 변경에 실패했습니다: ' + error);
-            });
+        const response = await fetchWithCSRF('/api/comments/' + commentId, 'PUT', { content });
 
+        if (response.ok) {
+            document.getElementById('content-view_' + commentId).textContent = content;
+            cancelEdit(commentId);
+        }
+        else{
+            var errorText = await response.text();
+            console.error('변경 중 오류가 발생했습니다:', errorText);
+            alert('게시글 변경에 실패했습니다: ' + errorText);
+        }
+    }
+    async function deleteComment(element) {
+        var url = element.getAttribute('data-uri');
+        var commentId = element.getAttribute('data-id');
+
+        if (!confirm('댓글을 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const response = await fetchWithCSRF(url, 'DELETE');
+
+            if (response.ok) {
+                alert('댓글이 성공적으로 삭제되었습니다.');
+                var commentElement = document.getElementById('comment_' + commentId);
+                if (commentElement) {
+                    commentElement.parentNode.removeChild(commentElement);
+                }
+            } else {
+                throw new Error(await response.text());
+            }
+        } catch (error) {
+            console.error('삭제 중 오류가 발생했습니다:', error);
+            alert('댓글 삭제에 실패했습니다: ' + error);
+        }
     }
 
-
-
-
-
-    function deleteComment(element) {
+    /*function deleteComment(element) {
         var url = element.getAttribute('data-uri');
         var commentId = element.getAttribute('data-id');
 
@@ -287,7 +272,7 @@
                 console.error('삭제 중 오류가 발생했습니다:', error);
                 alert('댓글 삭제에 실패했습니다: ' + error);
             });
-    }
+    }*/
     // 댓글 추천
 
     function updateLikeButton(commentId, liked, count){
@@ -317,95 +302,42 @@
         }
     }
 
-    function likeComment(commentId){
+
+    async function likeComment(commentId) {
         var buttonId = 'like-btn_' + commentId;
         var button = document.getElementById(buttonId);
-        var isLiked = button.getAttribute('liked')  === 'true';  // boolean 타입으로 변경
+        var isLiked = button.getAttribute('liked') === 'true'; // Convert to boolean
 
-
-
-        if(!isLiked){
-
-            if (!confirm('이 댓글을 추천 하시겠습니까?')) {
-                return;
-            }
-
-            fetch("/api/comments/"+commentId +"/commentLikes", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                    // CSRF 토큰 추가
-                },
-                credentials: 'include' // 쿠키 포함
-            }).then(response => {
-                if (response.ok) {
-                    response.json().then(
-                        data=>{
-                            console.log(data["count"]);
-                            updateLikeButton(commentId, true, data["count"])
-                            if(data["changed"]) {
-                                alert('댓글을 추천 하였습니다.');
-                            }
-                            else
-                                alert('이미 추천 하였습니다.')
-
-                        }
-
-                    )
-
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-                .catch(error => {
-                    console.error('추천 중 오류가 발생했습니다:', error);
-                    alert('댓글 추천에 실패했습니다: ' + error);
-                });
-
-        }
-        else{
-            if (!confirm('추천을 취소 하시겠습니까?')) {
-                return;
-            }
-
-            fetch("/api/comments/"+commentId +"/commentLikes", {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                    // CSRF 토큰 추가
-                },
-                credentials: 'include' // 쿠키 포함
-            }).then(response => {
-                if (response.ok) {
-                    response.json().then(
-                        data=>{
-                            console.log(data.toString());
-                            updateLikeButton(commentId, false, data["count"])
-                            if(data["changed"]) {
-                                alert('추천을 취소 하였습니다.');
-                            }
-                            else
-                                alert('이미 취소 하였습니다.')
-
-                        }
-                    )
-
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-                .catch(error => {
-                    console.error('댓글 추천 취소 오류가 발생했습니다:', error);
-                    alert('추천 취소에 실패했습니다: ' + error);
-                });
-
+        var method, userConfirmationMessage;
+        if (!isLiked) {
+            method = 'POST';
+            userConfirmationMessage = '이 댓글을 추천 하시겠습니까?';
+        } else {
+            method = 'DELETE';
+            userConfirmationMessage = '추천을 취소 하시겠습니까?';
         }
 
+        if (!confirm(userConfirmationMessage)) {
+            return;
+        }
 
+        try {
+            const response = await fetchWithCSRF(`/api/comments/${commentId}/commentLikes`, method);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data["count"]);
+                updateLikeButton(commentId, !isLiked, data["count"]);
+                //let alertMessage = !isLiked ? '댓글을 추천 하였습니다.' : '추천을 취소 하였습니다.';
+                //alert(data["changed"] ? alertMessage : '이미 ' + (!isLiked ? '추천' : '취소') + ' 하였습니다.');
+            } else {
+                throw new Error(await response.text());
+            }
+        } catch (error) {
+            console.error('댓글 추천/취소 중 오류가 발생했습니다:', error);
+            alert('댓글 추천/취소에 실패했습니다: ' + error);
+        }
     }
-
 
     function updatePostLikeButton(postId, liked, count){
         var buttonId = 'like-btn_post';
@@ -434,95 +366,42 @@
         }
     }
 
-
-    function likePost(postId){
-        var buttonId = 'like-btn_post'
+    async function likePost(postId) {
+        var buttonId = 'like-btn_post';
         var button = document.getElementById(buttonId);
-        var isLiked = button.getAttribute('liked')  === 'true';  // boolean 타입으로 변경
+        var isLiked = button.getAttribute('liked') === 'true'; // Convert to boolean
 
-
-
-        if(!isLiked){
-
-            if (!confirm('이 댓글을 추천 하시겠습니까?')) {
-                return;
-            }
-
-            fetch("/api/posts/"+postId +"/postLikes", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                    // CSRF 토큰 추가
-                },
-                credentials: 'include' // 쿠키 포함
-            }).then(response => {
-                if (response.ok) {
-                    response.json().then(
-                        data=>{
-                            console.log(data["count"]);
-                            updatePostLikeButton(postId, true, data["count"])
-                            if(data["changed"]) {
-                                alert('게시글을 추천 하였습니다.');
-                            }
-                            else
-                                alert('이미 추천 하였습니다.')
-
-                        }
-
-                    )
-
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-                .catch(error => {
-                    console.error('추천 중 오류가 발생했습니다:', error);
-                    alert('게시글 추천에 실패했습니다: ' + error);
-                });
-
-        }
-        else{
-            if (!confirm('추천을 취소 하시겠습니까?')) {
-                return;
-            }
-
-            fetch("/api/posts/"+postId +"/postLikes", {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                    // CSRF 토큰 추가
-                },
-                credentials: 'include' // 쿠키 포함
-            }).then(response => {
-                if (response.ok) {
-                    response.json().then(
-                        data=>{
-                            console.log(data.toString());
-                            updatePostLikeButton(postId, false, data["count"])
-                            if(data["changed"]) {
-                                alert('추천을 취소 하였습니다.');
-                            }
-                            else
-                                alert('이미 취소 하였습니다.')
-
-                        }
-                    )
-
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-                .catch(error => {
-                    console.error('게시글 추천 취소 오류가 발생했습니다:', error);
-                    alert('추천 취소에 실패했습니다: ' + error);
-                });
-
+        var method, userConfirmationMessage;
+        if (!isLiked) {
+            method = 'POST';
+            userConfirmationMessage = '이 글을 추천 하시겠습니까?';
+        } else {
+            method = 'DELETE';
+            userConfirmationMessage = '추천을 취소 하시겠습니까?';
         }
 
+        if (!confirm(userConfirmationMessage)) {
+            return;
+        }
 
+        try {
+            const response = await fetchWithCSRF(`/api/posts/${postId}/postLikes`, method);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data["count"]);
+                updatePostLikeButton(postId, !isLiked, data["count"]);
+                //let alertMessage = !isLiked ? '게시글을 추천 하였습니다.' : '추천을 취소 하였습니다.';
+                //alert(data["changed"] ? alertMessage : '이미 ' + (!isLiked ? '추천' : '취소') + ' 하였습니다.');
+            } else {
+                throw new Error(await response.text());
+            }
+        } catch (error) {
+            console.error('게시글 추천/취소 중 오류가 발생했습니다:', error);
+            alert('게시글 추천/취소에 실패했습니다: ' + error);
+        }
     }
+
 
 
 </script>
