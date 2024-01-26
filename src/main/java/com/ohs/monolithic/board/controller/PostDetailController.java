@@ -54,8 +54,8 @@ public class PostDetailController {
         }
 
         commentService.createByID(id, commentForm.getContent(), viewer.getId());
-        baseModelMapping(model, id, viewer, new CommentForm());
-        return "post_detail";
+        //baseModelMapping(model, id, viewer, new CommentForm());
+        return "redirect:/post/{%d}".formatted(id);
     }
 
 

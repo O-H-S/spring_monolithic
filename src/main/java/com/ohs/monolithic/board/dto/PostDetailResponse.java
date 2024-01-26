@@ -11,6 +11,7 @@ public class PostDetailResponse {
   public Integer id;
   public Integer boardID;
   public Long authorID;
+  public Boolean mine;
   public String authorName;
   public String title;
   public String content;
@@ -18,11 +19,13 @@ public class PostDetailResponse {
   public LocalDateTime createDate;
   public Long likeCount;
   public Long viewCount;
+  public Boolean liked;
 
 
-  public static PostDetailResponse of(Post targetPost){
+  public static PostDetailResponse of(Post targetPost, Boolean mine, Boolean liked){
     PostDetailResponse newResponse = new PostDetailResponse();
     newResponse.id = targetPost.getId();
+    newResponse.mine = mine;
     newResponse.boardID = targetPost.getBoard().getId();
     newResponse.authorID = targetPost.getAuthor().getId();
     newResponse.authorName = targetPost.getAuthor().getUsername();
@@ -32,6 +35,7 @@ public class PostDetailResponse {
     newResponse.createDate = targetPost.getCreateDate();
     newResponse.likeCount = targetPost.getLikeCount();
     newResponse.viewCount = targetPost.getViewCount();
+    newResponse.liked = liked;
     return newResponse;
   }
 
