@@ -73,23 +73,21 @@ public class PostApiController {
 
   @PreAuthorize("hasAuthority('ADMIN')")
   @PostMapping("/{boardId}/bulk")
-  public ResponseEntity<?> bulkInsertPosts(@Valid @RequestBody BulkInsertForm form, @PathVariable("boardId") Integer boardId/* BindingResult bindingResult*/) {
+  public ResponseEntity<?> bulkInsertPosts(Principal currentUser, @Valid @RequestBody BulkInsertForm form, @PathVariable("boardId") Integer boardId/* BindingResult bindingResult*/) {
 
 
     boardService.assertBoardExists(boardId);
+    Account operator = accountService.getAccount(currentUser.getName());
 
+    // 리팩토링 필요.
+    // 컨트롤러에서 도메인 객체를 다루고 있음. (PostProxy or PostManipulator)
     LocalDateTime nowTime = LocalDateTime.now();
-    Post reusablePost = Post.builder()
-            .title(form.getTitle())
-            .author(null)
-            .createDate(nowTime)
-            .build();
-
     long startTime = System.currentTimeMillis();
-    writeService.createAllAsync(boardId, null, idx -> {
-      reusablePost.setContent(String.format("[%d / %d] \n 까지 총 %d (ms) 만큼 소요 되었습니다. ", idx + 1, form.getCount(), System.currentTimeMillis() - startTime));
-      reusablePost.setCreateDate(nowTime.plusNanos(idx * 1000));
-      return reusablePost;
+
+    writeService.createAllAsync(boardId, operator.getId(), (post, idx) -> {
+      post.setTitle(form.getTitle());
+      post.setContent(String.format("[%d / %d] \n 까지 총 %d (ms) 만큼 소요 되었습니다. ", idx + 1, form.getCount(), System.currentTimeMillis() - startTime));
+      post.setCreateDate(nowTime.plusNanos(idx * 1000));
     }, form.getCount());
 
     return ResponseEntity.status(HttpStatus.CREATED).build();

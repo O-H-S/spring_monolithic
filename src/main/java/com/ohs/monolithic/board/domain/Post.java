@@ -94,10 +94,10 @@ public class Post {
     @Builder
     public Post(Board board, Account author, String title, String content, LocalDateTime createDate){
 
-        Assert.notNull(board, " board must not be null");
-        Assert.notNull(author, " board must not be null");
-        Assert.notNull(title, " board must not be null");
-        Assert.notNull(content, " board must not be null");
+        Assert.notNull(board, "Post Creation : board must not be null");
+        Assert.notNull(author, "Post Creation : author must not be null");
+        Assert.notNull(title, "Post Creation : title must not be null");
+        Assert.notNull(content, "Post Creation : content must not be null");
 
         if (createDate == null)
             createDate = LocalDateTime.now();

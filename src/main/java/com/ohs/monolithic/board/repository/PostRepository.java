@@ -3,19 +3,15 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.domain.PostLike;
-import com.ohs.monolithic.utils.JdbcOperationsRepository;
 import jakarta.persistence.LockModeType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Optional;
 
 
