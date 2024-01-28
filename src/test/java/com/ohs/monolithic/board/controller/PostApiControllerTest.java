@@ -6,8 +6,10 @@ import com.ohs.monolithic.board.controller.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.service.BoardService;
+import com.ohs.monolithic.board.service.PostLikeService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
+import com.ohs.monolithic.user.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -52,6 +54,10 @@ public class PostApiControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private AccountService accountService;
+    @MockBean
+    private PostLikeService postLikeService;
     @MockBean
     private PostWriteService writeService;
     @MockBean
@@ -200,6 +206,7 @@ public class PostApiControllerTest {
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_성공() throws Exception {
 
+        doNothing().when(boardService).assertBoardExists(anyInt());
         // given, when
 
         BulkInsertForm form = BulkInsertForm.builder()

@@ -3,15 +3,12 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.domain.PostLike;
-import com.ohs.monolithic.board.domain.PostView;
 import com.ohs.monolithic.board.dto.BulkInsertResponse;
 import com.ohs.monolithic.board.dto.PostForm;
-import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.utils.JdbcOperationsRepository;
+import com.ohs.monolithic.utils.BulkInsertableRepository.BatchProcessor;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +22,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.function.BiConsumer;
 import java.util.function.LongFunction;
 
 
@@ -71,39 +70,15 @@ public class PostWriteService {
 
     }
 
-    private void _createAll(Integer boardID, List<Post> posts, LongFunction<Post> entityGenerator, Long counts, JdbcOperationsRepository.BatchProcessor logicPerBatch){
-
-        boardService.incrementPostCount(boardID, counts.intValue());
-        //System.out.println(String.format("%d, %d", posts.size(), boardService.getPostCount(boardID)));
-        Board boardReference = em.getReference(Board.class, boardID);
-
-        if(entityGenerator == null) {
-            posts.forEach(post -> post.setBoard(boardReference));
-            pRepo.bulkInsert(posts, logicPerBatch);
-        }
-        else {
-            LongFunction<Post> wrappedEntityGenerator = index -> {
-                // 기존 entityGenerator 로직
-                Post generated = entityGenerator.apply(index);
-                generated.setBoard(boardReference);
-                return generated;
-            };
-            pRepo.bulkInsert(counts, wrappedEntityGenerator, logicPerBatch);
-        }
-    }
-
-    @Transactional
-    public void createAll(Integer boardID, List<Post> posts) {
-        this._createAll(boardID, posts, null, (long)posts.size(), null);
-    }
-
 
     @Async("bulkInsertTaskExecutor")
     @Transactional
-    public void createAllAsync(Integer boardID, List<Post> posts, LongFunction<Post> entityGenerator, Long counts){
+    public CompletableFuture<Void> createAllAsync(Integer boardID, Long authorId, BiConsumer<Post, Long> entityConfigurer, Long counts){
+
         Long tID = Thread.currentThread().getId();
         bulkInsertStatus.put(tID, new BulkInsertResponse());
 
+        // 리팩토링 : 이 코드는 내부로 이동시켜야함.
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCompletion(int status) {
@@ -114,30 +89,36 @@ public class PostWriteService {
             }
         });
 
+        boardService.incrementPostCount(boardID, counts.intValue());
+        Board boardReference = em.getReference(Board.class, boardID);
 
-        this._createAll(boardID, posts, entityGenerator, posts != null ? (long)posts.size() : counts ,new JdbcOperationsRepository.BatchProcessor() {
+        Post reusablePost = Post.builder()
+                .board(em.getReference(Board.class, boardID))
+                .title("BulkInsertResult")
+                .content("BulkInsertResult")
+                .author(em.getReference(Account.class, authorId))
+                .createDate(LocalDateTime.now())
+                .build();
+
+        var customLogic = new BatchProcessor() {
             @Override
-            public void process(Integer curBatch, Integer maxBatch, Integer batchSize ,Boolean finished, Long executionTime) {
+            public void process(Integer curBatch, Integer maxBatch, Integer batchSize, Boolean finished, Long executionTime) {
 
-                bulkInsertStatus.get(tID).update(curBatch.longValue() * batchSize, maxBatch.longValue() * batchSize);
+                bulkInsertStatus.get(tID).update(curBatch.longValue() * batchSize, maxBatch.longValue() * batchSize); // 리팩토링 : 이 코드는 내부로 이동시켜야함.
                 System.out.println("bulkInsert batch : " + curBatch.toString() + " (" + executionTime.toString() + "ms) ");
-               /* bulkInsertStatus.compute(tID, (aLong, bulkInsertResponse) -> {
-                    bulkInsertResponse.update(curBatch.longValue() * batchSize, maxBatch.longValue() * batchSize);
-                    return bulkInsertResponse;
-                });*/
+
             }
+        };
 
-        });
-
+        LongFunction<Post> wrappedEntityGenerator = index -> {
+            // 기존 entityGenerator 로직
+            entityConfigurer.accept(reusablePost, index);
+            return reusablePost;
+        };
+        pRepo.bulkInsert(counts, wrappedEntityGenerator, customLogic);
+        return CompletableFuture.completedFuture(null);
     }
 
-    // legacy
-    public void modify(Post post, String title, String content) {
-        post.setTitle(title);
-        post.setContent(content);
-        post.setModifyDate(LocalDateTime.now());
-        this.pRepo.save(post);
-    }
 
     @Transactional
     public void modifyBy(Long id, Account operator, PostForm form){

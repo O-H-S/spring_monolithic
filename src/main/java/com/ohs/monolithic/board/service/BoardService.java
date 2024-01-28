@@ -28,6 +28,7 @@ public class BoardService {
     postCountCache = cache;
   }
 
+  // 트랜잭션 안에서 실행되어야함.
   public void incrementPostCount(Integer boardId) {
     postCountCache.compute(boardId, (key, count) -> count == null ? 1 : count + 1);
 
@@ -41,6 +42,7 @@ public class BoardService {
 
   }
 
+  // 트랜잭션 안에서 실행되어야함.
   public void incrementPostCount(Integer boardId, int delta) {
 
     postCountCache.compute(boardId, (key, count) -> count == null ? delta : count + delta);
@@ -56,6 +58,7 @@ public class BoardService {
 
   }
 
+  // 트랜잭션 안에서 실행되어야함.
   public void decrementPostCount(Integer boardId) {
     postCountCache.computeIfPresent(boardId, (key, count) -> count > 1 ? count - 1 : null);
 
