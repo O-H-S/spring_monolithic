@@ -1,21 +1,22 @@
 package com.ohs.monolithic.board.dto;
 
 
+import com.ohs.monolithic.board.BoardPaginationType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
-@Builder
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor(force = true)
 public class BoardCreationForm {
 
     @NotNull
     @Size(min = 1, max = 100)
-    final private String title;
+    private String title;
 
-    @Builder.Default
-    final private String desc = "";
+    private String desc = "";
+
+    private BoardPaginationType paginationType;
 
 }

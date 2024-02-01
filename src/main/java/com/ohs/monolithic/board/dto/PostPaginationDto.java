@@ -1,5 +1,6 @@
 package com.ohs.monolithic.board.dto;
 
+import com.ohs.monolithic.board.domain.Post;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,5 +30,18 @@ public class PostPaginationDto{
         commentCount = _commentCount;
         likeCount = _likeCount;
         viewCount = _viewCount;
+    }
+
+    public static PostPaginationDto of(Post origin){
+        return new PostPaginationDto(
+                origin.getId(),
+                origin.getTitle(),
+                origin.getAuthor().getId(),
+                origin.getAuthor().getUsername(),
+                origin.getCreateDate(),
+                origin.getCommentCount(),
+                origin.getLikeCount(),
+                origin.getViewCount()
+        );
     }
 }

@@ -1,13 +1,11 @@
 package com.ohs.monolithic.board.domain;
 
 
-import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.BoardPaginationType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 
 
 //@Table
@@ -21,7 +19,7 @@ import java.util.List;
 public class Board {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY) // GenerationType.SEQUENCE 와 차이점 공부하기.
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
 
@@ -34,26 +32,40 @@ public class Board {
   private String description;
 
   @Setter
-  @Column(nullable = true)
+  @Column
   private Long postCount;
 
   @Setter
   private LocalDateTime createDate;
+
+
+  // 차후, AttributeConverter를 통해 사용되지 않는 타입을 처리할 수 있다.
+  @Setter
+  @Enumerated(EnumType.STRING)
+  private BoardPaginationType paginationType;
+
+  // Hybrid Pagination 타입일 때, 몇개의 포스트부터 Cursor 방식으로 전환 되는지 결정.
+  @Setter
+  private Long thresholdForCursor;
 
   @Setter
   @Column(nullable = false)
   private Boolean deleted;
 
   @Builder
-  public Board(String title, String description, LocalDateTime createDate){
+  public Board(String title, String description, LocalDateTime createDate, BoardPaginationType paginationType, Long thresholdForCursor){
 
     if(createDate == null) createDate = LocalDateTime.now();
+    if(paginationType == null) paginationType = BoardPaginationType.Offset_CountCache_CoveringIndex;
+    if(paginationType.equals(BoardPaginationType.Hybrid) && thresholdForCursor == null) thresholdForCursor = 10000L;
 
     this.title = title;
     this.description = description;
     this.postCount = 0L;
     this.createDate = createDate;
     this.deleted = Boolean.FALSE;
+    this.paginationType = paginationType;
+    this.thresholdForCursor = thresholdForCursor;
 
   }
 

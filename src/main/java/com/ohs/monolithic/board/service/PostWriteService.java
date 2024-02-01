@@ -54,6 +54,11 @@ public class PostWriteService {
 
     private final BoardService boardService;
 
+    /*@Transactional
+    public Post create(Integer boardID, Integer userId, String title, String content){
+        return create(boardID, )
+    }*/
+
     @Transactional
     public Post create(Integer boardID, PostForm form, Account user) {
 

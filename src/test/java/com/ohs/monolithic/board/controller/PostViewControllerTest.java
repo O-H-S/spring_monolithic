@@ -29,12 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(PostDetailController.class)
+@WebMvcTest(PostViewController.class)
 @EnableMethodSecurity(prePostEnabled = true)
 @Import(SecurityConfigForUnitTest.class)
 @Tag("base")
 @Tag("unit")
-class PostDetailControllerTest {
+class PostViewControllerTest {
 
   @Autowired
   private MockMvc mockMvc;

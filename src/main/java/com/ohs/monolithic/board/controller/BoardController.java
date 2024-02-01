@@ -2,8 +2,10 @@ package com.ohs.monolithic.board.controller;
 
 
 import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.service.BoardService;
+import com.ohs.monolithic.board.service.PostPaginationService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.utils.IncludeExecutionTime;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+
+import java.util.List;
 
 /*
     HTML, Template 반환하는 컨트롤러(클라이언트가 브라우저에서 요청하는 경우)
@@ -23,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class BoardController {
     final BoardService bService;
-    final PostReadService pService;
+    final PostPaginationService paginationService;
 
 
     // Test 코드 작성됨.
@@ -36,23 +41,77 @@ public class BoardController {
     }
 
     @IncludeExecutionTime
-    @GetMapping("/{id}")
-    public String showBoard(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
+    @GetMapping("/{id}") // 게시판 리스트의 최초 진입
+    public String showBoard(Model model , @PathVariable("id") Integer id){
 
-        Page<PostPaginationDto> paging = this.pService.getListWithCovering(page,id);
-
-        Board curBoard = this.bService.getBoard(id);
-
+        BoardResponse curBoard = this.bService.getBoardReadOnly(id);
         model.addAttribute("title", curBoard.getTitle());
         model.addAttribute("desc", curBoard.getDescription());
-        model.addAttribute("paging", paging);
         model.addAttribute("board", id);
 
+        Page<PostPaginationDto> paging = this.paginationService.getPostListAsPage( id, 0 ,10);
+        if(paging != null){
+            model.addAttribute("paging", paging);
+            model.addAttribute("paginationFailed", false);
+            return "post_list";
+        }
+        List<PostPaginationDto> scroll = this.paginationService.getPostListAsScroll(id, null, 10);
+        if(scroll != null) {
+            model.addAttribute("scroll", scroll);
+            Long lastId = scroll.isEmpty() ? null : scroll.get(scroll.size() - 1).getId();
+            model.addAttribute("scroll_lastId", lastId);
+            model.addAttribute("scroll_isFinal", scroll.size() < 10);
+            model.addAttribute("paginationFailed", false);
+            return "post_list";
+        }
+        model.addAttribute("paginationFailed", true);
         return "post_list";
     }
 
+    @IncludeExecutionTime
+    @GetMapping(value = "/{id}", params = "page")
+    public String showBoardAsPage(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
+        Board curBoard = this.bService.getBoard(id);
+        model.addAttribute("title", curBoard.getTitle());
+        model.addAttribute("desc", curBoard.getDescription());
+        model.addAttribute("board", id);
+
+        Page<PostPaginationDto> paging = this.paginationService.getPostListAsPage( id, page ,10);
+        if(paging != null)
+        {
+            model.addAttribute("paging", paging);
+            model.addAttribute("paginationFailed", false);
+            return "post_list";
+        }
+
+        model.addAttribute("paginationFailed", true);
+        return "post_list";
+    }
+
+    @IncludeExecutionTime
+    @GetMapping(value = "/{id}", params = "lastPostId")
+    public String showBoardAsScroll(Model model , @PathVariable("id") Integer id, @RequestParam(value="lastPostId") Long lastId){
+        Board curBoard = this.bService.getBoard(id);
+        model.addAttribute("title", curBoard.getTitle());
+        model.addAttribute("desc", curBoard.getDescription());
+        model.addAttribute("board", id);
+
+        List<PostPaginationDto> scroll = this.paginationService.getPostListAsScroll(id, lastId, 10);
+        if(scroll != null) {
+            model.addAttribute("scroll", scroll);
+            Long newlastId = scroll.isEmpty() ? null : scroll.get(scroll.size() - 1).getId();
+            model.addAttribute("scroll_lastId", newlastId);
+            model.addAttribute("paginationFailed", false);
+            return "post_list";
+        }
+        model.addAttribute("paginationFailed", true);
+        return "post_list";
+    }
+
+
+
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/{id}/title")
+    @PutMapping("/{id}/title")
     public String titleChange(@AuthenticationPrincipal UserDetails user, @PathVariable("id") Integer id, @RequestParam String boardTitle){
 
         Board target = bService.getBoard(id);

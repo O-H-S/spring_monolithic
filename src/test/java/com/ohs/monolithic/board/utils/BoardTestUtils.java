@@ -43,22 +43,6 @@ public class BoardTestUtils {
     return newBoard;
   }
 
-  public static List<Post> bulkInsert(PostWriteService writeService, Integer boardID, int count) {
-    List<Post> posts = new ArrayList<>();
-    LocalDateTime cdate = LocalDateTime.now();
-    for (int i = 0; i < count; i++) {
-      posts.add(Post.builder()
-              .title("TestTitle")
-              .author(null)
-              .createDate(cdate)
-              .content("TestContent")
-              .build()
-      );
-      cdate = cdate.plusSeconds(1);
-    }
-    writeService.createAll(boardID, posts);
-    return posts;
-  }
 
   public static Triple<Post, Account, Board> createSimplePostAccountBoard() {
     Board simepleBoard = createBoardSimple(1, "Test", "Test");

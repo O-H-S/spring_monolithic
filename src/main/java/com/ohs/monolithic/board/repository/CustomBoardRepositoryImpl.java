@@ -38,6 +38,7 @@ public class CustomBoardRepositoryImpl extends QuerydslRepositorySupport impleme
             expressions.add(board.description);
         }
 
+        expressions.add(board.paginationType);
 
         Expression<BoardResponse> projection = Projections.bean(BoardResponse.class, expressions.toArray(new Expression[0])); // or Expression[]::new
         //Expression<BoardResponse> projection = Projections.bean(BoardResponse.class,board.id, board.title,null);

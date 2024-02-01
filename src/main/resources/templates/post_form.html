@@ -36,7 +36,7 @@
         var isNewPost = targetPostId == null;
         console.log(targetBoardId)
         console.log(isNewPost)
-        var requestUrl = isNewPost ? "/api/posts" : '/api/posts/' + targetPostId;
+        var requestUrl = isNewPost ? ("/api/"+targetBoardId +"/posts") : '/api/posts/' + targetPostId;
         var requestMethod = isNewPost ? 'POST' : 'PUT';
 
         // PostForm 객체 생성

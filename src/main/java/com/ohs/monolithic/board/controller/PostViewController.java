@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/post")
 @Controller
-public class PostDetailController {
+public class PostViewController {
 
     private final PostReadService readService;
     private final CommentService commentService;

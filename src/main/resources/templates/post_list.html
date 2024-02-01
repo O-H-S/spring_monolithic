@@ -55,43 +55,56 @@
 
     <table class="table table-custom table-responsive-md table-hover table-striped">
         <thead class="table-light">
-        <tr class="text-center">
-            <th scope="col">번호</th>
-            <th scope="col" class="title-cell">제목</th>
-            <th scope="col">추천</th>
-            <th scope="col">글쓴이</th>
-            <th scope="col">조회수</th>
-            <th scope="col">작성일시</th>
-        </tr>
+            <tr class="text-center">
+                <th scope="col">번호</th>
+                <th scope="col" class="title-cell">제목</th>
+                <th scope="col">추천</th>
+                <th scope="col">글쓴이</th>
+                <th scope="col">조회수</th>
+                <th scope="col">작성일시</th>
+            </tr>
         </thead>
         <tbody>
-        <tr class="text-center" th:each="post, loop : ${paging}">
-            <td th:text="${post.id}"></td>
-            <td class="text-start title-cell">
-                <a th:href="@{|/post/${post.id}|}" th:text="${post.title}"></a>
-                <span class="badge bg-danger rounded-pill ms-2"
-                      th:if="${post.commentCount > 0}"
-                      th:text="${post.commentCount}">
-                </span>
-            </td>
-            <td>
-                <span class="badge bg-primary ms-2" th:if="${post.getLikeCount() != null}" th:text="${post.getLikeCount()}"></span>
-            </td>
-            <td>
-                <span th:if="${post.getUserId() != null}" th:text="${post.getUserName()}"></span>
-                <span th:if="${post.userId == null}" class="text-muted fst-italic" th:text="'Unknown'"></span>
-            </td>
+            <!--<th:block th:each="source, loopStat : ${!paginationFailed and paging != null and !paging.isEmpty() ? paging : scroll}">
+                <tr class="text-center" th:each="post, loop : ${source}">
+                    <td th:text="${post.id}"></td>
+                    <td class="text-start title-cell">
+                        <a th:href="@{|/post/${post.id}|}" th:text="${post.title}"></a>
+                        <span class="badge bg-danger rounded-pill ms-2"
+                              th:if="${post.commentCount > 0}"
+                              th:text="${post.commentCount}">
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary ms-2" th:if="${post.getLikeCount() != null}" th:text="${post.getLikeCount()}"></span>
+                    </td>
+                    <td>
+                        <span th:if="${post.getUserId() != null}" th:text="${post.getUserName()}"></span>
+                        <span th:if="${post.userId == null}" class="text-muted fst-italic" th:text="'Unknown'"></span>
+                    </td>
 
-            <td>
-                <span th:text="${post.getViewCount() != null ? post.getViewCount() : 0}"></span>
-            </td>
-            <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-        </tr>
+                    <td>
+                        <span th:text="${post.getViewCount() != null ? post.getViewCount() : 0}"></span>
+                    </td>
+                    <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+            </th:block>-->
         </tbody>
+
+
     </table>
 
-    <!-- 페이징처리 시작 -->
-    <div th:if="${!paging.isEmpty()}">
+    <div th:if="${scroll != null and !scroll.isEmpty()}" class="d-flex justify-content-center">
+        <a id="loadMore" class="btn btn-primary btn-lg">더 보기</a>
+    </div>
+        <!--<a id="scrollPrev"  class="page-link btn btn-outline-primary">이전</a>-->
+
+        <!--<a id="scrollNext" class="page-link btn btn-outline-primary">다음</a>-->
+
+
+
+    <!-- 페이지 -->
+    <div th:if="${paging != null and !paging.isEmpty()}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
                 <a class="page-link"
@@ -112,10 +125,114 @@
             </li>
         </ul>
     </div>
-    <!-- 페이징처리 끝 -->
+
+
+
 
 
 
     <a th:href="@{|/post/write/${board}|}" class="btn btn-primary mt-3">글쓰기</a>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var paginationFailed = /*[[${paginationFailed}]]*/ true;
+        var paging = /*[[${paging}]]*/ [];
+        var scroll = /*[[${scroll}]]*/ [];
+        var lastId = /*[[${scroll_lastId}]]*/ null;
+        var isFinal = /*[[${scroll_isFinal}]]*/ false;
+        var boardId = /*[[${board}]]*/ null;
+        /*]]>*/
+
+
+        var sources;
+        if (!paginationFailed && paging != null ) {
+            sources = paging.content;
+        } else {
+            sources = scroll;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 초기 데이터 처리
+            processSources(sources);
+        });
+
+        function processSources(sources) {
+            sources.forEach(source => {
+                    createPostElement(source);
+            });
+        }
+
+        function createPostElement(post) {
+            var row = `<tr class="text-center">
+                    <td>${post.id}</td>
+                    <td class="text-start title-cell">
+                        <a href="/post/${post.id}">${post.title}</a>
+                        <span class="badge bg-danger rounded-pill ms-2"
+                              ${post.commentCount > 0 ? '' : 'style="display:none;"'}>
+                              ${post.commentCount || ''}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary ms-2" ${post.likeCount != null ? '' : 'style="display:none;"'}>
+                            ${post.likeCount}
+                        </span>
+                    </td>
+                    <td>
+                        ${post.userId != null ? post.userName : '<span class="text-muted fst-italic">Unknown</span>'}
+                    </td>
+                    <td>
+                        ${post.viewCount || 0}
+                    </td>
+                    <td>
+                        ${formatDate(post.createDate)}
+                    </td>
+                </tr>`;
+            document.querySelector('.table tbody').insertAdjacentHTML('beforeend', row);
+        }
+
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        function pad(number) {
+            return number < 10 ? '0' + number : number;
+        }
+
+
+        document.getElementById('loadMore').addEventListener('click', async function() {
+            let response = await fetchWithCredentials("/api/" + boardId + "/posts?lastPostId="+lastId, "GET");
+            if (response.ok) {
+                const data = await response.json();
+                data.forEach(p => createPostElement(p));
+                if (data && data.length > 0) {
+                    // lastId를 data의 마지막 요소의 id로 업데이트
+                    lastId = data[data.length - 1].id;
+                }
+            }
+
+        });
+
+        function updateFianlOnScroll(){
+            /*if(isFinal)*/
+        }
+
+
+
+
+    </script>
+
+
+
+
+
+
+
 </div>
+
+
+
+
+
 </html>

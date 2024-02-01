@@ -30,43 +30,33 @@ import static com.ohs.monolithic.user.QAccount.account;
 @Repository
 public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Post, Long> implements CustomPostRepository {
 
-
   final private JPAQueryFactory queryFactory;
 
 
-  public CustomPostRepositoryImpl(JdbcTemplate jdbcTemplate, JPAQueryFactory queryFactory, JdbcTemplate jdbcTemplate1) {
+  public CustomPostRepositoryImpl(JdbcTemplate jdbcTemplate, JPAQueryFactory queryFactory) {
     super(jdbcTemplate);
     this.queryFactory = queryFactory;
   }
 
-  //final private JdbcTemplate jdbcTemplate;
-
-
   //@Override
-  public Page<Post> selectAllByBoard(Pageable pageable, Board board, Long allCounts) {
+  public Page<PostPaginationDto> selectAllByBoard(Pageable pageable, Board board, Long allCounts) {
 
-        /*OrderSpecifier<?>[] orders = pageable.getSort().stream()
-                .map(order -> new OrderSpecifier<>(
-                        order.isAscending() ? Order.ASC : Order.DESC,
-                        Expressions.path(Post.class, qPost, order.getProperty())))
-                .toArray(OrderSpecifier[]::new);*/
-    List<Post> posts = queryFactory
-            .selectFrom(post)
-            /*select(Projections.fields(BookPaginationDto.class,
-                    book.id.as("bookId"),
-                    book.name,
-                    book.bookNo))
-            .from(book)*/
+    List<PostPaginationDto> posts = queryFactory
+            .select(createPostPaginationProjection())
             .where(
+                    post.deleted.isFalse(),
                     post.board.id.eq(board.getId())
-                    // board_id 와 board.getId()가 같을때
                     //book.name.like(name + "%") // like는 뒤에 %가 있을때만 인덱스가 적용됩니다.
             )
-            .orderBy(post.createDate.desc()) // 최신순으로
-            //.orderBy(qPost.id.desc())
-            .limit(pageable.getPageSize()) // 지정된 사이즈만큼
-            .offset(pageable.getOffset()) // 지정된 페이지 위치에서
-            .fetch(); // 조회
+            .from(post).leftJoin(post.author, account)
+            .orderBy(post.createDate.desc())
+            .limit(pageable.getPageSize())
+            .offset(pageable.getOffset())
+            .fetch();
+
+    if (CollectionUtils.isEmpty(posts)) {
+      return Page.empty(pageable);
+    }
 
     return new PageImpl<>(posts, pageable, allCounts);
   }
@@ -86,7 +76,6 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
             .fetch();
 
     if (CollectionUtils.isEmpty(ids)) {
-      //반환 코드 개선 필요.
       return Page.empty(pageable);
     }
 
@@ -99,11 +88,11 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
             .fetch();
 
     return new PageImpl<>(results, pageable, allCounts);
-    //return null;
   }
 
   @Override
   public List<PostPaginationDto> selectNextByBoard(Long baseID, Board board, Integer size) {
+
     List<PostPaginationDto> posts = queryFactory
             .select(createPostPaginationProjection())
             .from(post).leftJoin(post.author, account)
@@ -111,7 +100,7 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
                     post.deleted.isFalse(), post.board.id.eq(board.getId()), ltPostId(baseID)
             )
             .orderBy(post.createDate.desc()) // 최신순으로
-            //.orderBy(qPost.id.desc())
+
             .limit(size) // 지정된 사이즈만큼
             .fetch(); // 조회
     return posts;
@@ -138,8 +127,10 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
     return post.id.lt(postID);
   }
 
-
-  // 리팩토링 : Post 클래스의 필드 구성이 변경되면, 아래 코드들도 변경 되도록 자동화
+  /*
+    BulkInsert 관련 메소드 구현
+    리팩토링 : Post 클래스의 필드 구성이 변경되면, 아래 코드들도 변경 되도록 자동화
+  */
   @Override
   protected String initQuery() {
     // 'id' 필드는 생략.

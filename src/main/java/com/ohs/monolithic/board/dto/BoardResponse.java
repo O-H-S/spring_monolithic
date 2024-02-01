@@ -1,6 +1,7 @@
 package com.ohs.monolithic.board.dto;
 
 
+import com.ohs.monolithic.board.BoardPaginationType;
 import com.ohs.monolithic.board.domain.Board;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class BoardResponse {
     public String title;
     public String description;
     public Long postCounts;
+    public BoardPaginationType paginationType;
 
     public static BoardResponse fromEntity(Board board, Long postCounts) {
         return BoardResponse.builder()
@@ -23,6 +25,7 @@ public class BoardResponse {
                 .title(board.getTitle())
                 .description(board.getDescription())
                 .postCounts(postCounts)
+                .paginationType(board.getPaginationType())
                 .build();
     }
 }

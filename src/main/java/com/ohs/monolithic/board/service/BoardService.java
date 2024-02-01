@@ -1,7 +1,9 @@
 package com.ohs.monolithic.board.service;
 
 
+import com.ohs.monolithic.board.BoardPaginationType;
 import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.repository.BoardRepository;
@@ -85,14 +87,19 @@ public class BoardService {
     bRepo.saveAll(boards);
   }
 
+  @Transactional
+  public BoardResponse createBoard(String title, String desc){
+    return createBoard(title, desc, BoardPaginationType.Offset_CountCache_CoveringIndex);
+  }
 
   @Transactional
-  public BoardResponse createBoard(String title, String desc) {
+  public BoardResponse createBoard(String title, String desc, BoardPaginationType paginationType) {
 
 
     Board newBoard = Board.builder()
             .title(title)
             .description(desc)
+            .paginationType(paginationType)
             .build();
 
 
@@ -109,6 +116,16 @@ public class BoardService {
 
     return BoardResponse.builder()
             .id(resultBoard.getId()).title(resultBoard.getTitle()).description(resultBoard.getDescription()).build();
+  }
+
+  @Transactional
+  public BoardResponse updateBoard(Integer boardId, BoardCreationForm form){
+    Board target = getBoard(boardId);
+    target.setTitle(form.getTitle());
+    target.setDescription(form.getDesc());
+    target.setPaginationType(form.getPaginationType());
+    bRepo.save(target);
+    return BoardResponse.fromEntity(target, getPostCount(boardId));
   }
 
 

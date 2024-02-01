@@ -34,6 +34,17 @@ public class BoardApiController {
 
   }
 
+
+  @PreAuthorize("hasAuthority('ADMIN')")
+  @PutMapping("/{id}")
+  public ResponseEntity<BoardResponse> updateBoard(@PathVariable("id") Integer id, @Valid @ModelAttribute BoardCreationForm form) {
+
+    BoardResponse result = boardService.updateBoard(id, form);
+    return ResponseEntity.ok(result);
+  }
+
+
+
   // Test exists
   @GetMapping
   public ResponseEntity<List<BoardResponse>> getAllBoards(@Valid @ModelAttribute BoardQueryForm form, BindingResult bindingResult) {

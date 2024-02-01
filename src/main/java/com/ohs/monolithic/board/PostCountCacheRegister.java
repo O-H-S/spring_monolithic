@@ -33,12 +33,17 @@ public class PostCountCacheRegister implements ApplicationRunner {
                 board.setDeleted(false);
                 boardService.save(board);
             }
+            if(board.getPaginationType() == null) // 기존 데이터 호환성 위해
+            {
+                board.setPaginationType(BoardPaginationType.Offset_CountCache_CoveringIndex);
+                boardService.save(board);
+            }
 
             if(!board.getDeleted()) {
                 Long postCount = board.getPostCount();
-                if (postCount == null) {
+                /*if (postCount == null) {
                     postCount = postService.calculateCount(board.getId());
-                }
+                }*/
                 postCountMap.put(board.getId(), postCount);
             }
 

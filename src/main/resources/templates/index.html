@@ -34,7 +34,7 @@
                 </h5>
                 <!-- Add Settings Button for Admin Users -->
                 <div sec:authorize="hasAuthority('ADMIN')" class="ms-2">
-                  <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#settingsModal" th:data-board-id="${board.id}" th:data-board-title="${board.title}">설정</button>
+                  <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#settingsModal" th:data-board-id="${board.id}" th:data-board-title="${board.title}" th:data-board-desc="${board.description}" th:data-board-pagination="${board.paginationType}">설정</button>
                 </div>
               </div>
               <a th:href="@{|/board/${board.id}|}" class="btn btn-light btn-sm text-primary">More</a>
@@ -53,60 +53,140 @@
         </div>
       </div>
     </div>
-    <!-- 설정 모달 -->
-    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+
+    <!--<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg"> &lt;!&ndash; Adjusted modal size &ndash;&gt;
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="settingsModalLabel">게시판 설정</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="settingsForm" action="/board" method="post">
+            <form id="settingsForm" action="/board" method="post" class="mb-4">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-              <!-- 게시판 ID -->
-              <div class="mb-3">
-                <label for="boardId" class="form-label">게시판 ID</label>
-                <input type="text" class="form-control" id="boardId" name="boardId" readonly>
-              </div>
-              <!-- 이름 변경 입력 필드 -->
-              <div class="mb-3">
-                <label for="boardTitle" class="form-label">새로운 게시판 이름</label>
-                <input type="text" class="form-control" id="boardTitle" name="boardTitle" required>
-              </div>
-              <!-- 제출 버튼 -->
+
+              <fieldset>
+                <legend>General Settings</legend> &lt;!&ndash; Group Title &ndash;&gt;
+                <div class="mb-3">
+                  <label for="boardId" class="form-label">게시판 ID</label>
+                  <input type="text" class="form-control" id="boardId" name="boardId" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="boardTitle" class="form-label">새로운 게시판 이름</label>
+                  <input type="text" class="form-control" id="boardTitle" name="boardTitle" required>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Pagination Settings</legend> &lt;!&ndash; New Group Title &ndash;&gt;
+                <div class="mb-3">
+                  <label for="paginationType" class="form-label">페이지네이션 타입</label>
+                  <select id="paginationType" name="paginationType" class="form-select">
+                    <option th:each="type : ${paginationTypes}"
+                            th:value="${type}"
+                            th:text="${ type}">
+                    </option>
+                  </select>
+                </div>
+              </fieldset>
+
               <button type="submit" class="btn btn-primary">저장</button>
             </form>
-            <button id="deleteBoardBtn" class="btn btn-danger" data-board-id="{id}">Delete Board</button>
+
+            <button id="deleteBoardBtn" class="btn btn-danger mb-4" data-board-id="{id}">Delete Board</button>
+
             <form id="bulkInsertForm" action="/api/posts" method="post">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-              <!-- Bulk Insert에 필요한 포스트 제목 입력 필드 -->
-              <div class="mb-3">
-                <label for="bulkPostTitle" class="form-label">포스트 제목</label>
-                <input type="text" class="form-control" id="title" name="title" required>
-              </div>
-              <!-- Bulk Insert에 필요한 포스트 개수 입력 필드 -->
-              <div class="mb-3">
-                <label for="bulkPostCount" class="form-label">포스트 개수</label>
-                <input type="number" class="form-control" id="count" name="count" required>
-              </div>
-              <!-- Bulk Insert 제출 버튼 -->
+              <fieldset>
+                <legend>Bulk Post Insert</legend> &lt;!&ndash; Group Title &ndash;&gt;
+                <div class="mb-3">
+                  <label for="bulkPostTitle" class="form-label">포스트 제목</label>
+                  <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="mb-3">
+                  <label for="bulkPostCount" class="form-label">포스트 개수</label>
+                  <input type="number" class="form-control" id="count" name="count" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">Bulk Insert</button>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>-->
 
-              <button type="submit" class="btn btn-secondary">Bulk Insert</button>
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg"> <!-- Adjusted modal size -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="settingsModalLabel">게시판 설정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="settingsForm" action="/api/boards" method="post" class="mb-4">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <input type="hidden" name="_method" value="PUT"/>
+
+              <fieldset>
+                <legend>General Settings</legend> <!-- Group Title -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="boardId" class="form-label">게시판 ID</label>
+                    <input type="text" class="form-control" id="boardId" name="boardId" disabled>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="boardTitle" class="form-label">새로운 게시판 이름</label>
+                    <input type="text" class="form-control" id="boardTitle" name="title" required>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="boardDescription" class="form-label">게시판 설명</label>
+                  <textarea class="form-control" id="boardDescription" name="desc" rows="3"></textarea>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Pagination Settings</legend> <!-- New Group Title -->
+                <div class="mb-3">
+                  <label for="paginationType" class="form-label">페이지네이션 타입</label>
+                  <select id="paginationType" name="paginationType" class="form-select">
+                    <option th:each="type : ${paginationTypes}"
+                            th:value="${type}"
+                            th:text="${ type}">
+                    </option>
+                  </select>
+                </div>
+              </fieldset>
+
+              <button type="submit" class="btn btn-primary">저장</button>
             </form>
 
+            <button id="deleteBoardBtn" class="btn btn-danger mb-4" data-board-id="{id}">Delete Board</button>
 
+            <form id="bulkInsertForm" action="/api/posts" method="post">
 
-
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <fieldset>
+                <legend>Bulk Post Insert</legend> <!-- Group Title -->
+                <div class="mb-3">
+                  <label for="bulkPostTitle" class="form-label">포스트 제목</label>
+                  <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="mb-3">
+                  <label for="bulkPostCount" class="form-label">포스트 개수</label>
+                  <input type="number" class="form-control" id="count" name="count" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">Bulk Insert</button>
+              </fieldset>
+            </form>
           </div>
-
         </div>
       </div>
     </div>
+
+
+
     <script src="/settings-modal.js" defer></script>
   </div>
-
-
-
 
 </html>

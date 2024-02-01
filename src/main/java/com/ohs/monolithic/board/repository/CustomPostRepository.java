@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CustomPostRepository extends BulkInsertableRepository<Post, Long> {
-    Page<Post> selectAllByBoard(Pageable pageable, Board board, Long allCounts);
+    Page<PostPaginationDto> selectAllByBoard(Pageable pageable, Board board, Long allCounts);
     Page<PostPaginationDto> selectAllByBoardWithCovering(Pageable pageable, Board board, Long allCounts);
     List<PostPaginationDto> selectNextByBoard(Long baseID, Board board, Integer size);
 

@@ -10,16 +10,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const button = event.relatedTarget;
         const boardId = button.getAttribute('data-board-id');
         const boardTitle = button.getAttribute('data-board-title');
+        const paginationType = button.getAttribute('data-board-pagination');
+        const boardDesc = button.getAttribute('data-board-desc');
 
+        const modalPaginationTypeSelect = settingsModal.querySelector('#paginationType');
         const modalBoardId = settingsModal.querySelector('#boardId');
         const modalBoardName = settingsModal.querySelector('#boardTitle');
-        console.log(boardId + boardTitle);
+        const modalBoardDesc = settingsModal.querySelector('#boardDescription');
+
 
         modalBoardId.value = boardId;
         modalBoardName.value = boardTitle;
+        modalBoardDesc.value = boardDesc;
 
-        settingsForm.action = `/board/${boardId}/title`;
-        bulkInsertForm.action = `/api/posts/${boardId}/bulk`;
+        Array.from(modalPaginationTypeSelect.options).forEach(option => {
+            if(option.value === paginationType) {
+                option.textContent = option.value + " (Current)";
+                modalPaginationTypeSelect.value = paginationType;
+            }
+            else{
+                option.textContent = option.value;
+            }
+        });
+
+        settingsForm.action = `api/boards/${boardId}`;
 
     });
 
@@ -32,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const csrfToken = this.querySelector('[name="_csrf"]').value;
 
         // AJAX 요청을 사용하여 JSON 형식으로 데이터를 전송
-        fetch(`/api/posts/${boardId}/bulk`, {
+        fetch(`/api/${boardId}/posts/bulk`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

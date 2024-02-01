@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
+import com.ohs.monolithic.board.BoardPaginationType;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.repository.BoardRepository;
@@ -88,10 +89,10 @@ public class BoardControllerIntegrationTest {
         //given
 
         // when
-        BoardCreationForm form = BoardCreationForm.builder()
-                .title("Test Title")
-                .desc("Test Description")
-                .build();
+        BoardCreationForm form = new BoardCreationForm();
+        form.setTitle("Test Title");
+        form.setDesc("Test Description");
+        form.setPaginationType(BoardPaginationType.Offset_CountCache_CoveringIndex);
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders

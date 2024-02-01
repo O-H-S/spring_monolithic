@@ -26,3 +26,25 @@ async function fetchWithCSRF(url, method, body = null) {
     return response;
 
 }
+
+async function fetchWithCredentials(url, method, body = null) {
+    const headers = {
+
+    };
+
+    let options = {
+        method: method,
+        headers: headers,
+        credentials: 'include'
+    };
+
+
+
+    const response = await fetch(url, options);
+    /*if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+    }*/
+    return response;
+
+}

@@ -5,10 +5,8 @@ import com.ohs.monolithic.SecurityConfigForUnitTest;
 import com.ohs.monolithic.board.controller.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
-import com.ohs.monolithic.board.service.BoardService;
-import com.ohs.monolithic.board.service.PostLikeService;
-import com.ohs.monolithic.board.service.PostReadService;
-import com.ohs.monolithic.board.service.PostWriteService;
+import com.ohs.monolithic.board.service.*;
+import com.ohs.monolithic.user.Account;
 import com.ohs.monolithic.user.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,6 +63,10 @@ public class PostApiControllerTest {
     @MockBean
     private BoardService boardService;
 
+    @MockBean
+    private PostPaginationService postPaginationService;
+
+
     private Gson gson; // json 직렬화,역직렬화
 
     private String url;
@@ -82,14 +84,14 @@ public class PostApiControllerTest {
 
 
     @Test
-    @DisplayName("POST /api/posts/{board}/bulk : form 누락이면 실패 - 403 ")
+    @DisplayName("POST /api/{board}/posts/bulk : form 누락이면 실패 - 403 ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_실패_form누락() throws Exception {
 
         // given, when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/posts/1/bulk")
+                        .post("/api/1/posts/bulk")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -103,7 +105,7 @@ public class PostApiControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/posts/{board}/bulk : 어드민이 아니면 실패 - 403 ")
+    @DisplayName("POST /api/{board}/posts/bulk : 어드민이 아니면 실패 - 403 ")
     @WithMockUser(username = "hyeonsu", authorities = "USER")
     public void bulkInsert_실패_어드민아님() throws Exception {
 
@@ -116,7 +118,7 @@ public class PostApiControllerTest {
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/posts/1/bulk")
+                        .post("/api/1/posts/bulk")
                         .with(csrf())
                         .content(gson.toJson(form))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +133,7 @@ public class PostApiControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/posts/{board}/bulk : form 검증 실패 - 422 ")
+    @DisplayName("POST /api/{board}/posts/bulk  : form 검증 실패 - 422 ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_실패_FORM() throws Exception {
 
@@ -144,7 +146,7 @@ public class PostApiControllerTest {
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/posts/1/bulk")
+                        .post("/api/1/posts/bulk")
                         .with(csrf())
                         .content(gson.toJson(form))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,7 +161,7 @@ public class PostApiControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/posts/{board}/bulk : 게시판이 존재하지 않으면 실패- 404 ")
+    @DisplayName("POST /api/{board}/posts/bulk  : 게시판이 존재하지 않으면 실패- 404 ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_실패_게시판없음() throws Exception {
 
@@ -182,7 +184,7 @@ public class PostApiControllerTest {
 
         for(Integer idx : tryIDs) {
             // when
-            url = String.format( "/api/posts/%d/bulk", idx);
+            url = String.format( "/api/%d/posts/bulk", idx);
             ResultActions result = mockMvc.perform(
                     MockMvcRequestBuilders
                             .post(url)
@@ -202,11 +204,12 @@ public class PostApiControllerTest {
 
 
     @Test
-    @DisplayName("POST /api/posts/{board}/bulk : 성공- 201 ")
+    @DisplayName("POST /api/{board}/posts/bulk  : 성공- 201 ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_성공() throws Exception {
 
         doNothing().when(boardService).assertBoardExists(anyInt());
+        when(accountService.getAccount(anyString())).thenReturn(Account.builder().username("test").password("sdfsdf").build());
         // given, when
 
         BulkInsertForm form = BulkInsertForm.builder()
@@ -216,7 +219,7 @@ public class PostApiControllerTest {
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/posts/1/bulk")
+                        .post("/api/1/posts/bulk")
                         .with(csrf())
                         .content(gson.toJson(form))
                         .contentType(MediaType.APPLICATION_JSON)
