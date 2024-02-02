@@ -1,5 +1,6 @@
-package com.ohs.monolithic.user.oauth2;
+package com.ohs.monolithic.configuration;
 
+import com.ohs.monolithic.user.oauth2.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
