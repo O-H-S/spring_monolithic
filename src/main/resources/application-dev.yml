@@ -1,0 +1,21 @@
+spring:
+  jpa:
+    show_sql: true
+    properties:
+      hibernate:
+
+        format_sql: true
+
+
+logging:
+  level:
+    #root: debug
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
