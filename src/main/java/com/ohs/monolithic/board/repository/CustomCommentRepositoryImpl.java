@@ -6,6 +6,7 @@ import com.ohs.monolithic.user.Account;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -48,7 +49,9 @@ public class CustomCommentRepositoryImpl extends QuerydslRepositorySupport imple
             ? commentLike.member.id.eq(viewer.getId()).and(commentLike.valid.eq(true))
             : Expressions.asBoolean(false);
 
-    List<CommentPaginationDto> results = queryFactory.
+    List<CommentPaginationDto> results;
+
+    JPAQuery<CommentPaginationDto> query = queryFactory.
             select(
                     Projections.fields(CommentPaginationDto.class,
                             comment.id,
@@ -61,11 +64,16 @@ public class CustomCommentRepositoryImpl extends QuerydslRepositorySupport imple
                             )
             )
             .from(comment)
-            .leftJoin(comment.author, account)
-            .leftJoin(commentLike).on(comment.id.eq(commentLike.comment.id))
-            .where(comment.id.in(ids))
+            .leftJoin(comment.author, account);
+    if(viewer != null) {
+      query = query.leftJoin(commentLike).on(comment.id.eq(commentLike.comment.id)
+                      .and(commentLike.member.id.eq(viewer.getId())));
+    }
+
+    results = query.where(comment.id.in(ids))
             .orderBy(comment.createDate.desc())
             .fetch();
+
 
     // join의 on을 충족하지 못할 경우, null이 된다.
     results.forEach(dto -> {
