@@ -1,8 +1,7 @@
 
 
 - TO-DO
-    - https://mangkyu.tistory.com/182 (다 읽고 정리하기)
-    - 통합 테스트 코드 작성해보기
+
 ```java
 // template code
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

@@ -6,6 +6,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 application-secret.yml
+application-secret_dev.yml
+application-secret_common.yml
 .p12
 .pem
 
