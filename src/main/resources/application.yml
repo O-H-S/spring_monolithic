@@ -3,14 +3,16 @@ server:
 
 spring:
   config:
-    import: classpath:application-secret.yml
+    import:
+    - classpath:application-secret_common.yml
+    - classpath:application-secret.yml
 
   #JPA
   jpa:
     open-in-view: false
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         jdbc.batch_size: 1000
