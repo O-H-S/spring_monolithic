@@ -8,8 +8,11 @@
 
 ## 프로젝트 환경 / 구조
 
-![architecture_brief.png](documents%2Fimages%2Farchitecture_brief.png)
+### Test / Development 
+![test_architecture.png](documents%2Fimages%2Ftest_architecture.png)
 
+### Deployment / Production
+![prod_architecture.png](documents%2Fimages%2Fprod_architecture.png)
 ### Stack
 
 `IntelliJ 2023.2` `Java17` `Gradle 8.2.1` `SpringBoot 3.1.3` `SpringDataJPA` `Hibernate`
