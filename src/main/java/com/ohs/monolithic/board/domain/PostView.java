@@ -1,8 +1,7 @@
 package com.ohs.monolithic.board.domain;
 
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

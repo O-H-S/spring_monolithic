@@ -2,14 +2,22 @@
 
 > **Spring Boot** 학습 목적의 개인 프로젝트입니다.
 >
-> 이 프로젝트는 "점프 투 프로젝트(https://wikidocs.net/book/7601)" 을 따라하는 것부터 시작하여, 제가 개인적으로 학습한 백엔드 관련 지식들과 접목하여 개선 시키는 방향으로 진행하고 있습니다.
+> 
+> 기본적인 게시판 기능이 메인 서비스로, 대용량/대규모 트래픽의 시나리오에서 올바르게 동작할 수 있도록 구현하는 것이 최종 목표입니다. 비록 개인의 소규모 프로젝트이긴 하지만, 협업과 장기적인 유지보수를 가정하여 문서화와 리팩토링에 소홀히 하지 않고 있습니다.
+> 
+> (*) 이 프로젝트는 "점프 투 프로젝트(https://wikidocs.net/book/7601)" 을 따라하는 것부터 시작하여, 제가 개인적으로 학습한 백엔드 관련 지식들과 접목하여 개선 시키는 방향으로 진행하고 있습니다.
 >
-> 참고 자료의 결과물 : https://sbb.pybo.kr/  
-> 개선한 결과물(현재 Repository) : https://www.ohs.kr/
+> `[Before]` 참고 자료의 결과물 : https://sbb.pybo.kr/  
+> `[ After]` 개선한 결과물(현재 프로젝트) : https://www.ohs.kr/
+>
+>
+---
+
+
 * `index` 페이지
-![indexPage.png](documents%2Fimages%2FindexPage.png)
+  ![indexPage.png](documents%2Fimages%2FindexPage.png)
 * `post list` 페이지
-![postListPage.png](documents%2Fimages%2FpostListPage.png)
+  ![postListPage.png](documents%2Fimages%2FpostListPage.png)
 
 ## 프로젝트 환경 / 구조
 

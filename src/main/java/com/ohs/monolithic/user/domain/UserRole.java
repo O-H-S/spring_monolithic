@@ -1,4 +1,4 @@
-package com.ohs.monolithic.user;
+package com.ohs.monolithic.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

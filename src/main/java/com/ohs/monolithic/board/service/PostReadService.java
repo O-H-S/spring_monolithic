@@ -1,26 +1,16 @@
 package com.ohs.monolithic.board.service;
 
 
-import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
-import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
-import com.ohs.monolithic.user.Account;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.ohs.monolithic.user.domain.Account;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 

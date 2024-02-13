@@ -1,11 +1,17 @@
-package com.ohs.monolithic.user.oauth2;
+package com.ohs.monolithic.user.service;
 
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountService;
-import com.ohs.monolithic.user.UserRole;
+import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.domain.LocalCredential;
+import com.ohs.monolithic.user.domain.OAuth2Credential;
+import com.ohs.monolithic.user.dto.OAuth2AppUser;
+import com.ohs.monolithic.user.domain.UserRole;
+import com.ohs.monolithic.user.repository.LocalCredentialRepository;
+import com.ohs.monolithic.user.repository.OAuth2CredentialRepository;
 import lombok.RequiredArgsConstructor;
+import org.codehaus.groovy.classgen.FinalVariableAnalyzer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -13,14 +19,12 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class OAuth2UserService extends DefaultOAuth2UserService {
+public class OAuth2AccountService extends DefaultOAuth2UserService {
+    private final OAuth2CredentialRepository oAuth2CredentialRepository;
     private final AccountService accountService;
 
     @Override
@@ -36,7 +40,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
-        //System.out.println((userNameAttributeName)); 는 "id"라는 문자열을 반환한다.
+        //System.out.println((userNameAttributeName));  카카오, "id" 출력.
 
         // Debug 용
         oAuth2User.getAttributes().forEach((key, value) -> {
@@ -49,17 +53,19 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         // 고유한 id 값을 name으로 가지는 계정이 없다면, 새롭게 만든다.
         //
-        String username = Objects.requireNonNull(oAuth2User.getAttribute(userNameAttributeName)).toString();
-        Account _siteUser = null;
-        try {
-            _siteUser = this.accountService.getAccount(username);
+        String providerId = Objects.requireNonNull(oAuth2User.getAttribute(userNameAttributeName)).toString();
+
+        Optional<OAuth2Credential> credentialOp = oAuth2CredentialRepository.findByProviderAndProviderId(provider, providerId);
+        Account account = null;
+        if (credentialOp.isEmpty()) {
+            account = accountService.createAsOAuth2("", "", provider, providerId);
         }
-        catch(Exception e) {
-            _siteUser = this.accountService.create(username, null, "", provider, username, UserRole.USER);
+        else{
+            account = credentialOp.get().getAccount();
         }
 
         // 유저 권한 지정.
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(_siteUser.getRole().toString());
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(account.getRole().toString());
 
 
         // attribute 정의
@@ -67,7 +73,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         //attributes.put("name", username);
 
 
-        // DefaultOAuth2User 객체를 소유하여, 기능 구현되므로 생성자로 넘겨주기.
-        return new CustomOAuth2User(new DefaultOAuth2User(authorities, attributes, userNameAttributeName));
+
+        return new OAuth2AppUser(account, authorities, attributes,userNameAttributeName);
     }
 }

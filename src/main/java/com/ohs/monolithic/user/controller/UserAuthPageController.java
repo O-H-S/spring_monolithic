@@ -1,10 +1,12 @@
-package com.ohs.monolithic.user;
+package com.ohs.monolithic.user.controller;
 
+import com.ohs.monolithic.user.domain.UserRole;
+import com.ohs.monolithic.user.dto.AccountCreateForm;
+import com.ohs.monolithic.user.dto.AppUser;
 import com.ohs.monolithic.user.exception.FailedAdminLoginException;
-import jakarta.persistence.PostLoad;
+import com.ohs.monolithic.user.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -26,17 +27,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserAuthPageController {
 
     private final AccountService service;
 
     @PreAuthorize("isAuthenticated()")
     //@PatchMapping("/me/admin")
     @PostMapping("/me/admin")
-    public String tryLoginToAdmin(@AuthenticationPrincipal UserDetails user, @RequestParam String secretKey){
+    public String tryLoginToAdmin(@AuthenticationPrincipal AppUser user, @RequestParam String secretKey){
         System.out.println("trying to get admin role : " + secretKey);
         try {
-            service.upgradeToAdmin(user.getUsername(), secretKey);
+            service.upgradeToAdmin(user.getAccount(), secretKey);
             Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
             List<GrantedAuthority> updatedAuthorities = AuthorityUtils.createAuthorityList(UserRole.ADMIN.toString());
 
@@ -78,11 +79,11 @@ public class UserController {
             return "signup_form";
         }
         try {
-            service.create(accountCreateForm.getUsername(),
-                    accountCreateForm.getEmail(), accountCreateForm.getPassword1());
+            service.createAsLocal(accountCreateForm.getNickname(), accountCreateForm.getEmail(), accountCreateForm.getUsername(), accountCreateForm.getPassword1());
         }
         catch(DataIntegrityViolationException e) {
             e.printStackTrace();
+
             bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
             return "signup_form";
         }

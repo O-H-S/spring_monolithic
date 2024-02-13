@@ -5,15 +5,14 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountService;
-import jakarta.validation.Valid;
+import com.ohs.monolithic.user.dto.AppUser;
+import com.ohs.monolithic.user.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -57,10 +56,10 @@ public class PostWriteController {
 */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String postModify(Model model, PostForm postForm, @PathVariable("id") Long id, Principal principal) {
+    public String postModify(Model model, PostForm postForm, @PathVariable("id") Long id, @AuthenticationPrincipal AppUser user) {
         // 리팩토링 대상, postService에 위임하기.
         Post post = this.readService.getPost(id, true);
-        if(!post.getAuthor().getUsername().equals(principal.getName())) {
+        if(!post.getAuthor().getId().equals(user.getAccountId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         postForm.setSubject(post.getTitle());

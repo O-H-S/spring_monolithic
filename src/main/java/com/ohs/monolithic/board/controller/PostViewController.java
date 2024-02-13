@@ -6,11 +6,13 @@ import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.service.CommentService;
 import com.ohs.monolithic.board.service.PostReadService;
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountService;
+import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.dto.AppUser;
+import com.ohs.monolithic.user.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,9 +35,9 @@ public class PostViewController {
 
 
     @GetMapping("/{id}")
-    public String getPostDetail(Model model, @PathVariable("id") Long id, Principal currentUser){
+    public String getPostDetail(Model model, @PathVariable("id") Long id, @AuthenticationPrincipal AppUser user){
 
-        Account viewer = currentUser != null ? accountService.getAccount(currentUser.getName()) : null;
+        Account viewer = user != null ? user.getAccount() : null;
 
         baseModelMapping(model, id, viewer, new CommentForm());
         return "post_detail";
@@ -45,15 +47,14 @@ public class PostViewController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/comments")
     public String writeComment( Model model, @PathVariable("id") Long id,
-                               @Valid CommentForm commentForm, BindingResult bindingResult, Principal currentUser){
-        Account viewer =  accountService.getAccount(currentUser.getName());
+                               @Valid CommentForm commentForm, BindingResult bindingResult, @AuthenticationPrincipal AppUser user){
 
         if (bindingResult.hasErrors()) {
-            baseModelMapping(model, id, viewer, commentForm);
+            baseModelMapping(model, id, user.getAccount(), commentForm);
             return "post_detail";
         }
 
-        commentService.createByID(id, commentForm.getContent(), viewer.getId());
+        commentService.createByID(id, commentForm.getContent(), user.getAccountId());
         //baseModelMapping(model, id, viewer, new CommentForm());
         return String.format("redirect:/post/%d", id);
     }

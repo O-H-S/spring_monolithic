@@ -7,7 +7,7 @@ import com.ohs.monolithic.board.dto.BulkInsertResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 import com.ohs.monolithic.utils.BulkInsertableRepository.BatchProcessor;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,7 +20,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;

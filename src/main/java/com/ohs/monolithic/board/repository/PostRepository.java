@@ -18,10 +18,7 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository {
 
-    
-    //@EntityGraph(attributePaths = { "author.address"}) 이런식으로 중첩된 동작 가능.
-    //  Integer id가 실제로 어떤 엔터티를 찾을지 결정하는 기준이 됩니
-    //  다??
+
 
     @EntityGraph(attributePaths = {"board", "author"}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")

@@ -5,13 +5,11 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostView;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.repository.PostViewRepository;
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

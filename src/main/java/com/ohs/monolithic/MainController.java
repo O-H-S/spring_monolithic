@@ -5,11 +5,12 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostPaginationService;
-import com.ohs.monolithic.board.service.PostReadService;
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountService;
-import com.ohs.monolithic.user.UserRole;
+import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.dto.AppUser;
+import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,12 +30,11 @@ public class MainController {
   final PostPaginationService postPaginationService;
 
   @GetMapping("/")
-  public String index(Principal currentUser, Model model) {
+  public String index(@AuthenticationPrincipal AppUser user, Model model) {
 
     boolean requiredDesc = false;
-    if(currentUser != null) {
-      Account visitor = accountService.getAccount(currentUser.getName());
-      if(visitor.getRole() == UserRole.ADMIN) requiredDesc = true;
+    if(user != null) {
+      if(user.getAccount().getRole() == UserRole.ADMIN) requiredDesc = true;
     }
 
     List<BoardResponse> boards = boardService.getBoardsReadOnly(true, requiredDesc);

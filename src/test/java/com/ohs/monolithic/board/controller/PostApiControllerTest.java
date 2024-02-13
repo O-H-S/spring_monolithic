@@ -2,20 +2,16 @@ package com.ohs.monolithic.board.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.ohs.monolithic.SecurityConfigForUnitTest;
-import com.ohs.monolithic.board.controller.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.service.*;
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountService;
+import com.ohs.monolithic.board.utils.WithMockCustomUser;
+import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,7 +23,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -205,11 +200,11 @@ public class PostApiControllerTest {
 
     @Test
     @DisplayName("POST /api/{board}/posts/bulk  : 성공- 201 ")
-    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_성공() throws Exception {
 
         doNothing().when(boardService).assertBoardExists(anyInt());
-        when(accountService.getAccount(anyString())).thenReturn(Account.builder().username("test").password("sdfsdf").build());
+        //when(accountService.getAccount(anyString())).thenReturn(Account.builder().nickname("test").build());
         // given, when
 
         BulkInsertForm form = BulkInsertForm.builder()

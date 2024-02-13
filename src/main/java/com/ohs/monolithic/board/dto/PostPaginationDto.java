@@ -14,18 +14,18 @@ public class PostPaginationDto{
     Long id;
     String title;
     Long userId;
-    String userName;
+    String userNickname;
     LocalDateTime createDate;
     Integer commentCount;
     Long likeCount;
     Long viewCount;
     @QueryProjection
-    public PostPaginationDto(Long _id, String _title, Long _userId, String _userName, LocalDateTime _createDate
+    public PostPaginationDto(Long _id, String _title, Long _userId, String _userNickname, LocalDateTime _createDate
             , Integer _commentCount, Long _likeCount, Long _viewCount){
         id = _id;
         title = _title;
         userId = _userId;
-        userName = _userName;
+        userNickname = _userNickname;
         createDate = _createDate;
         commentCount = _commentCount;
         likeCount = _likeCount;
@@ -37,7 +37,7 @@ public class PostPaginationDto{
                 origin.getId(),
                 origin.getTitle(),
                 origin.getAuthor().getId(),
-                origin.getAuthor().getUsername(),
+                origin.getAuthor().getNickname(),
                 origin.getCreateDate(),
                 origin.getCommentCount(),
                 origin.getLikeCount(),

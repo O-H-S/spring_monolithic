@@ -28,7 +28,7 @@ public class PostDetailResponse {
     newResponse.mine = mine;
     newResponse.boardID = targetPost.getBoard().getId();
     newResponse.authorID = targetPost.getAuthor().getId();
-    newResponse.authorName = targetPost.getAuthor().getUsername();
+    newResponse.authorName = targetPost.getAuthor().getNickname();
     newResponse.title = targetPost.getTitle();
     newResponse.content = targetPost.getContent();
     newResponse.modifyDate = targetPost.getModifyDate();

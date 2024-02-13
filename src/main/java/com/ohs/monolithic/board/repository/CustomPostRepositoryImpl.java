@@ -23,7 +23,7 @@ import java.sql.*;
 import java.util.List;
 
 import static com.ohs.monolithic.board.domain.QPost.post;
-import static com.ohs.monolithic.user.QAccount.account;
+import static com.ohs.monolithic.user.domain.QAccount.account;
 
 
 
@@ -114,7 +114,7 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
             post.id.as("id"),
             post.title,
             account.id.as("userId"),
-            account.username.as("userName"),
+            account.nickname.as("userNickname"),
             post.createDate,
             post.commentCount, post.likeCount, post.viewCount);
   }

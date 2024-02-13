@@ -1,16 +1,12 @@
 package com.ohs.monolithic.board.domain;
 
 
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.cglib.core.Local;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 
 
 @Entity
