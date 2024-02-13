@@ -1,13 +1,10 @@
 package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.BoardPaginationType;
-import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.user.Account;
-import org.antlr.v4.runtime.misc.Triple;
+import com.ohs.monolithic.board.utils.IntegrationTestBase;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,28 +20,10 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-@Tag("base")
-@Tag("integrate")
-public class PostPaginationServiceIntegrationTest {
+public class PostPaginationServiceIntegrationTest extends IntegrationTestBase {
 
   @Autowired
   private PostPaginationService postPaginationService;
-
-
-  @Autowired
-  private BoardIntegrationTestHelper helper;
-
-  @BeforeEach
-  public void setUp() {
-
-
-  }
-
-  @AfterEach
-  public void release(){
-    helper.release();
-  }
 
   static int pageSize = 10;
   private static Stream<Arguments> parameters_getPostListAsPage() {

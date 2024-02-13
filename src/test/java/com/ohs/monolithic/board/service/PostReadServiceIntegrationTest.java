@@ -5,7 +5,8 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.repository.PostViewRepository;
 import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.board.utils.IntegrationTestBase;
+import com.ohs.monolithic.user.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,31 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Tag("base")
-@Tag("integrate")
-public class PostReadServiceIntegrationTest {
+public class PostReadServiceIntegrationTest extends IntegrationTestBase {
 
   @Autowired
   private PostReadService postReadService;
 
   @Autowired
   private PostViewRepository postViewRepository;
-
-  @Autowired
-  private BoardIntegrationTestHelper helper;
-
-  @BeforeEach
-  public void setUp() {
-
-
-  }
-
-  @AfterEach
-  public void release(){
-    helper.release();
-  }
-
 
   @Test
   @DisplayName("readPost(Integer, Account): 게시글을 조회하면, viewCount가 증가하고, PostView 가 추가된다.")

@@ -9,6 +9,8 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
+import com.ohs.monolithic.board.utils.IntegrationTestBase;
+import com.ohs.monolithic.board.utils.WithMockCustomUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -27,37 +29,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureRestDocs
-@AutoConfigureMockMvc
-@Tag("base")
-@Tag("integrate")
-public class BoardControllerIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+public class BoardControllerIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private BoardService boardService;
-    @Autowired
-    private BoardRepository boardRepository;
-    private Gson gson; // json 직렬화,역직렬화
-
-    @Autowired
-    BoardIntegrationTestHelper initializer;
-
-    @BeforeEach
-    public void init() {
-
-        gson = new Gson();
-
-    }
-
-
-    @AfterEach
-    public void release(){
-        initializer.release();
-    }
     @Test
     @DisplayName("POST /api/boards: desc가 생략된 요청도 가능하다 - 201  ")
     @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
@@ -84,7 +60,7 @@ public class BoardControllerIntegrationTest {
 
     @Test
     @DisplayName("POST /api/boards: 성공 - 201  ")
-    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
     public void createBoard_1() throws Exception {
         //given
 

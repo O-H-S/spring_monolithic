@@ -1,21 +1,16 @@
 package com.ohs.monolithic.board.controller;
 
-import com.nimbusds.jose.shaded.gson.Gson;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.board.utils.IntegrationTestBase;
+import com.ohs.monolithic.board.utils.WithMockCustomUser;
+import com.ohs.monolithic.user.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -28,29 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest
-@AutoConfigureRestDocs
-@AutoConfigureMockMvc
-@Tag("base")
-@Tag("integrate")
-class CommentDetailApiControllerIntegrationTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  private Gson gson; // json 직렬화,역직렬화
+class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
 
-  @Autowired
-  BoardIntegrationTestHelper initializer;
 
-  @BeforeEach
-  public void init() {
-    gson = new Gson();
-  }
-
-  @AfterEach
-  public void release(){
-    initializer.release();
-  }
 
    /*================================================================================
 
@@ -60,11 +36,12 @@ class CommentDetailApiControllerIntegrationTest {
 
   @Test
   @DisplayName("POST /api/comments/{commentID}/commentLikes: 성공 - 200  ")
-  @WithMockUser(username = "hyeonsu", authorities = "USER")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
   public void createBoard_0() throws Exception {
+    initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = initializer.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = initializer.commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
 
     // when
     ResultActions result = mockMvc.perform(
@@ -75,7 +52,7 @@ class CommentDetailApiControllerIntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
 
-    ).andDo(print());;
+    ).andDo(print());
 
     // then
     result.andExpect(status().isOk());
@@ -88,13 +65,14 @@ class CommentDetailApiControllerIntegrationTest {
 
   @Test
   @DisplayName("POST /api/comments/{commentID}/commentLikes: 이미 추천한 상태면 changed 는 false  - 200  ")
-  @WithMockUser(username = "hyeonsu", authorities = "USER")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
   public void createBoard_1() throws Exception {
+    Account viewer = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = initializer.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = initializer.commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
+    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
 
-    initializer.commentLikeService.likeComment(targetComment, givens.b);
+    helper.commentLikeService.likeComment(targetComment.getId(), viewer.getId());
 
     // when
     ResultActions result = mockMvc.perform(
@@ -122,9 +100,10 @@ class CommentDetailApiControllerIntegrationTest {
   @DisplayName("POST /api/comments/{commentID}/commentLikes: 인증된 접근이 아니면, 실패 - 403  ")
   @WithAnonymousUser
   public void createBoard_2() throws Exception {
+    initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = initializer.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = initializer.commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
 
 
     // when
@@ -148,10 +127,11 @@ class CommentDetailApiControllerIntegrationTest {
 
   @Test
   @DisplayName("POST /api/comments/{commentID}/commentLikes: 해당 댓글이 없으면 실패  - 404  ")
-  @WithMockUser(username = "hyeonsu", authorities = "USER")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
   public void createBoard_3() throws Exception {
+    initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = initializer.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
 
     // when
     ResultActions result = mockMvc.perform(
@@ -183,12 +163,13 @@ class CommentDetailApiControllerIntegrationTest {
 
   @Test
   @DisplayName("DELETE /api/comments/{commentID}/commentLikes: 성공 - 200  ")
-  @WithMockUser(username = "hyeonsu", authorities = "USER")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
   public void unlikeComment_0() throws Exception {
+    Account operator = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = initializer.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = initializer.commentService.create(givens.c, "test", givens.b);
-    initializer.commentLikeService.likeComment(targetComment, givens.b);
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
+    helper.commentLikeService.likeComment(targetComment.getId(), operator.getId());
 
     // when
     ResultActions result = mockMvc.perform(

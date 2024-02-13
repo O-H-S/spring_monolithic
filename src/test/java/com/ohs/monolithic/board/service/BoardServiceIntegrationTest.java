@@ -4,6 +4,7 @@ package com.ohs.monolithic.board.service;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
+import com.ohs.monolithic.board.utils.IntegrationTestBase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -20,23 +21,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@SpringBootTest
-@Tag("base")
-@Tag("integrate")
-public class BoardServiceIntegrationTest {
+public class BoardServiceIntegrationTest extends IntegrationTestBase {
 
   @Autowired
   private BoardService boardService;
-  @Autowired
-  private BoardRepository boardRepository;
-
-  @Autowired
-  BoardIntegrationTestHelper initializer;
-
-  @AfterEach
-  public void release(){
-    initializer.release();
-  }
   @Test
   @DisplayName("deleteBoard(Integer) : 정상적으로 삭제됨. ")
   public void deleteBoard() throws Exception {
@@ -53,6 +41,5 @@ public class BoardServiceIntegrationTest {
     assertThat(boards).hasSize(1);
 
   }
-
 
 }
