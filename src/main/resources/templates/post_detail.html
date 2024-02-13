@@ -88,7 +88,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <small class="text-muted">
-                            <span th:if="${comment.writer != null}" th:text="${comment.writer}"></span>,
+                            <span th:text="${comment.getWriterNickname()}"></span>,
                             <span th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </small>
                     </div>
@@ -114,7 +114,7 @@
                     <!-- Edit Button -->
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-2"
                        sec:authorize="isAuthenticated()"
-                       th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
+                       th:if="${ myAccount != null and myAccount.getId() == comment.getWriterId()}"
                        th:onclick="|editComment(${comment.id})|" th:text="수정"></a>
 
                     <!-- Delete Button -->
@@ -123,7 +123,7 @@
                        th:data-id="${comment.id}"
                        class="btn btn-sm btn-outline-danger"
                        sec:authorize="isAuthenticated()"
-                       th:if="${comment.writer != null and #authentication.getPrincipal().getUsername() == comment.writer}"
+                       th:if="${ myAccount != null and myAccount.getId() == comment.getWriterId()}"
                        onclick="deleteComment(this)"
                        th:text="삭제"></a>
                 </div>

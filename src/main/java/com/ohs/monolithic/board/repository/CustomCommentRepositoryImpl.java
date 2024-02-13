@@ -2,22 +2,20 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.*;
 import com.ohs.monolithic.board.dto.CommentPaginationDto;
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static com.ohs.monolithic.board.domain.QComment.comment;
-import static com.ohs.monolithic.user.QAccount.account;
+import static com.ohs.monolithic.user.domain.QAccount.account;
 import static com.ohs.monolithic.board.domain.QCommentLike.commentLike;
 
 @Repository
@@ -56,7 +54,8 @@ public class CustomCommentRepositoryImpl extends QuerydslRepositorySupport imple
                     Projections.fields(CommentPaginationDto.class,
                             comment.id,
                             comment.content,
-                            account.username.as("writer"),
+                            account.id.as("writerId"),
+                            account.nickname.as("writerNickname"),
                             comment.likeCount,
                             likedExpression.as("liked"),
                             comment.createDate,

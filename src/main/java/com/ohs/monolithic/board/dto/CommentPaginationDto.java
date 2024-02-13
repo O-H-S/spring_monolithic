@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 public class CommentPaginationDto {
   Long id;
   String content;
-  String writer;
+  Long writerId;
+  String writerNickname;
   Long likeCount;
 
   @Setter
