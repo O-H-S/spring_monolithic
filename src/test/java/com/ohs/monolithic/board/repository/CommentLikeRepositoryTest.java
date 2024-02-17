@@ -6,12 +6,9 @@ import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.CommentLike;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.utils.BoardRepositoryTestHelper;
-import com.ohs.monolithic.board.utils.BoardTestUtils;
 import com.ohs.monolithic.configuration.QuerydslConfig;
-import com.ohs.monolithic.user.Account;
-import groovy.lang.Tuple;
+import com.ohs.monolithic.user.domain.Account;
 import groovy.lang.Tuple3;
-import org.antlr.v4.runtime.misc.Triple;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +16,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
@@ -58,7 +54,7 @@ public class CommentLikeRepositoryTest {
     Comment testComment = helper.writeCommentTo(givens.getV1(),givens.getV2());
 
 
-    Optional<CommentLike> commentLikeOp = commentLikeRepository.findCommentLikeWithLock(testComment, givens.getV2());
+    Optional<CommentLike> commentLikeOp = commentLikeRepository.findCommentLikeWithLock(testComment.getId(), givens.getV2().getId());
 
     assertThat(commentLikeOp).isNotNull();
     assertThat(commentLikeOp.isEmpty()).isTrue();
@@ -77,7 +73,7 @@ public class CommentLikeRepositoryTest {
     CommentLike testLike = helper.likeTo(testComment, givens.getV2());
     //when
 
-    Optional<CommentLike> commentLikeOp = commentLikeRepository.findCommentLikeWithLock(testComment, givens.getV2());
+    Optional<CommentLike> commentLikeOp = commentLikeRepository.findCommentLikeWithLock(testComment.getId(), givens.getV2().getId());
 
     // then
     assertThat(commentLikeOp).isNotNull();

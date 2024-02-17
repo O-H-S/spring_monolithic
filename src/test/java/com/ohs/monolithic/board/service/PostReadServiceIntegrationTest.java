@@ -33,7 +33,7 @@ public class PostReadServiceIntegrationTest extends IntegrationTestBase {
 
     // when
 
-    PostDetailResponse response = postReadService.readPost(targetPost.getId(), viewer);
+    PostDetailResponse response = postReadService.readPost(targetPost.getId(), viewer.getId());
 
     // then
 
@@ -55,14 +55,14 @@ public class PostReadServiceIntegrationTest extends IntegrationTestBase {
     Post targetPost = givens.c;
     Account viewer = givens.b;
 
-    PostDetailResponse response = postReadService.readPost(targetPost.getId(), viewer);
+    PostDetailResponse response = postReadService.readPost(targetPost.getId(), viewer.getId());
 
     long old_uniqueView = helper.postReadService.getPost(targetPost.getId()).getViewCount();
     int old_repeativeView = postViewRepository.findByPostIdAndUserId(targetPost.getId(), viewer.getId()).getCount();
     // when
-    postReadService.readPost(targetPost.getId(), viewer);
-    postReadService.readPost(targetPost.getId(), viewer);
-    postReadService.readPost(targetPost.getId(), viewer);
+    postReadService.readPost(targetPost.getId(), viewer.getId());
+    postReadService.readPost(targetPost.getId(), viewer.getId());
+    postReadService.readPost(targetPost.getId(), viewer.getId());
 
     // then
 

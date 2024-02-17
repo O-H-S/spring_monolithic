@@ -30,17 +30,22 @@ public class PostApiController {
 
 
 
-  // 리팩토링 필요, BoardId를 form안에 말고 path로 처리하기.
+
   @PreAuthorize("isAuthenticated()")
   @PostMapping
   public ResponseEntity<?> createPost(@AuthenticationPrincipal AppUser user,
+                                      @PathVariable("boardId") Integer boardId,
                                       @RequestBody @Valid PostForm postForm,
                                       @RequestParam(value = "includeData", defaultValue = "true",  required = false) Boolean includeData) {
-    Post result = writeService.create(postForm.getBoardId(), postForm, user.getAccount());
+    Post result = writeService.create(boardId, postForm, user.getAccount());
     if(!includeData)
       return ResponseEntity.status(HttpStatus.OK).build();
     return ResponseEntity.status(HttpStatus.CREATED).body(PostDetailResponse.of(result, Boolean.TRUE, Boolean.FALSE));
   }
+
+
+
+
 
 
   @GetMapping(params = "lastPostId")

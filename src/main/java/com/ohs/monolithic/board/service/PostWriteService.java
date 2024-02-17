@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.security.access.AccessDeniedException;
 
 
 import java.time.LocalDateTime;
@@ -155,10 +156,10 @@ public class PostWriteService {
     }
 
     @Transactional
-    public void deleteBy(Long id, Account operator){
+    public void deleteBy(Long id, Long accountId) throws Exception {
         Post targetPost = getPost(id);
-        if (!targetPost.getAuthor().getId().equals(operator.getId())) {
-            throw new RuntimeException("게시글 삭제 권한이 없습니다");
+        if (!targetPost.getAuthor().getId().equals(accountId)) {
+            throw new AccessDeniedException("게시글 삭제 권한이 없습니다");
         }
         delete(id);
     }

@@ -6,6 +6,7 @@ import com.ohs.monolithic.board.domain.PostView;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.repository.PostViewRepository;
 import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -16,15 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostViewService {
   final PostRepository postRepository;
   final PostViewRepository postViewRepository;
+  final AccountRepository accountRepository;
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void view(Post post, Account member){
+  public void view(Post post, Long memberId){
 
-    PostView view = postViewRepository.findByPostIdAndUserId(post.getId(), member.getId());
+    PostView view = postViewRepository.findByPostIdAndUserId(post.getId(), memberId);
     if(view == null) {
       view = PostView.builder()
               .post(post)
-              .member(member)
+              .member(accountRepository.getReferenceById(memberId))
               .build();
 
       postRepository.updateViewCount(post.getId(), 1);

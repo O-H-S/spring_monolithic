@@ -24,37 +24,44 @@ public class PostReadService {
 
 
     @Transactional(readOnly = true)
-    public PostDetailResponse readPost(Long postID, Account viewer){
-        Post targetPost = getPost(postID, true);
-        Boolean isLiked = Boolean.FALSE;
-        Boolean isMine = Boolean.FALSE;
-        if(viewer != null) {
-            // 조회수 카운팅 트랜잭션이 실패하더라도 게시글을 반환한다.
+    public PostDetailResponse readPost(Long postID, Long viewerId){
+        if(viewerId != null) {
             try {
-                postViewService.view(targetPost, viewer); // 독립된 트랜잭션
+                postViewService.view(repository.getReferenceById(postID), viewerId); // 독립된 트랜잭션
             } catch (Exception e) {
                 System.out.println("Error updating post view count. : " + e.toString());
             }
+        }
+        return getPostReadOnly(postID, viewerId, true, true);
+    }
 
-            isLiked = postLikeService.doesLikePost(postID, viewer.getId());
-            isMine = viewer.getId().equals( targetPost.getAuthor().getId());
+    @Transactional(readOnly = true)
+    public PostDetailResponse getPostReadOnly(Long postId, Long viewerId, boolean determineLiked, boolean determineMine){
+        Post targetPost = getPost(postId, false);
+        Boolean isLiked = null;
+        Boolean isMine = null;
+        if(viewerId != null) {
+            if(determineLiked)
+                isLiked = postLikeService.doesLikePost(postId, viewerId);
+            if(determineMine)
+                isMine = viewerId.equals( targetPost.getAuthor().getId());
         }
 
         return PostDetailResponse.of(targetPost, isMine, isLiked);
+
+
     }
 
+    // 리팩토링 : private으로 변경할 예정
     public Post getPost(Long id){
         return this.getPost(id, false);
     }
 
+    // 리팩토링 : private으로 변경할 예정
     public Post getPost(Long id, Boolean relatedData ) {
 
-        Optional<Post> question = null;
-        if (relatedData)
-            question = this.repository.findWithAuthorAndBoard(id);
-        else{
-            question = this.repository.findById(id);
-        }
+        Optional<Post> question = relatedData ? this.repository.findWithAuthorAndBoard(id) : this.repository.findById(id);
+
         if (question.isPresent()) {
             return question.get();
         } else {

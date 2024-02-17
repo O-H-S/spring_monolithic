@@ -114,8 +114,7 @@ public class BoardService {
     postCountCache.putIfAbsent(resultBoard.getId(), 0L);
 
 
-    return BoardResponse.builder()
-            .id(resultBoard.getId()).title(resultBoard.getTitle()).description(resultBoard.getDescription()).build();
+    return BoardResponse.fromEntity(resultBoard, getPostCount(resultBoard.getId()));
   }
 
   @Transactional

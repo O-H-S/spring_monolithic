@@ -30,7 +30,6 @@ public class PostViewController {
 
     private final PostReadService readService;
     private final CommentService commentService;
-    private final AccountService accountService;
 
 
 
@@ -64,10 +63,10 @@ public class PostViewController {
     void baseModelMapping(Model model, Long id, Account viewer, CommentForm commentForm)
     {
 
-        PostDetailResponse response = this.readService.readPost(id, viewer);
+        PostDetailResponse response = this.readService.readPost(id, viewer != null? viewer.getId() : null);
         List<CommentPaginationDto> comments = this.commentService.getCommentsAsPage(id, viewer);
 
-
+        model.addAttribute("myAccount", viewer); // 리팩토링 대상
         model.addAttribute("response", response);
         model.addAttribute("comments", comments);
         model.addAttribute("commentForm", commentForm);

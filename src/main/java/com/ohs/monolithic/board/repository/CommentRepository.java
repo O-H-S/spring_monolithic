@@ -23,6 +23,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, CustomC
     @Query("UPDATE Comment c SET c.likeCount = c.likeCount + (:delta) WHERE c.id = :commentID")
     void addLikeCount(Long commentID, Long delta);
 
+    @Query("SELECT c.likeCount FROM Comment c WHERE c.id = :commentId")
+    Long findLikeCountById(@Param("commentId") Long commentId);
+
     @Query("SELECT c FROM Comment c WHERE c.deleted = false AND c.id = :id")
     Comment getComment(@Param("id") Long id);
 
