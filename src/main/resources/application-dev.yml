@@ -5,10 +5,15 @@ spring:
     import:
       - classpath:application-secret_common.yml
       - classpath:application-secret_dev.yml
+  flyway:
+    enabled: true
+    baseline-on-migrate: false # 최초 적용시에만 true로 설정, 적용 후에는 false로 바꾸기.
+    baseline-version: 1
+
   jpa:
     show_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true

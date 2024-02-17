@@ -47,6 +47,9 @@ dependencies {
     //runtimeOnly("mysql:mysql-connector-java") 이전 버전에서는 이렇게 명시해야했음.
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	// flyway
+	implementation("org.flywaydb:flyway-core")
+	implementation("org.flywaydb:flyway-mysql")
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
