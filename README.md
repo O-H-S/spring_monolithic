@@ -7,7 +7,7 @@
 > 
 > (*) 이 프로젝트는 "점프 투 프로젝트(https://wikidocs.net/book/7601)" 을 따라하는 것부터 시작하여, 제가 개인적으로 학습한 백엔드 관련 지식들과 접목하여 개선 시키는 방향으로 진행하고 있습니다.
 >
-> `[Before]` 참고 자료의 결과물 : https://sbb.pybo.kr/  
+> `[Before]` 참고한 자료의 결과물 : https://sbb.pybo.kr/  
 > `[ After]` 개선한 결과물(현재 프로젝트) : https://www.ohs.kr/
 >
 >

@@ -5,8 +5,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <meta name="_csrf" th:content="${_csrf.token}"/>
-        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+        <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+        <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">

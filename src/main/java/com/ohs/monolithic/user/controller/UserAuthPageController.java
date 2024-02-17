@@ -70,8 +70,7 @@ public class UserAuthPageController {
         if (bindingResult.hasErrors()) {
             return "signup_form";
         }
-
-        //ClassPathScanningCandidateComponentProvider
+        
 
         if (!accountCreateForm.getPassword1().equals(accountCreateForm.getPassword2())) {
             bindingResult.rejectValue("password2", "passwordInCorrect",
@@ -92,11 +91,11 @@ public class UserAuthPageController {
             bindingResult.reject("signupFailed", e.getMessage());
             return "signup_form";
         }
-        //bindingResult.reject(오류코드, 오류메시지)는 특정 필드의 오류가 아닌 일반적인 오류를 등록할때 사용한다.
+
+
         return "redirect:/";
     }
 
-    // 실제 로그인을 진행하는 @PostMapping 방식의 메서드는 스프링 시큐리티가 대신 처리하므로 직접 구현할 필요가 없다.
     @GetMapping("/login")
     public String login() {
         return "login_form";

@@ -1,22 +1,37 @@
 <html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
-  <form th:action="@{/user/login}" method="post">
-    <div th:if="${param.error}">
-      <div class="alert alert-danger">
-        사용자ID 또는 비밀번호를 확인해 주세요.
+<div layout:fragment="content" class="container my-3 d-flex justify-content-center align-items-center">
+  <div class="custom-container" style="width: 30%;">
+    <form th:action="@{/user/login}" method="post">
+      <div th:if="${param.error}">
+        <div class="alert alert-danger">
+          사용자ID 또는 비밀번호를 확인해 주세요.
+        </div>
       </div>
-      <!--로그인 실패시 파라미터로 error가 전달되는 것은 스프링 시큐리티의 규칙이다.-->
+      <div class="mb-3">
+        <label for="username" class="form-label">사용자ID</label>
+        <input type="text" name="username" id="username" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">비밀번호</label>
+        <input type="password" name="password" id="password" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">로그인</button>
+    </form>
+
+    <hr> <!-- Horizontal line to separate form and social login buttons -->
+
+    <div class="d-flex justify-content-around">
+      <a href="/oauth2/authorization/kakao" class="btn btn-light p-0" style="width: 50px; height: 50px;">
+        <img src="/logo-kakao.png" class="w-100 h-auto">
+      </a>
+
+      <a href="/oauth2/authorization/google" class="btn btn-light p-0" style="width: 50px; height: 50px;">
+        <img src="/logo-google.png" class="w-100 h-auto">
+      </a>
+      <a href="/oauth2/authorization/naver" class="btn btn-light p-0" style="width: 50px; height: 50px;">
+        <img src="/logo-naver.png" class="w-100 h-auto">
+      </a>
     </div>
-    <div class="mb-3">
-      <label for="username" class="form-label">사용자ID</label>
-      <input type="text" name="username" id="username" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">비밀번호</label>
-      <input type="password" name="password" id="password" class="form-control">
-    </div>
-    <button type="submit" class="btn btn-primary">로그인</button>
-    <a href="/oauth2/authorization/kakao"> 카카오 로그인</a>
-  </form>
+  </div>
 </div>
 </html>
