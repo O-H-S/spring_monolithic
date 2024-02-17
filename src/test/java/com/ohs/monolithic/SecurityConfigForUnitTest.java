@@ -19,8 +19,7 @@ public class SecurityConfigForUnitTest {
                     .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
             //위는 모든 인증되지 않은 요청을 허락한다는 의미이다. 따라서 로그인을 하지 않더라도 모든 페이지에 접근할 수 있다.
 
-            .csrf((csrf) -> csrf
-                    .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
+            .csrf(AbstractHttpConfigurer::disable)
             // /h2-console/로 시작하는 URL은 CSRF 검증을 하지 않는다는 설정을 추가했다.
 
             .headers((headers) -> headers

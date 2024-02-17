@@ -9,13 +9,16 @@ import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.repository.CommentLikeRepository;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountRepository;
-import com.ohs.monolithic.user.UserRole;
+import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.domain.AuthenticationType;
+import com.ohs.monolithic.user.domain.LocalCredential;
+import com.ohs.monolithic.user.repository.AccountRepository;
+import com.ohs.monolithic.user.domain.UserRole;
 
+import com.ohs.monolithic.user.repository.LocalCredentialRepository;
+import com.ohs.monolithic.user.repository.OAuth2CredentialRepository;
 import groovy.lang.Tuple;
 import groovy.lang.Tuple3;
-import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +33,14 @@ import java.util.Random;
 @Transactional
 public class BoardRepositoryTestHelper {
   @Autowired
+  public LocalCredentialRepository localCredentialRepository;
+  @Autowired
+  public OAuth2CredentialRepository oAuth2CredentialRepository;
+  @Autowired
   public AccountRepository accountRepository;
+
+
+
   @Autowired
   public CommentRepository commentRepository;
   @Autowired
@@ -64,11 +74,17 @@ public class BoardRepositoryTestHelper {
   public Account establishMember() {
     dummyMemberCount += 1;
     Account newAccount = Account.builder()
-            .username("dummyUser" + dummyMemberCount)
-            .password("blah blah")
+            .nickname("dummyUserNick" + dummyMemberCount)
+            .authenticationType(AuthenticationType.Local)
             .email("blah{%d}@blah.com".formatted(dummyMemberCount))
             .role(UserRole.USER).build();
+    LocalCredential credential = LocalCredential.builder()
+            .username("dummyUser" + dummyMemberCount)
+            .password("blah blah")
+            .account(newAccount)
+                    .build();
     accountRepository.save(newAccount);
+    localCredentialRepository.save(credential);
     return newAccount;
   }
 

@@ -3,14 +3,11 @@ package com.ohs.monolithic.board.utils;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.service.PostWriteService;
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
-import org.springframework.data.util.Pair;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

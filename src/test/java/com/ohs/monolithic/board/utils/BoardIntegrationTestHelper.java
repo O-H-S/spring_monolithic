@@ -1,16 +1,16 @@
 package com.ohs.monolithic.board.utils;
 
 
-import com.ohs.monolithic.board.BoardPaginationType;
-import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.repository.*;
 import com.ohs.monolithic.board.service.*;
-import com.ohs.monolithic.user.Account;
-import com.ohs.monolithic.user.AccountRepository;
-import com.ohs.monolithic.user.AccountService;
+import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.user.repository.AccountRepository;
+import com.ohs.monolithic.user.repository.LocalCredentialRepository;
+import com.ohs.monolithic.user.repository.OAuth2CredentialRepository;
+import com.ohs.monolithic.user.service.AccountService;
 import org.antlr.v4.runtime.misc.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.random.RandomGenerator;
 
 @Component
 public class BoardIntegrationTestHelper {
@@ -33,22 +32,36 @@ public class BoardIntegrationTestHelper {
   public PostReadService postReadService;
 
   @Autowired
+  public PostLikeService postLikeService;
+
+
+  @Autowired
   public CommentService commentService;
   @Autowired
   public CommentLikeService commentLikeService;
 
+  // repos
   @Autowired
   CommentLikeRepository commentLikeRepository;
   @Autowired
   CommentRepository commentRepository;
   @Autowired
   PostRepository postRepository;
+
+  @Autowired
+  public LocalCredentialRepository localCredentialRepository;
+  @Autowired
+  public OAuth2CredentialRepository oAuth2CredentialRepository;
+
   @Autowired
   AccountRepository accountRepository;
   @Autowired
   BoardRepository boardRepository;
   @Autowired
   PostViewRepository postViewRepository;
+  @Autowired
+  PostLikeRepository postLikeRepository;
+
 
   public Triple<BoardResponse, Account, Post> InitDummy_BoardAccountPost()
   {
@@ -57,17 +70,27 @@ public class BoardIntegrationTestHelper {
 
   public Triple<BoardResponse, Account, Post> InitDummy_BoardAccountPost(String boardTitle, String userName, String postTitle) {
     BoardResponse newBoard = boardService.createBoard(boardTitle,"Test");
-    Account newUser = accountService.create(userName, "abc@naver.com", "blah blah");
+    Account newUser = accountService.createAsLocal(userName,"test@abc.ddd", userName, "blah");
     Post post = postWriteService.create(newBoard.getId(), PostForm.builder().subject("abc").content("abc").build() , newUser);
 
     return new Triple<>(newBoard, newUser, post);
+  }
+
+
+  public BoardResponse simpleBoard(){
+    Random random = new Random();
+    int randomValue = random.nextInt();
+
+    BoardResponse newBoard = boardService.createBoard("dummyBoard" + randomValue,"");
+
+    return newBoard;
   }
 
   public Account simpleAccount(){
     Random random = new Random();
     int randomValue = random.nextInt();
 
-    Account newUser = accountService.create("dummy" + randomValue, "abc@naver.com", "blah blah");
+    Account newUser = accountService.createAsLocal("dummyNick" + randomValue, "dummyEmail" + randomValue, "dummy" + randomValue, "blah blah");
     return newUser;
   }
 
@@ -94,10 +117,14 @@ public class BoardIntegrationTestHelper {
 
     // 외래키 제약으로 인해, delete의 순서가 중요하다. (에러 발생함)
     // TODO : trancate 명령어 사용하기.
+    postLikeRepository.deleteAll();
     postViewRepository.deleteAll();
     commentLikeRepository.deleteAll();
     commentRepository.deleteAll();
     postRepository.deleteAll();
+
+    localCredentialRepository.deleteAll();
+    oAuth2CredentialRepository.deleteAll();
     accountRepository.deleteAll();
     boardRepository.deleteAll();
     System.out.println("--------------------------------------------");

@@ -22,7 +22,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
     List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(customUser.authorities());
     Account account = Account.builder()
-            .nickname("securityUser")
+            .nickname("MockLoggedUser")
             .authenticationType(AuthenticationType.Local)
             .email("user@security.com")
             .role(customUser.role())
