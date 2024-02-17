@@ -50,6 +50,33 @@ tasks.register("deployDockerImage") {
 }
 
 
+tasks.register("reloadProductionServer") {
+    String hostProp = project.property('EC2_HOST')
+    String userProp = project.property('EC2_USER')
+    def pemFile = file("${project.rootDir}/${project.property('EC2_SSH_PEM')}")
+    def ec2Server = remotes {
+        ec2Server {
+            host = hostProp
+            user = userProp
+            identity = pemFile
+        }
+    }
+
+    doLast {
+        ssh.run{
+            session(ec2Server){
+                execute 'sudo docker stop web-server || true'
+                execute 'sudo docker rm web-server || true'
+                execute 'sudo docker run -d -p 443:443 --name web-server com.ohs/app:latest'
+                //execute 'sudo docker logs web-server-container'
+
+
+            }
+        }
+    }
+}
+
+
 
 docker {
 
