@@ -14,7 +14,12 @@
 NOTE: (*) 표시는 생략 가능한 데이터를 뜻합니다 +
 자세한 정보는 각 Description를 클릭하면 확인할 수 있습니다.
 
-== Board
+NOTE: 쿠키-세션 인증 시, POST API는 CSRF 토큰("_csrf")을 포함해야합니다. +
+JWT로 인증하거나, 외부 시스템에서 API 호출 시 CSRF 토큰은 생략 가능합니다. +
+문서 내의 모든 요청은 쿠키-세션 인증을 가정하였고, jsessionid 쿠키는 요청 메세지에서 생략 하였습니다.
+
+
+== link:boards.html[Board(게시판)]
  게시판 관련 데이터(제목, 설명, 게시글 수 등등..)에 대한 API 입니다.
 
 
@@ -27,16 +32,46 @@ NOTE: (*) 표시는 생략 가능한 데이터를 뜻합니다 +
 | POST | `/api/boards` | body |link:boards.html#anchor-post[게시판 생성]
 |===
 
-== Post
+== link:posts.html[Post(게시글)]
+ 게시판에 종속되는 게시글과 관련된 API입니다. 특정된 게시글은 boardId가 결정되므로, 경로에 boardId가 생략됩니다.
+
 [options="header", cols="1,2,2,3"]
 |===
 | Method | URL | Input | Description
+
+| GET | `/api/{boardId}/posts/` | path, query  | link:posts.html#anchor-getlist[게시글 list 조회]
+| POST | `/api/{boardId}/posts/` | path, body  | link:posts.html#anchor-create[게시글 생성]
+| DELETE | `/api/posts/{id}` | path  | link:posts.html#anchor-delete[특정 게시글 삭제]
+| GET | `/api/posts/{id}` | path, (*)query  | link:posts.html#anchor-getbyid[특정 게시글 상세 조회]
+| PUT | `/api/posts/{id}` | path, body  | link:posts.html#anchor-updatebyid[특정 게시글 수정]
+| POST | `/api/posts/{id}/postLikes` | path  | link:posts.html#anchor-likebyid[특정 게시글 추천]
+| DELETE | `/api/posts/{id}/postLikes` | path  | link:posts.html#anchor-unlikebyid[특정 게시글 추천 취소]
 
 | POST | `/api/posts/{boardID}/bulk` | path, body |link:posts.html#anchor-post-bulk[Bulk Insert]
 |===
 
 
+== link:comments.html[Comment(댓글)]
+ 게시글에 종속되는 댓글과 관련된 API입니다. 특정된 댓글은 postId가 결정되므로, 경로에 postId가 생략됩니다.
+[options="header", cols="1,2,2,3"]
+|===
+| Method | URL | Input | Description
+| POST | `/api/{postId}/comments/` | path, body  | link:comments.html#anchor-create[댓글 생성]
+| PUT | `/api/comments/{id}` | path, body  | link:comments.html#anchor-update[특정 댓글 변경]
+| DELETE | `/api/comments/{id}` | path  | link:comments.html#anchor-create[특정 댓글 삭제]
+| POST | `/api/comments/{id}/commentLikes` | path  | link:comments.html#anchor-likebyid[특정 댓글 추천]
+| DELETE | `/api/comments/{id}/commentLikes` | path  | link:comments.html#anchor-unlikebyid[특정 댓글 추천 취소]
+
+
+|===
 
 
 
-== Member
+
+
+== link:accounts.html[Account(계정)]
+[options="header", cols="1,2,2,3"]
+|===
+| Method | URL | Input | Description
+
+|===

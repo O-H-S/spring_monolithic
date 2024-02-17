@@ -5,9 +5,118 @@
 :toc: left
 :toclevels: 3
 
+[[anchor-get]]
+== link:/docs/index.html[Back to the main]
+
+
+
+// done
+[[anchor-create]]
+== [ 게시글 생성 ]
+
+=== ★ 권장
+Request
+include::{snippets}/posts/post/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/posts/post/succeeded-recommended/http-response.adoc[]
+
+
+
+[[anchor-getlist]]
+== [ 게시글 리스트 조회 ]  (작성중)
+
+
+
+// DONE
+[[anchor-delete]]
+== [ 특정 게시글 삭제 ]
+
+=== ★ 권장
+Request
+include::{snippets}/posts/delete/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/posts/delete/succeeded-recommended/http-response.adoc[]
+
+=== 실패
+==== 글 작성자가 아니면, 실패
+Request
+include::{snippets}/posts/delete/failed-access/http-request.adoc[]
+Response
+include::{snippets}/posts/delete/failed-access/http-response.adoc[]
+
+
+//done
+[[anchor-getbyid]]
+== [ 특정 게시글 상세조회 ]
+
+=== ★ 권장
+
+
+Request
+include::{snippets}/posts/getById/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/posts/getById/succeeded-recommended/http-response.adoc[]
+
+
+쿼리 스트링 determineLiked, determineMine를 추가하여 추가 정보를 얻을 수 있다.
+Request
+include::{snippets}/posts/getById/succeeded-recommended2/http-request.adoc[]
+Response
+include::{snippets}/posts/getById/succeeded-recommended2/http-response.adoc[]
+
+
+// DONE
+[[anchor-updatebyid]]
+== [ 특정 게시글 수정 ]
+
+=== ★ 권장
+Request
+include::{snippets}/posts/put/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/posts/put/succeeded-recommended/http-response.adoc[]
+
+// doen
+[[anchor-likebyid]]
+== [ 특정 게시글 추천 ]
+
+=== ★ 권장
+Request
+include::{snippets}/postLikes/post/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/postLikes/post/succeeded-recommended/http-response.adoc[]
+
+=== 성공
+==== 이미 추천을 한 상태라면, "change"는 false로 반환
+Request
+include::{snippets}/postLikes/post/succeeded-unchanged/http-request.adoc[]
+Response
+include::{snippets}/postLikes/post/succeeded-unchanged/http-response.adoc[]
+
+
+
+// done
+[[anchor-unlikebyid]]
+== [ 특정 게시글 추천 취소]
+
+=== ★ 권장
+Request
+include::{snippets}/postLikes/delete/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/postLikes/delete/succeeded-recommended/http-response.adoc[]
+
+=== 성공
+==== 추천한 적 없다면, "change"는 false로 반환
+Request
+include::{snippets}/postLikes/delete/succeeded-unchanged/http-request.adoc[]
+Response
+include::{snippets}/postLikes/delete/succeeded-unchanged/http-response.adoc[]
+
+
+//DONE
 [[anchor-post-bulk]]
-== 게시글 bulk insert(테스트 메소드)
-=== 권장
+== [ 게시글 bulk insert ]
+
+=== ★ 권장
 Request
 include::{snippets}/boards/create-succeeded-recommended/http-request.adoc[]
 Response
@@ -15,7 +124,6 @@ include::{snippets}/boards/create-succeeded-recommended/http-response.adoc[]
 
 
 === 성공
-
 
 ==== 어드민이 존재하는 게시판 ID에 유효한 form을 입력하면 성공
 Request

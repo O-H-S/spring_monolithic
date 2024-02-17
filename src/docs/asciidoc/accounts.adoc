@@ -1,0 +1,9 @@
+= Account API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+[[anchor-get]]
+== link:/docs/index.html[Back to the main]

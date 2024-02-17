@@ -1,0 +1,82 @@
+= Comment API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+[[anchor-get]]
+== link:/docs/index.html[Back to the main]
+
+
+// done
+[[anchor-create]]
+== [ 댓글 생성 ]
+
+=== ★ 권장
+Request
+include::{snippets}/comments/post/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/comments/post/succeeded-recommended/http-response.adoc[]
+
+[[anchor-create]]
+== [ 특정 댓글 변경 ]
+
+=== ★ 권장
+Request
+include::{snippets}/comments/put/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/comments/put/succeeded-recommended/http-response.adoc[]
+
+=== 실패
+==== 자신의 댓글이 아니면 실패
+Request
+include::{snippets}/comments/put/failed-denied/http-request.adoc[]
+Response
+include::{snippets}/comments/put/failed-denied/http-response.adoc[]
+
+
+// DONE
+[[anchor-delete]]
+== [ 특정 댓글 삭제 ]
+
+=== ★ 권장
+Request
+include::{snippets}/comments/delete/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/comments/delete/succeeded-recommended/http-response.adoc[]
+
+
+// done
+[[anchor-likebyid]]
+== [ 특정 댓글 추천 ]
+
+=== ★ 권장
+Request
+include::{snippets}/commentLikes/post/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/commentLikes/post/succeeded-recommended/http-response.adoc[]
+
+=== 성공
+==== 이미 추천을 한 상태라면, "change"는 false로 반환
+Request
+include::{snippets}/commentLikes/post/succeeded-alreadyliked/http-request.adoc[]
+Response
+include::{snippets}/commentLikes/post/succeeded-alreadyliked/http-response.adoc[]
+
+// done
+[[anchor-unlikebyid]]
+== [ 특정 댓글 추천 취소 ]
+
+=== ★ 권장
+Request
+include::{snippets}/commentLikes/delete/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/commentLikes/delete/succeeded-recommended/http-response.adoc[]
+
+
+
+
+
+
+

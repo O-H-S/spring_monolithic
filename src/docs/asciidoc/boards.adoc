@@ -6,8 +6,10 @@
 :toclevels: 3
 
 [[anchor-get]]
-== 전체 게시판 조회
-=== 권장
+== link:/docs/index.html[Back to the main]
+
+== [전체 게시판 조회]
+=== ★ 권장
 Request
 include::{snippets}/boards/get-succeeded-recommended/http-request.adoc[]
 Response
@@ -37,16 +39,16 @@ include::{snippets}/boards/get-succeeded-emptyboards/http-response.adoc[]
 
 
 [[anchor-getbyid]]
-== 특정 게시판 조회
-=== 권장
+== [특정 게시판 조회]
+=== ★ 권장
 Request
 include::{snippets}/boards/{id}/get-succeeded-recommended/http-request.adoc[]
 Response
 include::{snippets}/boards/{id}/get-succeeded-recommended/http-response.adoc[]
 
 [[anchor-deletebyid]]
-== 특정 게시판 삭제
-=== 권장
+== [특정 게시판 삭제]
+=== ★ 권장
 Request
 include::{snippets}/boards/{id}/delete-succeeded-recommended/http-request.adoc[]
 Response
@@ -55,8 +57,8 @@ include::{snippets}/boards/{id}/delete-succeeded-recommended/http-response.adoc[
 
 
 [[anchor-post]]
-== 게시판 생성
-=== 권장
+== [게시판 생성]
+=== ★ 권장
 Request
 include::{snippets}/boards/create-succeeded-recommended/http-request.adoc[]
 Response
