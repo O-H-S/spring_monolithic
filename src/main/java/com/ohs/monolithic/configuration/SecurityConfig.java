@@ -1,14 +1,24 @@
 package com.ohs.monolithic.configuration;
 
+import com.ohs.monolithic.user.service.OAuth2AccountService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 
 @Configuration
@@ -16,27 +26,16 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-// prePostEnabled = true 설정은 QuestionController와 AnswerController에서 로그인 여부를 판별하기 위해 사용했던 @PreAuthorize 애너테이션을 사용하기 위해 반드시 필요하다.
-//이것은 로그인 후에 원래 하려고 했던 페이지로 리다이렉트 시키는 스프링 시큐리티의 기능이다.
-// @EnableWebSecurity는 모든 요청 URL이 스프링 시큐리티의 제어를 받도록 만드는 애너테이션이다.
-//내부적으로 SpringSecurityFilterChain이 동작하여 URL 필터가 적용된다.
+
 public class SecurityConfig {
 
-    private final OAuth2LoginConfig oAuthConfigurer;
+    //private final OAuth2LoginConfig oAuthConfigurer;
 
-    //스프링 시큐리티가 CSRF 토큰 값을 세션을 통해 발행하고 웹 페이지에서는 폼 전송시에 해당 토큰을 함께 전송하여 실제 웹 페이지에서 작성된 데이터가 전달되는지를 검증하는 기술이다.
-    // ex ) <input type="hidden" name="_csrf" value="0d609fbc-b102-4b3f-aa97-0ab30c8fcfd4"/>
-    // (만약 CSRF 값이 없거나 해커가 임의의 CSRF 값을 강제로 만들어 전송하는 악의적인 URL 요청은 스프링 시큐리티에 의해 블록킹 될 것이다.)
-
-    // 스프링 시큐리티는 사이트의 콘텐츠가 다른 사이트에 포함되지 않도록 하기 위해 X-Frame-Options 헤더값을 사용하여 이를 방지한다. (clickjacking 공격을 막기위해 사용함)
     @Bean
-     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(2)
+     SecurityFilterChain sessionFilterChain(HttpSecurity http) throws Exception {
 
-        //OAuth2LoginAuthenticationFilter
-
-
-        oAuthConfigurer.Apply(http);
-
+      this.Apply(http);
         http
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
@@ -50,6 +49,7 @@ public class SecurityConfig {
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 /*
+                사이트의 콘텐츠가 다른 사이트에 포함되지 않도록 하기 위해 X-Frame-Options 헤더값을 사용하여 이를 방지한다. (clickjacking 공격을 막기위해 사용함)
                 URL 요청시 X-Frame-Options 헤더값을 sameorigin으로 설정하여 오류가 발생하지 않도록 했다.
                 X-Frame-Options 헤더의 값으로 sameorigin을 설정하면 frame에 포함된 페이지가 페이지를 제공하는 사이트와 동일한 경우에는 계속 사용할 수 있다.
                 */
@@ -69,6 +69,83 @@ public class SecurityConfig {
 
     }
 
+  @Bean
+  @Order(1)
+  public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
+
+    // OAuth2 관련 URL 매칭을 위한 AntPathRequestMatcher
+    /*RequestMatcher oauth2Matcher = new AntPathRequestMatcher("/oauth2/**");
+    RequestMatcher oauth2Matcher2 = new AntPathRequestMatcher("/login/oauth2/**");*/
+
+    RequestMatcher oauth2Matcher = new AntPathRequestMatcher("test/oauth2/**");
+    RequestMatcher oauth2Matcher2 = new AntPathRequestMatcher("test/login/oauth2/**");
+
+    // Authorization 헤더에 Bearer 토큰이 포함된 요청을 매칭하기 위한 커스텀 RequestMatcher
+    RequestMatcher bearerTokenMatcher = new RequestMatcher() {
+      @Override
+      public boolean matches(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        return (authHeader != null && authHeader.startsWith("Bearer "));
+      }
+    };
+
+    // OrRequestMatcher를 사용하여 두 매처를 결합
+    RequestMatcher combinedMatcher = new OrRequestMatcher(oauth2Matcher, oauth2Matcher2, bearerTokenMatcher);
+
+    // 결합된 매처를 사용하여 securityMatcher 설정
+    http.securityMatcher(combinedMatcher)
+        .httpBasic(configurer -> configurer.disable())
+        .csrf((csrfConfig) -> csrfConfig.disable())
+        .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+
+    ;
+
+    //oAuthConfigurer.Apply(http);
+             // JWT 검증 설정
+    return http.build();
+  }
+
+  private final OAuth2AccountService uService;
+  public void Apply(HttpSecurity http) throws Exception {
+    http
+            .oauth2Login(
+                    oauth2Configurer -> oauth2Configurer
+                            .userInfoEndpoint(userInfoEndpoint  -> userInfoEndpoint.userService(this.uService))
+                            .loginPage("/user/login")
+                            .successHandler(successHandler())
+            );
+
+    System.out.println("apply oauth2loginConfig");
+  }
+  @Bean
+  AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    System.out.println("apply authenticationManager");
+    return authenticationConfiguration.getAuthenticationManager();
+  }
+
+    /*AuthenticationManager 빈을 생성했다. AuthenticationManager는 스프링 시큐리티의 인증을 담당한다.
+    AuthenticationManager는 사용자 인증시 앞에서 작성한 UserSecurityService와 PasswordEncoder를 사용한다.*/
+
+  public AuthenticationSuccessHandler successHandler() {
+    return ((request, response, authentication) -> {
+
+      System.out.println("success handler");
+      //DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+      response.sendRedirect("/");
+            /*String id = defaultOAuth2User.getAttributes().get("id").toString();
+            String body = """
+                    {"id":"%s"}
+                    """.formatted(id);
+
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+            PrintWriter writer = response.getWriter();
+            writer.println(body);
+            writer.flush();*/
+    });
+  }
 
 
 

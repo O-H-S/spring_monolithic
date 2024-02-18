@@ -14,11 +14,11 @@ public class Account {
     private Long id;
 
     @Setter
-    @Column(unique = true)
+    @Column(unique = false)
     private String nickname;
 
     @Setter
-    @Column(unique = true, nullable = true)
+    @Column(unique = false, nullable = true)
     private String email;
 
     @Setter

@@ -7,8 +7,10 @@ import com.ohs.monolithic.user.dto.OAuth2AppUser;
 import com.ohs.monolithic.user.domain.UserRole;
 import com.ohs.monolithic.user.repository.LocalCredentialRepository;
 import com.ohs.monolithic.user.repository.OAuth2CredentialRepository;
+import com.ohs.monolithic.utils.OAuth2ProviderIdExtractor;
 import lombok.RequiredArgsConstructor;
 import org.codehaus.groovy.classgen.FinalVariableAnalyzer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +26,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class OAuth2AccountService extends DefaultOAuth2UserService {
+    private final Map<String, OAuth2ProviderIdExtractor> providerIdExtractors;
     private final OAuth2CredentialRepository oAuth2CredentialRepository;
     private final AccountService accountService;
 
@@ -40,25 +43,23 @@ public class OAuth2AccountService extends DefaultOAuth2UserService {
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
-        //System.out.println((userNameAttributeName));  카카오, "id" 출력.
 
-        // Debug 용
+        /*Debug 용
         oAuth2User.getAttributes().forEach((key, value) -> {
             System.out.println(key + ": " + value);
         });
+*/
 
-        // OAuth2 제공자 이름 가져오기 (예: "google", "facebook")
         String provider = userRequest.getClientRegistration().getRegistrationId();
 
-
-        // 고유한 id 값을 name으로 가지는 계정이 없다면, 새롭게 만든다.
-        //
-        String providerId = Objects.requireNonNull(oAuth2User.getAttribute(userNameAttributeName)).toString();
+        OAuth2ProviderIdExtractor extractor = providerIdExtractors.get(provider + "ProviderIdExtractor");
+        String providerId = extractor != null ? extractor.extract(oAuth2User) : oAuth2User.getName();
 
         Optional<OAuth2Credential> credentialOp = oAuth2CredentialRepository.findByProviderAndProviderId(provider, providerId);
         Account account = null;
         if (credentialOp.isEmpty()) {
-            account = accountService.createAsOAuth2("", "", provider, providerId);
+            long rand = (new Random()).nextLong();
+            account = accountService.createAsOAuth2("사용자(" + rand + ")" , "", provider, providerId);
         }
         else{
             account = credentialOp.get().getAccount();

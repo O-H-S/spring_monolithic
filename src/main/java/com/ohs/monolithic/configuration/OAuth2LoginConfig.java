@@ -1,57 +1,43 @@
 package com.ohs.monolithic.configuration;
 
-import com.ohs.monolithic.user.oauth2.OAuth2UserService;
+import com.ohs.monolithic.user.service.OAuth2AccountService;
+import com.ohs.monolithic.utils.OAuth2ProviderIdExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2LoginConfig {
 
-    private final OAuth2UserService uService;
-    public void Apply(HttpSecurity http) throws Exception {
-        http.oauth2Login(oauth2Configurer -> oauth2Configurer
-                .userInfoEndpoint(userInfoEndpoint  -> userInfoEndpoint.userService(this.uService))
-                .loginPage("/user/login")
-                .successHandler(successHandler())
-        );
 
-        System.out.println("apply oauth2loginConfig");
-    }
+
+
+    final private ApplicationContext applicationContext;
+
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        System.out.println("apply authenticationManager");
-        return authenticationConfiguration.getAuthenticationManager();
+    public Map<String, OAuth2ProviderIdExtractor> providerIdExtractors() {
+        Map<String, OAuth2ProviderIdExtractor> extractors = new HashMap<>();
+        Map<String, OAuth2ProviderIdExtractor> beansOfType = applicationContext.getBeansOfType(OAuth2ProviderIdExtractor.class);
+        for (Map.Entry<String, OAuth2ProviderIdExtractor> entry : beansOfType.entrySet()) {
+            OAuth2ProviderIdExtractor extractor = entry.getValue();
+
+            String providerName = extractor.getProviderName();
+            extractors.put(providerName, extractor);
+        }
+        return extractors;
     }
 
-    /*AuthenticationManager 빈을 생성했다. AuthenticationManager는 스프링 시큐리티의 인증을 담당한다.
-    AuthenticationManager는 사용자 인증시 앞에서 작성한 UserSecurityService와 PasswordEncoder를 사용한다.*/
 
-    public AuthenticationSuccessHandler successHandler() {
-        return ((request, response, authentication) -> {
-
-            System.out.println("success handler");
-            //DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-            response.sendRedirect("/");
-            /*String id = defaultOAuth2User.getAttributes().get("id").toString();
-            String body = """
-                    {"id":"%s"}
-                    """.formatted(id);
-
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-
-            PrintWriter writer = response.getWriter();
-            writer.println(body);
-            writer.flush();*/
-        });
-    }
 
 
 }

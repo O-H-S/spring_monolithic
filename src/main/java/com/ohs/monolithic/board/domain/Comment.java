@@ -1,17 +1,15 @@
 package com.ohs.monolithic.board.domain;
 
 
-import com.ohs.monolithic.user.Account;
+import com.ohs.monolithic.user.domain.Account;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 
 @Entity

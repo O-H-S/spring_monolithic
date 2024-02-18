@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 public class OAuth2AppUser extends DefaultOAuth2User implements AppUser {
 
@@ -27,4 +28,6 @@ public class OAuth2AppUser extends DefaultOAuth2User implements AppUser {
     public Account getAccount() {
         return account;
     }
+
+
 }
