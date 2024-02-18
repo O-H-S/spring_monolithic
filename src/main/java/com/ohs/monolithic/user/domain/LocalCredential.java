@@ -11,6 +11,7 @@ import org.springframework.cglib.core.Local;
 @Getter
 @Entity
 @NoArgsConstructor
+@Table(name = "local_credential")
 public class LocalCredential {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

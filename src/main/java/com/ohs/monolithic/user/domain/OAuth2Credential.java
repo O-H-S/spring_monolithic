@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @NoArgsConstructor
+@Table(name = "oauth2_credential")
 public class OAuth2Credential {
 
   @Id

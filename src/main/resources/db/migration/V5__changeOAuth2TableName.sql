@@ -1,0 +1,1 @@
+RENAME TABLE oauth2credential TO oauth2_credential;
