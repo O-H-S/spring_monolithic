@@ -1,7 +1,10 @@
 package com.ohs.monolithic.board.controller;
 
+import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.service.PostLikeService;
+import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
 import com.ohs.monolithic.user.domain.Account;
 import com.ohs.monolithic.user.dto.AppUser;
@@ -23,15 +26,15 @@ import java.util.Map;
 @RequestMapping("/api/posts/{id}")
 public class PostDetailApiController {
 
-  final private AccountService accountService;
   final private PostWriteService writeService;
+  final private PostReadService readService;
   final private PostLikeService postLikeService;
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping
-  public ResponseEntity<?> deletePost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id) {
+  public ResponseEntity<?> deletePost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id) throws Exception {
 
 
-    writeService.deleteBy(id, user.getAccount());
+    writeService.deleteBy(id, user.getAccountId());
     return ResponseEntity.status(HttpStatus.OK).build();
 
   }
@@ -42,6 +45,19 @@ public class PostDetailApiController {
 
     writeService.modifyBy(id, user.getAccount(), postForm);
     return ResponseEntity.status(HttpStatus.OK).build();
+
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping
+  public ResponseEntity<?> getPost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id,
+                                   @RequestParam(value="determineLiked", defaultValue= "false") boolean determineLiked,
+                                   @RequestParam(value="determineMine", defaultValue= "false") boolean determineMine) {
+
+    Long accoundId = user!=null ? user.getAccountId() : null;
+    PostDetailResponse response = readService.getPostReadOnly(id, accoundId, determineLiked, determineMine);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
 
   }
 

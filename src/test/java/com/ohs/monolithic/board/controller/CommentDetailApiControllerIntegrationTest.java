@@ -3,6 +3,8 @@ package com.ohs.monolithic.board.controller;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.CommentForm;
+import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.utils.IntegrationTestBase;
 import com.ohs.monolithic.board.utils.WithMockCustomUser;
 import com.ohs.monolithic.user.domain.Account;
@@ -13,6 +15,8 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.List;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -25,6 +29,117 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
+  /*================================================================================
+
+        특정 댓글 변경
+
+  ================================================================================*/
+
+  @Test
+  @DisplayName("PUT /api/comments/{id}: 성공 - 200  ")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
+  public void modifyPost_0() throws Exception {
+    Account writer = initSecurityUserAccount();
+    //given
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Comment targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
+
+    CommentForm form = new CommentForm();
+    form.setContent("modified content");
+
+
+    // when
+    ResultActions result = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .put(
+                            String.format("/api/comments/%d", targetComment.getId() )
+                    )
+                    .content(gson.toJson(form))
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+
+    ).andDo(print());
+
+    // then
+    result.andExpect(status().isOk());
+    //result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    result.andDo(document("comments/put/succeeded-recommended",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())));
+  }
+
+  @Test
+  @DisplayName("PUT /api/comments/{id}: 자신의 댓글이 아니면 실패 -   ")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
+  public void modifyPost_1() throws Exception {
+    Account writer = initSecurityUserAccount();
+    //given
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Comment targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", givens.b.getId());
+
+    CommentForm form = new CommentForm();
+    form.setContent("modified content");
+
+
+    // when
+    ResultActions result = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .put(
+                            String.format("/api/comments/%d", targetComment.getId() )
+                    )
+                    .content(gson.toJson(form))
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+
+    ).andDo(print());
+
+    // then
+    result.andExpect(status().isForbidden());
+    //result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    result.andDo(document("comments/put/failed-denied",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())));
+  }
+
+
+
+
+  /*================================================================================
+
+        댓글 삭제
+
+  ================================================================================*/
+
+  @Test
+  @DisplayName("DELETE /api/comments/{id}: 성공 - 200  ")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
+  public void deleteComment_0() throws Exception {
+    Account writer = initSecurityUserAccount();
+    //given
+    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Comment targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
+    // when
+    ResultActions result = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .delete(
+                            String.format("/api/comments/%d", targetComment.getId() )
+                    )
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+
+    ).andDo(print());
+
+    // then
+    result.andExpect(status().isOk());
+    //result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    result.andDo(document("comments/delete/succeeded-recommended",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())));
+  }
+
 
 
 

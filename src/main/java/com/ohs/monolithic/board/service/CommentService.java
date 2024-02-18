@@ -8,16 +8,13 @@ import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.user.Account;
-import jakarta.persistence.EntityExistsException;
+import com.ohs.monolithic.user.domain.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -99,7 +96,7 @@ public class CommentService {
         }
 
         if (!targetComment.getAuthor().getId().equals(operator.getId())) {
-            throw new RuntimeException("댓글 수정 권한이 없습니다");
+            throw new AccessDeniedException("댓글 수정 권한이 없습니다");
         }
 
         targetComment.setContent(form.getContent());

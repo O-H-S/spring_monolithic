@@ -15,6 +15,8 @@ app:
   jwt-secret: testtesttesttesttestq57TejMnVUyzblYDfPQye02f7MGVA9XkHa
 
 spring:
+  flyway:
+    enabled: false
   datasource:
     driver-class-name: org.h2.Driver
 #    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1e
