@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.exception;
+package com.ohs.monolithic.exception;
 
 import com.ohs.monolithic.board.dto.BoardResponse;
 import jakarta.servlet.http.HttpServletRequest;

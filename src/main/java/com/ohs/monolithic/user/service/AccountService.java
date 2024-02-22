@@ -15,7 +15,9 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,13 +50,14 @@ public class AccountService {
                 .role(UserRole.USER)
                 .build();
 
+        userRepository.save(newAccount);
         LocalCredential newCredential = LocalCredential.builder()
                 .account(newAccount)
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .build();
 
-        userRepository.save(newAccount);
+
         localCredentialRepository.save(newCredential);
         return newAccount;
     }
@@ -68,22 +71,26 @@ public class AccountService {
                 .role(UserRole.USER)
                 .build();
 
+        userRepository.save(newAccount);
+
         OAuth2Credential newCredential = OAuth2Credential.builder()
                 .account(newAccount)
                 .provider(provider)
                 .providerId(providerId)
                 .build();
 
-        userRepository.save(newAccount);
+
         oauth2CredentialRepository.save(newCredential);
         return newAccount;
     }
 
+    @Transactional
     public void upgradeToAdmin(Account target, String typedAdminKey){
 
         if(typedAdminKey.equals(adminKey)) {
             System.out.println(target.getNickname() + " is registered as admin");
             target.setRole(UserRole.ADMIN);
+
             this.userRepository.save(target);
 
         }

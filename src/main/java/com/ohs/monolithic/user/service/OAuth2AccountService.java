@@ -57,14 +57,19 @@ public class OAuth2AccountService extends DefaultOAuth2UserService {
         OAuth2ProviderIdExtractor extractor = providerIdExtractors.get(provider + "ProviderIdExtractor");
         String providerId = extractor != null ? extractor.extract(oAuth2User) : oAuth2User.getName();
 
-        Optional<OAuth2Credential> credentialOp = oAuth2CredentialRepository.findByProviderAndProviderId(provider, providerId);
         Account account = null;
-        if (credentialOp.isEmpty()) {
-            long rand = (new Random()).nextLong();
-            account = accountService.createAsOAuth2("사용자(" + rand + ")" , "", provider, providerId);
-        }
-        else{
-            account = credentialOp.get().getAccount();
+        try {
+            Optional<OAuth2Credential> credentialOp = oAuth2CredentialRepository.findByProviderAndProviderId(provider, providerId);
+
+            if (credentialOp.isEmpty()) {
+                long rand = (new Random()).nextLong();
+                account = accountService.createAsOAuth2("사용자(" + rand + ")", "", provider, providerId);
+            } else {
+                account = credentialOp.get().getAccount();
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            throw e;
         }
 
         // 유저 권한 지정.
