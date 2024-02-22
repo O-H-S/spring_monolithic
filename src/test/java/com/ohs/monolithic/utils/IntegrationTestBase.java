@@ -2,8 +2,8 @@ package com.ohs.monolithic.utils;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 
-import com.ohs.monolithic.user.domain.Account;
-import com.ohs.monolithic.user.dto.LocalAppUser;
+import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.account.dto.LocalAppUser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;

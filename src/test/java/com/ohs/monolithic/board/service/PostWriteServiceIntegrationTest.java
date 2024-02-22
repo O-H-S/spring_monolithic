@@ -3,7 +3,7 @@ package com.ohs.monolithic.board.service;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.account.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,12 +1,10 @@
 package com.ohs.monolithic.board.controller;
 
-import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.dto.CommentForm;
 import com.ohs.monolithic.board.service.CommentLikeService;
 import com.ohs.monolithic.board.service.CommentService;
-import com.ohs.monolithic.user.domain.Account;
-import com.ohs.monolithic.user.dto.AppUser;
-import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
@@ -16,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.Map;
 
 @RestController

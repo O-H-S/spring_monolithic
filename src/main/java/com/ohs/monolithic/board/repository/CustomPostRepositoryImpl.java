@@ -3,27 +3,22 @@ package com.ohs.monolithic.board.repository;
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import com.ohs.monolithic.board.domain.*;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.utils.DefaultBulkInsertableRepository;
+import com.ohs.monolithic.common.utils.DefaultBulkInsertableRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.List;
 
 import static com.ohs.monolithic.board.domain.QPost.post;
-import static com.ohs.monolithic.user.domain.QAccount.account;
+import static com.ohs.monolithic.account.domain.QAccount.account;
 
 
 

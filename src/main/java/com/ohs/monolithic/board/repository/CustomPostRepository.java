@@ -2,9 +2,8 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.domain.PostLike;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.utils.BulkInsertableRepository;
+import com.ohs.monolithic.common.utils.BulkInsertableRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

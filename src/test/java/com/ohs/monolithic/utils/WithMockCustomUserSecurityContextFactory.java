@@ -1,10 +1,9 @@
 package com.ohs.monolithic.utils;
 
 
-import com.ohs.monolithic.user.domain.Account;
-import com.ohs.monolithic.user.domain.AuthenticationType;
-import com.ohs.monolithic.user.dto.LocalAppUser;
-import com.ohs.monolithic.utils.WithMockCustomUser;
+import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.account.domain.AuthenticationType;
+import com.ohs.monolithic.account.dto.LocalAppUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;

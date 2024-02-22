@@ -1,14 +1,11 @@
 package com.ohs.monolithic.board.controller;
 
-import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.service.PostLikeService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
-import com.ohs.monolithic.user.domain.Account;
-import com.ohs.monolithic.user.dto.AppUser;
-import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.account.dto.AppUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
@@ -18,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.Map;
 
 @RestController

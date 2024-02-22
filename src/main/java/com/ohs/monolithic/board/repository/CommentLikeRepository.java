@@ -1,9 +1,7 @@
 package com.ohs.monolithic.board.repository;
 
 
-import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.CommentLike;
-import com.ohs.monolithic.user.domain.Account;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

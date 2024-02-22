@@ -6,8 +6,8 @@ import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.CommentLike;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.utils.BoardRepositoryTestHelper;
-import com.ohs.monolithic.configuration.QuerydslConfig;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.common.configuration.QuerydslConfig;
+import com.ohs.monolithic.account.domain.Account;
 import groovy.lang.Tuple3;
 
 import org.junit.jupiter.api.AfterEach;

@@ -2,7 +2,7 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostLike;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.account.domain.Account;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

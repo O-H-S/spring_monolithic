@@ -6,9 +6,8 @@ import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.service.CommentService;
 import com.ohs.monolithic.board.service.PostReadService;
-import com.ohs.monolithic.user.domain.Account;
-import com.ohs.monolithic.user.dto.AppUser;
-import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.account.dto.AppUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 // 게시글 조회 페이지 , 웹 컨트롤러

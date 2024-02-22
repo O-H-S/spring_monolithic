@@ -6,8 +6,7 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostPaginationService;
-import com.ohs.monolithic.board.service.PostReadService;
-import com.ohs.monolithic.utils.IncludeExecutionTime;
+import com.ohs.monolithic.common.utils.IncludeExecutionTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 import java.util.List;
 

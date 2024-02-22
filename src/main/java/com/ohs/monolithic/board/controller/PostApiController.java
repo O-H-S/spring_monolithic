@@ -3,9 +3,8 @@ package com.ohs.monolithic.board.controller;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.*;
 import com.ohs.monolithic.board.service.*;
-import com.ohs.monolithic.user.domain.Account;
-import com.ohs.monolithic.user.dto.AppUser;
-import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 

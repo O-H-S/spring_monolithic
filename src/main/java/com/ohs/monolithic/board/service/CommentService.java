@@ -8,7 +8,7 @@ import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.account.domain.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;

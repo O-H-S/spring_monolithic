@@ -1,6 +1,6 @@
 package com.ohs.monolithic.utils;
 
-import com.ohs.monolithic.user.domain.UserRole;
+import com.ohs.monolithic.account.domain.UserRole;
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 import java.lang.annotation.Retention;

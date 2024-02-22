@@ -5,7 +5,7 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.account.domain.Account;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

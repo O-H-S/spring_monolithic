@@ -6,7 +6,7 @@ import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.service.CommentService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostViewService;
-import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.account.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

@@ -5,8 +5,8 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
-import com.ohs.monolithic.user.dto.AppUser;
-import com.ohs.monolithic.user.service.AccountService;
+import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.security.Principal;
 
 // 게시글 작성과 관련된 웹 컨트롤러
 @RequiredArgsConstructor

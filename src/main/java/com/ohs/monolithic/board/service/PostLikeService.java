@@ -4,7 +4,7 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostLike;
 import com.ohs.monolithic.board.repository.PostLikeRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.account.domain.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,7 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.board.domain.*;
 import com.ohs.monolithic.board.dto.CommentPaginationDto;
-import com.ohs.monolithic.user.domain.Account;
+import com.ohs.monolithic.account.domain.Account;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.ohs.monolithic.board.domain.QComment.comment;
-import static com.ohs.monolithic.user.domain.QAccount.account;
+import static com.ohs.monolithic.account.domain.QAccount.account;
 import static com.ohs.monolithic.board.domain.QCommentLike.commentLike;
 
 @Repository

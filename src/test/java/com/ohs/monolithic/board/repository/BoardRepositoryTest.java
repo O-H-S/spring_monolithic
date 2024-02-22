@@ -2,7 +2,7 @@ package com.ohs.monolithic.board.repository;
 
 
 
-import com.ohs.monolithic.configuration.QuerydslConfig;
+import com.ohs.monolithic.common.configuration.QuerydslConfig;
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
