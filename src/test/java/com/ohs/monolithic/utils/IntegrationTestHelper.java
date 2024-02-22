@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.utils;
+package com.ohs.monolithic.utils;
 
 
 import com.ohs.monolithic.board.domain.Post;
@@ -21,7 +21,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class BoardIntegrationTestHelper {
+public class IntegrationTestHelper {
   @Autowired
   public BoardService boardService;
   @Autowired
@@ -85,6 +85,7 @@ public class BoardIntegrationTestHelper {
 
     return newBoard;
   }
+
 
   public Account simpleAccount(){
     Random random = new Random();

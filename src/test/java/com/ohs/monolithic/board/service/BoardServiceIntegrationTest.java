@@ -2,15 +2,10 @@ package com.ohs.monolithic.board.service;
 
 
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.repository.BoardRepository;
-import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.board.utils.IntegrationTestBase;
-import org.junit.jupiter.api.AfterEach;
+import com.ohs.monolithic.utils.IntegrationTestBase;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 

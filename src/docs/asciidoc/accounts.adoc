@@ -7,3 +7,29 @@
 
 [[anchor-get]]
 == link:/docs/index.html[Back to the main]
+
+
+// done
+[[anchor-patch]]
+== [ 계정 정보 부분 변경 ]
+
+=== ★ 권장
+Request
+include::{snippets}/accounts/patch/succeeded-recommended/http-request.adoc[]
+Response
+include::{snippets}/accounts/patch/succeeded-recommended/http-response.adoc[]
+
+=== 실패
+==== 자신의 계정이 아니면, 403
+Request
+include::{snippets}/accounts/patch/failed-accessdenied/http-request.adoc[]
+Response
+include::{snippets}/accounts/patch/failed-accessdenied/http-response.adoc[]
+
+==== 중복된 닉네임이면, 400
+Request
+include::{snippets}/accounts/patch/failed-violation/http-request.adoc[]
+Response
+include::{snippets}/accounts/patch/failed-violation/http-response.adoc[]
+
+

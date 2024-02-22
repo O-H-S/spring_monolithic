@@ -4,13 +4,11 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.repository.PostViewRepository;
-import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.board.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.user.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

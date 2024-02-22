@@ -2,6 +2,9 @@ package com.ohs.monolithic.board.exception;
 
 import com.ohs.monolithic.board.dto.BoardResponse;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -9,6 +12,8 @@ import org.springframework.security.web.csrf.CsrfException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @ControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionHandler {
@@ -18,6 +23,19 @@ public class GlobalExceptionHandler {
         //System.out.println(e.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+
+       Throwable cause = e.getCause();
+       if(cause instanceof ConstraintViolationException detailException){
+           if(detailException.getSQLException().getSQLState().equals( "23505") || detailException.getSQLException().getSQLState().equals( "23000"))
+               // 23505는 H2에서 발생
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("중복된 값 입니다");
+       }
+
+       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
 

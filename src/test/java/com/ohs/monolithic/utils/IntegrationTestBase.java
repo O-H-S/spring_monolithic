@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.utils;
+package com.ohs.monolithic.utils;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 
@@ -27,7 +27,7 @@ public class IntegrationTestBase {
   protected Gson gson; // json 직렬화,역직렬화
 
   @Autowired
-  protected BoardIntegrationTestHelper helper;
+  protected IntegrationTestHelper helper;
 
   @BeforeEach
   public void init() {

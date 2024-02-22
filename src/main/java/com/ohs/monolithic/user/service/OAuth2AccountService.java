@@ -1,5 +1,6 @@
 package com.ohs.monolithic.user.service;
 
+import com.ohs.monolithic.user.AppUserEntityMapper;
 import com.ohs.monolithic.user.domain.Account;
 import com.ohs.monolithic.user.domain.LocalCredential;
 import com.ohs.monolithic.user.domain.OAuth2Credential;
@@ -28,6 +29,7 @@ import java.util.*;
 public class OAuth2AccountService extends DefaultOAuth2UserService {
     private final Map<String, OAuth2ProviderIdExtractor> providerIdExtractors;
     private final OAuth2CredentialRepository oAuth2CredentialRepository;
+    private final AppUserEntityMapper mapper;
     private final AccountService accountService;
 
     @Override
@@ -75,6 +77,9 @@ public class OAuth2AccountService extends DefaultOAuth2UserService {
 
 
 
-        return new OAuth2AppUser(account, authorities, attributes,userNameAttributeName);
+        OAuth2AppUser appUser = new OAuth2AppUser(account, authorities, attributes,userNameAttributeName);
+
+        mapper.map(appUser);
+        return appUser;
     }
 }

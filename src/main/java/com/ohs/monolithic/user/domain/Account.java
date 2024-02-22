@@ -3,6 +3,7 @@ package com.ohs.monolithic.user.domain;
 import com.ohs.monolithic.board.BoardPaginationType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.context.event.EventListener;
 
 @Getter
 @Entity
@@ -14,7 +15,7 @@ public class Account {
     private Long id;
 
     @Setter
-    @Column(unique = false)
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     @Setter

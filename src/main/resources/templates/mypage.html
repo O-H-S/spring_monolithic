@@ -1,0 +1,80 @@
+
+
+
+
+<html layout:decorate="~{layout}">
+
+    <style layout:fragment="style">
+        .vertical-line {
+            border-left: 1px solid #ddd;
+            height: 100%;
+        }
+        .top-margin {
+            margin-top: 20px;
+        }
+        /* 커스텀 메뉴 버튼 가로 길이 조정 */
+        .custom-nav-link {
+            width: 50%; /* 가로 길이를 현재의 50%로 설정 */
+            margin: 0 auto; /* 중앙 정렬 */
+        }
+        /* 커스텀 메뉴 컨테이너 조정 */
+        .custom-nav-pills {
+            padding-right: 20px; /* 수직선과의 간격 조정 */
+        }
+    </style>
+
+
+    <div layout:fragment="content" class="container-fluid top-margin">
+        <div class="row justify-content-center">
+            <!-- 메뉴 -->
+            <div class="col-md-3">
+                <div class="nav flex-column nav-pills custom-nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link custom-nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true">프로필</a>
+                    <a class="nav-link custom-nav-link " id="v-pills-info-tab" data-bs-toggle="pill" href="#v-pills-info" role="tab" aria-controls="v-pills-info" aria-selected="false">개인정보</a>
+                    <a class="nav-link custom-nav-link " id="v-pills-posts-tab" data-bs-toggle="pill" href="#v-pills-posts" role="tab" aria-controls="v-pills-posts" aria-selected="false">작성글</a>
+                </div>
+            </div>
+
+            <!-- 수직선 -->
+            <div class="col-md-1 d-none d-md-block vertical-line"></div>
+
+            <!-- 내용 -->
+            <div class="col-md-5">
+                <div class="tab-content" id="v-pills-tabContent">
+                    <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">닉네임</label>
+                            <input type="text" class="form-control" id="nickname" name="nickname" th:value="${myAccount.getNickname()}">
+                        </div>
+                        <button id="updateNicknameBtn" class="btn btn-primary" onclick="updateNickname()">변경</button>
+
+                    </div>
+                    <div class="tab-pane fade" id="v-pills-info" role="tabpanel" aria-labelledby="v-pills-info-tab">개인정보</div>
+                    <div class="tab-pane fade" id="v-pills-posts" role="tabpanel" aria-labelledby="v-pills-posts-tab">작성글</div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            var myAccount = /*[[${myAccount}]]*/ null;
+            async function updateNickname() {
+                // 닉네임 필드에서 값 가져오기
+                var nickname = document.getElementById('nickname').value;
+                var content = { 'nickname' : nickname}
+                var response = await fetchWithCSRF("/api/accounts/"+myAccount["id"], "PATCH", content)
+                if (response.ok) {
+                    alert('닉네임이 변경 되었습니다.');
+                }
+                else{
+                    var errorText = await response.text();
+                    console.error('변경 중 오류가 발생했습니다:', errorText);
+                    alert('닉네임 변경에 실패했습니다: ' + errorText);
+                }
+            }
+        </script>
+
+
+    </div>
+
+
+</html>

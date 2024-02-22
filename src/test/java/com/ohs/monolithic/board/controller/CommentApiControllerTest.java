@@ -2,11 +2,9 @@ package com.ohs.monolithic.board.controller;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.dto.CommentCreationForm;
 import com.ohs.monolithic.board.dto.CommentForm;
-import com.ohs.monolithic.board.dto.PostForm;
-import com.ohs.monolithic.board.utils.IntegrationTestBase;
-import com.ohs.monolithic.board.utils.WithMockCustomUser;
+import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.user.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.DisplayName;

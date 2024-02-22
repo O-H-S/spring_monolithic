@@ -73,5 +73,5 @@ JWT로 인증하거나, 외부 시스템에서 API 호출 시 CSRF 토큰은 생
 [options="header", cols="1,2,2,3"]
 |===
 | Method | URL | Input | Description
-
+| PATCH | `/api/accounts/{id}` | path, body  | link:accounts.html#anchor-patch[계정 정보 부분 변경]
 |===

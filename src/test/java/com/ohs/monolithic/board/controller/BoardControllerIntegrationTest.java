@@ -1,24 +1,17 @@
 package com.ohs.monolithic.board.controller;
 
 
-import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.ohs.monolithic.board.BoardPaginationType;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.service.BoardService;
-import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.board.utils.IntegrationTestBase;
-import com.ohs.monolithic.board.utils.WithMockCustomUser;
+import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.WithMockCustomUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 

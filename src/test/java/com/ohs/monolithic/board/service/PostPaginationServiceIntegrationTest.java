@@ -3,14 +3,12 @@ package com.ohs.monolithic.board.service;
 import com.ohs.monolithic.board.BoardPaginationType;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.board.utils.BoardIntegrationTestHelper;
-import com.ohs.monolithic.board.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestBase;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 
 import java.util.Arrays;

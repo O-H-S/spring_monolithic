@@ -1,5 +1,6 @@
 package com.ohs.monolithic.user.service;
 
+import com.ohs.monolithic.user.AppUserEntityMapper;
 import com.ohs.monolithic.user.domain.Account;
 import com.ohs.monolithic.user.domain.LocalCredential;
 import com.ohs.monolithic.user.dto.LocalAppUser;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class LocalAccountService implements UserDetailsService {
 
     private final LocalCredentialRepository localCredentialRepository;
+    private final AppUserEntityMapper mapper;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<LocalCredential> credentialOp = localCredentialRepository.findByUsername(username);
@@ -37,6 +39,11 @@ public class LocalAccountService implements UserDetailsService {
 
         authorities.add(new SimpleGrantedAuthority(account.getRole().toString()));
 
-        return new LocalAppUser(account, credential.getUsername(), credential.getPassword(), authorities);
+
+        LocalAppUser appUser = new LocalAppUser(account, credential.getUsername(), credential.getPassword(), authorities);
+
+        mapper.map(appUser);
+        return appUser;
+
     }
 }

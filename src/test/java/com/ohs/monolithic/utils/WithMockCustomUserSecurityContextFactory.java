@@ -1,10 +1,10 @@
-package com.ohs.monolithic.board.utils;
+package com.ohs.monolithic.utils;
 
 
 import com.ohs.monolithic.user.domain.Account;
 import com.ohs.monolithic.user.domain.AuthenticationType;
-import com.ohs.monolithic.user.domain.UserRole;
 import com.ohs.monolithic.user.dto.LocalAppUser;
+import com.ohs.monolithic.utils.WithMockCustomUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -22,7 +22,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
     List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(customUser.authorities());
     Account account = Account.builder()
-            .nickname("MockLoggedUser")
+            .nickname(customUser.nickname())
             .authenticationType(AuthenticationType.Local)
             .email("user@security.com")
             .role(customUser.role())
