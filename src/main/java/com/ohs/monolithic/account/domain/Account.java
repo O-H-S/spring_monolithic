@@ -2,6 +2,9 @@ package com.ohs.monolithic.account.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -21,6 +24,10 @@ public class Account {
     private String email;
 
     @Setter
+    @Column(unique = false, nullable = true)
+    private String profileImage;
+
+    @Setter
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -28,12 +35,25 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AuthenticationType authenticationType;
 
+
+    @Setter
+    @Column(name = "create_date")
+    //@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    //@JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createDate;
+
     @Builder/*(builderClassName = "AsLocal", builderMethodName = "AsLocal")*/
-    public Account(String nickname, String email, UserRole role, AuthenticationType authenticationType){
+    public Account(String nickname, String email, UserRole role, AuthenticationType authenticationType, LocalDateTime createDate){
+
+        if (createDate == null)
+            createDate = LocalDateTime.now();
+
         this.nickname = nickname;
         this.email = email;
         this.authenticationType = authenticationType;
         this.role = role;
+        this.createDate = createDate;
+
     }
 
 /*

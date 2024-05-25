@@ -92,11 +92,14 @@ public class AccountService {
 
     }
 
+    public void assertPermission(AppUser operator, Long targetId){
+        if(!operator.getAccountId().equals(targetId) && !operator.isAdmin())
+            throw new AccessDeniedException("(Account Failed) 해당 요청의 권한이 없습니다.");
+    }
     @Transactional
     public AccountResponse updateAccount(Long id, Map<String, String> data, AppUser operator){
 
-        if(!operator.getAccountId().equals(id) && operator.getAccount().getRole() != UserRole.ADMIN)
-            throw new AccessDeniedException("(Account Patch Failed) 해당 요청의 권한이 없습니다.");
+        assertPermission(operator, id);
 
         Optional<Account> targetOp = userRepository.findById(id);
         if(targetOp.isEmpty())
@@ -117,12 +120,17 @@ public class AccountService {
         if(targetEmail != null)
             target.setEmail(targetEmail);
 
+        String targetProfileImage = data.get("profileImage");
+        if(targetProfileImage != null)
+            target.setProfileImage(targetProfileImage);
+
 
         userRepository.save(target);
-        userPrincipalMapper.sync(target);
 
 
         return AccountResponse.of(target);
     }
+
+
 
 }

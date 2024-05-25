@@ -51,6 +51,13 @@ dependencies {
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
 
+	// s3
+	// https://docs.awspring.io/spring-cloud-aws/docs/3.1.0/reference/html/index.html 참고함
+	val springCloudAwsVersion: String = project.property("springCloudAwsVersion") as String
+	implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:$springCloudAwsVersion"))
+	implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
+
+	// 롬복
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 }
