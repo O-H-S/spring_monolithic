@@ -1,6 +1,7 @@
 package com.ohs.monolithic.account.service;
 
 import com.ohs.monolithic.account.domain.*;
+import com.ohs.monolithic.account.dto.AccountCreateForm;
 import com.ohs.monolithic.account.dto.AccountResponse;
 import com.ohs.monolithic.account.event.AccountDataChangeEvent;
 import com.ohs.monolithic.auth.domain.AppUser;
@@ -11,6 +12,8 @@ import com.ohs.monolithic.account.repository.LocalCredentialRepository;
 import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AccountService {

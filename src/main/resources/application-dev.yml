@@ -29,16 +29,5 @@ spring:
         jdbc.batch_size: 1000
 
 
-
 logging:
-  level:
-    #root: debug
-    org:
-      springframework:
-        orm:
-          jpa: DEBUG
-
-      hibernate:
-        type:
-          descriptor:
-            sql: trace
+  config: classpath:logback-dev.xml

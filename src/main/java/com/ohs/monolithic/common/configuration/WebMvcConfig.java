@@ -1,6 +1,7 @@
 package com.ohs.monolithic.common.configuration;
 
 import com.ohs.monolithic.common.utils.ExecutionTimeInterceptor;
+import com.ohs.monolithic.common.utils.LoggingInterceptor;
 import com.ohs.monolithic.common.utils.StringToBoardPaginationTypeConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +15,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    final private LoggingInterceptor loggingInterceptor;
     final private ExecutionTimeInterceptor executionTimeInterceptor;
 
+
+    // 인터셉터 등록
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loggingInterceptor);
         registry.addInterceptor(executionTimeInterceptor);
     }
 

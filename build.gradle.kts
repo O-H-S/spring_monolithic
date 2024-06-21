@@ -76,4 +76,6 @@ apply(from = "./buildGradles/build-docs.gradle")
 apply(from = "./buildGradles/build-deploy.gradle")
 apply(from = "./buildGradles/build-querydsl.gradle")
 apply(from = "./buildGradles/build-testing.gradle")
+apply(from = "./buildGradles/build-logging.gradle")
+
 
