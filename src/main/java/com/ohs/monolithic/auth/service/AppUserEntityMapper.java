@@ -1,8 +1,8 @@
-package com.ohs.monolithic.account;
+package com.ohs.monolithic.auth.service;
 
 
 import com.ohs.monolithic.account.domain.Account;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,8 +14,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 
+@Deprecated
+@Component
 public class AppUserEntityMapper implements ApplicationListener<SessionDestroyedEvent> {
   Map<Long, AppUser> maps;
 
@@ -37,7 +38,7 @@ public class AppUserEntityMapper implements ApplicationListener<SessionDestroyed
       @Override
       public void afterCompletion(int status) {
         if(status == STATUS_COMMITTED) {
-          mapped.setAccount(entity);
+          //mapped.setAccount(entity);
         }
       }
     });

@@ -32,13 +32,10 @@ public class SecurityConfig {
 
     //private final OAuth2LoginConfig oAuthConfigurer;
 
-  @Bean
-  PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+
     @Bean
     @Order(2)
-     SecurityFilterChain sessionFilterChain(HttpSecurity http) throws Exception {
+     SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
 
       this.Apply(http);
         http
@@ -74,13 +71,13 @@ public class SecurityConfig {
 
     }
 
-  @Bean
+  /*@Bean
   @Order(1)
   public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
 
     // OAuth2 관련 URL 매칭을 위한 AntPathRequestMatcher
-    /*RequestMatcher oauth2Matcher = new AntPathRequestMatcher("/oauth2/**");
-    RequestMatcher oauth2Matcher2 = new AntPathRequestMatcher("/login/oauth2/**");*/
+    *//*RequestMatcher oauth2Matcher = new AntPathRequestMatcher("/oauth2/**");
+    RequestMatcher oauth2Matcher2 = new AntPathRequestMatcher("/login/oauth2/**");*//*
 
     RequestMatcher oauth2Matcher = new AntPathRequestMatcher("test/oauth2/**");
     RequestMatcher oauth2Matcher2 = new AntPathRequestMatcher("test/login/oauth2/**");
@@ -109,7 +106,7 @@ public class SecurityConfig {
     //oAuthConfigurer.Apply(http);
              // JWT 검증 설정
     return http.build();
-  }
+  }*/
 
   private final OAuth2AccountService uService;
   public void Apply(HttpSecurity http) throws Exception {

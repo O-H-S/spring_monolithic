@@ -1,8 +1,8 @@
-package com.ohs.monolithic.account.controller;
+package com.ohs.monolithic.account.controller.mvc;
 
 import com.ohs.monolithic.account.domain.UserRole;
 import com.ohs.monolithic.account.dto.AccountCreateForm;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.account.exception.FailedAdminLoginException;
 import com.ohs.monolithic.account.service.AccountService;
 import jakarta.validation.Valid;
@@ -39,7 +39,7 @@ public class UserAuthPageController {
         System.out.println("trying to get admin role : " + secretKey);
         try {
             // 리팩토링 대상
-            service.upgradeToAdmin(user.getAccount(), secretKey);
+            service.upgradeToAdmin(user, secretKey);
             Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
             List<GrantedAuthority> updatedAuthorities = AuthorityUtils.createAuthorityList(UserRole.ADMIN.toString());
 
@@ -74,13 +74,13 @@ public class UserAuthPageController {
         }
         
 
-        if (!accountCreateForm.getPassword1().equals(accountCreateForm.getPassword2())) {
+        if (!accountCreateForm.getPassword().equals(accountCreateForm.getPassword2())) {
             bindingResult.rejectValue("password2", "passwordInCorrect",
                     "2개의 패스워드가 일치하지 않습니다.");
             return "signup_form";
         }
         try {
-            service.createAsLocal(accountCreateForm.getNickname(), accountCreateForm.getEmail(), accountCreateForm.getUsername(), accountCreateForm.getPassword1());
+            service.createAsLocal(accountCreateForm.getNickname(), accountCreateForm.getEmail(), accountCreateForm.getUsername(), accountCreateForm.getPassword());
         }
         catch(DataIntegrityViolationException e) {
             if(e.getCause() instanceof ConstraintViolationException cException && cException.getSQLState().equals( "23000"))

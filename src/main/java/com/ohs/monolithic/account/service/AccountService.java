@@ -1,9 +1,10 @@
 package com.ohs.monolithic.account.service;
 
-import com.ohs.monolithic.account.AppUserEntityMapper;
 import com.ohs.monolithic.account.domain.*;
 import com.ohs.monolithic.account.dto.AccountResponse;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.account.event.AccountDataChangeEvent;
+import com.ohs.monolithic.auth.domain.AppUser;
+import com.ohs.monolithic.account.exception.FailedAccountCreationException;
 import com.ohs.monolithic.account.exception.FailedAdminLoginException;
 import com.ohs.monolithic.account.repository.AccountRepository;
 import com.ohs.monolithic.account.repository.LocalCredentialRepository;
@@ -11,6 +12,9 @@ import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,13 +28,39 @@ import java.util.Optional;
 public class AccountService {
 
     private final AccountRepository userRepository;
-    private final AppUserEntityMapper userPrincipalMapper;
     private final LocalCredentialRepository localCredentialRepository;
     private final OAuth2CredentialRepository oauth2CredentialRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin-key}")
     private String adminKey;
+
+    @Transactional
+    public AccountResponse createAccount(AccountCreateForm form){
+
+
+        if (!form.getPassword().equals(form.getPassword2())){
+            throw new FailedAccountCreationException("비밀번호 확인 값이 불일치합니다.");
+        }
+        Account result = createAsLocal(form.getNickname(), form.getEmail(), form.getUsername(), form.getPassword());
+        return AccountResponse.of(result);
+    }
+
+
+    //  "엔티티를 스프링이나 외부 캐시에 저장하면 절대! 안됩니다. 엔티티는 영속성 컨텍스트에서 상태를 관리하기 때문에, 항상 DTO로 변환해서 변환한 DTO를 캐시에 저장해서 관리해야 합니다."
+    // 높은 동시성 환경에서 고비용 연산을 캐싱하는 경우 sync = true 설정을 고려할 수 있음.
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "accounts", key = "#id")
+    public AccountResponse getAccount(Long id, AppUser user){
+        if (id == null || id < 0) {
+            throw new IllegalArgumentException("올바르지 않은 account id 입니다.");
+        }
+        Optional<Account> byId = userRepository.findById(id);
+        if(byId.isEmpty())
+            throw new EntityNotFoundException("존재하지 않는 계정입니다.");
+        //log.info("");
+        return AccountResponse.of(byId.get());
+    }
 
 
     @Transactional
@@ -41,16 +71,28 @@ public class AccountService {
                 .email(email)
                 .role(UserRole.USER)
                 .build();
+        try {
+            userRepository.save(newAccount);
+        } catch(DataIntegrityViolationException e) {
+            if(e.getCause() instanceof ConstraintViolationException cException && cException.getSQLState().equals( "23000")) {
+                throw new FailedAccountCreationException("중복된 닉네임입니다.");
+            }
+        }
 
-        userRepository.save(newAccount);
+
         LocalCredential newCredential = LocalCredential.builder()
                 .account(newAccount)
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .build();
 
-
-        localCredentialRepository.save(newCredential);
+        try{
+            localCredentialRepository.save(newCredential);
+        }catch(DataIntegrityViolationException e) {
+            if(e.getCause() instanceof ConstraintViolationException cException && cException.getSQLState().equals( "23000")) {
+                throw new FailedAccountCreationException("중복된 아이디입니다.");
+            }
+        }
         return newAccount;
     }
 
@@ -63,7 +105,13 @@ public class AccountService {
                 .role(UserRole.USER)
                 .build();
 
-        userRepository.save(newAccount);
+        try {
+            userRepository.save(newAccount);
+        } catch(DataIntegrityViolationException e) {
+            if(e.getCause() instanceof ConstraintViolationException cException && cException.getSQLState().equals( "23000")) {
+                throw new FailedAccountCreationException("중복된 닉네임입니다.");
+            }
+        }
 
         OAuth2Credential newCredential = OAuth2Credential.builder()
                 .account(newAccount)
@@ -71,19 +119,31 @@ public class AccountService {
                 .providerId(providerId)
                 .build();
 
-
-        oauth2CredentialRepository.save(newCredential);
+        try {
+            oauth2CredentialRepository.save(newCredential);
+        }catch(DataIntegrityViolationException e) {
+            if(e.getCause() instanceof ConstraintViolationException cException && cException.getSQLState().equals( "23000")) {
+                throw new FailedAccountCreationException("이미 가입된 외부 계정입니다.");
+            }
+        }
         return newAccount;
     }
 
     @Transactional
-    public void upgradeToAdmin(Account target, String typedAdminKey){
+    public void upgradeToAdmin(AppUser user, String typedAdminKey){
 
         if(typedAdminKey.equals(adminKey)) {
-            System.out.println(target.getNickname() + " is registered as admin");
-            target.setRole(UserRole.ADMIN);
+            Optional<Account> accountOp = userRepository.findById(user.getAccountId());
+            if(accountOp.isEmpty())
+                return;
+            Account account = accountOp.get();
 
-            this.userRepository.save(target);
+            System.out.println(account.getNickname() + " is registered as admin");
+
+            account.setRole(UserRole.ADMIN);
+            this.userRepository.save(account);
+
+            eventPublisher.publishEvent(new AccountDataChangeEvent());
 
         }
         else{
