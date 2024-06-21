@@ -1,7 +1,7 @@
-package com.ohs.monolithic.account.controller;
+package com.ohs.monolithic.account.controller.mvc;
 
 
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +17,7 @@ public class MyPageController {
   @GetMapping("/mypage")
   public String showMyPage(@AuthenticationPrincipal AppUser user, Model model){
 
-    model.addAttribute("myAccount", user.getAccount());
+    //model.addAttribute("myAccount", user.getAccount());
     return "mypage";
   }
 }

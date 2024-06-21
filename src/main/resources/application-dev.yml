@@ -1,4 +1,13 @@
+client:
+  origin: http://localhost:3000
 
+server:
+  ssl:
+    enabled: false # 스프링 부트가 자동으로 ssl를 활성화하려 시도할수있음.
+  servlet:
+    session:
+      cookie:
+        domain: localhost
 
 spring:
   config:

@@ -1,4 +1,4 @@
-package com.ohs.monolithic.account;
+package com.ohs.monolithic.auth.service;
 
 import com.ohs.monolithic.common.utils.OAuth2ProviderIdExtractor;
 import org.springframework.security.oauth2.core.user.OAuth2User;

@@ -2,6 +2,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.domain.PostTag;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.board.repository.PostRepository;
 import jakarta.persistence.EntityManager;
@@ -17,12 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PostPaginationService {
   private final BoardService boardService;
   private final PostRepository postRepository;
+  private final PostTagService postTagService;
 
   @PersistenceContext
   EntityManager em;
@@ -104,13 +108,32 @@ public class PostPaginationService {
   }
 
   // Offset, Count cache, Covering index
+
   @Transactional(readOnly = true)
-  public Page<PostPaginationDto> getListWithCovering(int page, Integer boardID, Integer count) {
+  public Page<PostPaginationDto> getListWithCovering(int page, Integer boardID, Integer count, List<String> tags) {
     Board boardReference = em.getReference(Board.class, boardID);
     List<Sort.Order> sorts = new ArrayList<>();
     sorts.add(Sort.Order.desc("createDate"));
     Pageable pageable = PageRequest.of(page, count, Sort.by(sorts));
-    return this.postRepository.selectAllByBoardWithCovering(pageable, boardReference, boardService.getPostCount(boardID));
+
+    Page<PostPaginationDto> result  = this.postRepository.selectAllByBoardWithCovering(pageable, boardReference, boardService.getPostCount(boardID), postTagService.getTagFilter(tags));
+
+    List<Long> postIds = result.stream()
+            .map(PostPaginationDto::getId)
+            .toList();
+
+    Map<Long, List<PostTag>> tagTables = postTagService.getPostListTags(postIds);
+    for(PostPaginationDto dto : result){
+      List<PostTag> tagsPerPost = tagTables.get(dto.getId());
+      if(tagsPerPost != null)
+        dto.mapTags(tagsPerPost);
+    }
+
+    return result;
+  }
+  @Transactional(readOnly = true)
+  public Page<PostPaginationDto> getListWithCovering(int page, Integer boardID, Integer count) {
+    return getListWithCovering(page, boardID, count, null);
   }
 
   // No offset(Cursor)

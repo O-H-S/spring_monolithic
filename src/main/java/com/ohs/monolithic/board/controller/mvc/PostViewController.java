@@ -1,13 +1,15 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.mvc;
 
 
+import com.ohs.monolithic.account.dto.AccountResponse;
+import com.ohs.monolithic.account.service.AccountService;
 import com.ohs.monolithic.board.dto.CommentForm;
 import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.service.CommentService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.account.domain.Account;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,15 +30,14 @@ public class PostViewController {
 
     private final PostReadService readService;
     private final CommentService commentService;
-
+    private final AccountService accountService;
 
 
     @GetMapping("/{id}")
     public String getPostDetail(Model model, @PathVariable("id") Long id, @AuthenticationPrincipal AppUser user){
 
-        Account viewer = user != null ? user.getAccount() : null;
 
-        baseModelMapping(model, id, viewer, new CommentForm());
+        baseModelMapping(model, id, user, new CommentForm());
         return "post_detail";
     }
 
@@ -47,7 +48,7 @@ public class PostViewController {
                                @Valid CommentForm commentForm, BindingResult bindingResult, @AuthenticationPrincipal AppUser user){
 
         if (bindingResult.hasErrors()) {
-            baseModelMapping(model, id, user.getAccount(), commentForm);
+            baseModelMapping(model, id, user, commentForm);
             return "post_detail";
         }
 
@@ -58,13 +59,13 @@ public class PostViewController {
 
 
 
-    void baseModelMapping(Model model, Long id, Account viewer, CommentForm commentForm)
+    void baseModelMapping(Model model, Long id, AppUser viewer, CommentForm commentForm)
     {
-
-        PostDetailResponse response = this.readService.readPost(id, viewer != null? viewer.getId() : null);
+        AccountResponse accountData = accountService.getAccount(viewer.getAccountId(), viewer);
+        PostDetailResponse response = this.readService.readPost(id, viewer != null? viewer.getAccountId() : null);
         List<CommentPaginationDto> comments = this.commentService.getCommentsAsPage(id, viewer);
 
-        model.addAttribute("myAccount", viewer); // 리팩토링 대상
+        model.addAttribute("myAccount", accountData); // 리팩토링 대상
         model.addAttribute("response", response);
         model.addAttribute("comments", comments);
         model.addAttribute("commentForm", commentForm);

@@ -1,6 +1,7 @@
 package com.ohs.monolithic.board;
 
 import com.ohs.monolithic.board.domain.Board;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostReadService;
 import jakarta.annotation.PreDestroy;

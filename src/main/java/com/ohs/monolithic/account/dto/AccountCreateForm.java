@@ -17,9 +17,11 @@ public class AccountCreateForm {
     @NotEmpty(message = "닉네임은 필수항목입니다.")
     private String nickname;
 
+    @Size(min = 7, max = 25)
     @NotEmpty(message = "비밀번호는 필수항목입니다.")
-    private String password1;
+    private String password;
 
+    @Size(min = 7, max = 25)
     @NotEmpty(message = "비밀번호 확인은 필수항목입니다.")
     private String password2;
 

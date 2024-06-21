@@ -1,0 +1,1 @@
+CREATE INDEX idx_problem_found_date_id ON problem (found_date DESC, id);

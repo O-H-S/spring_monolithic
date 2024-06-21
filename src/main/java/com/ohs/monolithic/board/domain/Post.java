@@ -66,11 +66,10 @@ public class Post {
     }*/
 
 
-
-
     @Setter
     @Column(name = "create_date")
     private LocalDateTime createDate;
+
     @Setter
     private LocalDateTime modifyDate;
 

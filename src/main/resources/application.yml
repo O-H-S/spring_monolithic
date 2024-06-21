@@ -2,6 +2,12 @@ server:
   port: 443
 
 
+  servlet:
+    session:
+      cookie:
+        domain: ohs.kr
+client:
+  origin: https://ohs.kr
 
 
 

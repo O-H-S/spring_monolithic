@@ -1,7 +1,7 @@
 package com.ohs.monolithic.board.domain;
 
 
-import com.ohs.monolithic.board.BoardPaginationType;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import jakarta.persistence.*;
 import lombok.*;
 

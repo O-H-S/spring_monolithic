@@ -1,11 +1,11 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.mvc;
 
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

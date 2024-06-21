@@ -24,6 +24,10 @@ repositories {
 
 dependencies {
 
+	// redis 세션
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	implementation("org.springframework.session:spring-session-data-redis")
+
 	// 템플릿 엔진
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")

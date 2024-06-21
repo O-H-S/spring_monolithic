@@ -2,6 +2,7 @@ package com.ohs.monolithic.board.service;
 
 
 import com.ohs.monolithic.board.domain.Post;
+import com.ohs.monolithic.board.domain.PostTag;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -17,8 +19,9 @@ import java.util.Optional;
 @Service
 public class PostReadService {
     private final PostRepository repository;
-    private final PostViewService postViewService;
-    private final PostLikeService postLikeService;
+    private final PostViewService postViewService; // 조회수 관련 서비스
+    private final PostLikeService postLikeService; // 추천 관련 서비스
+    private final PostTagService postTagService;
 
 
 
@@ -45,8 +48,10 @@ public class PostReadService {
             if(determineMine)
                 isMine = viewerId.equals( targetPost.getAuthor().getId());
         }
+        List<PostTag> tags = postTagService.getPostTags(postId);
 
-        return PostDetailResponse.of(targetPost, isMine, isLiked);
+
+        return PostDetailResponse.of(targetPost, isMine, isLiked, tags);
 
 
     }

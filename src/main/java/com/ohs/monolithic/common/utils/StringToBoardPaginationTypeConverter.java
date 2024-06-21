@@ -1,6 +1,6 @@
 package com.ohs.monolithic.common.utils;
 
-import com.ohs.monolithic.board.BoardPaginationType;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

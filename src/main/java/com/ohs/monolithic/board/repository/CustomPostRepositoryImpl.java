@@ -16,10 +16,11 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ohs.monolithic.board.domain.QPost.post;
 import static com.ohs.monolithic.account.domain.QAccount.account;
-
+import static com.ohs.monolithic.board.domain.QPostTag.postTag;
 
 
 @Repository
@@ -56,25 +57,34 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
     return new PageImpl<>(posts, pageable, allCounts);
   }
 
-
   @Override
-  public Page<PostPaginationDto> selectAllByBoardWithCovering(Pageable pageable, Board board, Long allCounts) {
+  public Page<PostPaginationDto> selectAllByBoardWithCovering(Pageable pageable, Board board, Long allCounts, BooleanBuilder customBuilder){
+
+    var coreQuery = queryFactory
+            .from(post)
+            .leftJoin(postTag).on(postTag.post.id.eq(post.id))
+            .where(post.deleted.isFalse(), post.board.id.eq(board.getId()), customBuilder);
 
     // 빠르게 인덱스만으로 대상 id 값들을 구해온다.
-    List<Long> ids = queryFactory
-            .select(post.id)
-            .from(post)
-            .where(post.deleted.isFalse(), post.board.id.eq(board.getId()))
+    // coreQuery.clone() 를 하지않으면, 재사용 되어야하는 원본 coreQuery가 변경됨.
+    List<Tuple> result = coreQuery.clone()
+            .select(post.id, post.createDate).distinct()
             .orderBy(post.createDate.desc())
-            .limit(pageable.getPageSize()) // 지정된 사이즈만큼
-            .offset(pageable.getOffset()) // 지정된 페이지 위치에서
+            .limit(pageable.getPageSize())
+            .offset(pageable.getOffset())
             .fetch();
+
+    List<Long> ids = result.stream()
+            .map(tuple -> tuple.get(post.id))
+            .collect(Collectors.toList());
+
 
     if (CollectionUtils.isEmpty(ids)) {
       return Page.empty(pageable);
     }
 
     QBean<PostPaginationDto> projection = createPostPaginationProjection();
+
     List<PostPaginationDto> results = queryFactory
             .select(projection)
             .from(post).leftJoin(post.author, account) // left outer join = left join 같은 의미로 쓰인다. (left inner join은 없다)
@@ -82,7 +92,13 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
             .orderBy(post.createDate.desc())
             .fetch();
 
-    return new PageImpl<>(results, pageable, allCounts);
+    Long totalCounts = coreQuery.select(post.id.countDistinct()).fetchFirst();
+    return new PageImpl<>(results, pageable, totalCounts);
+  }
+
+  @Override
+  public Page<PostPaginationDto> selectAllByBoardWithCovering(Pageable pageable, Board board, Long allCounts) {
+    return selectAllByBoardWithCovering(pageable, board, allCounts, new BooleanBuilder());
   }
 
   @Override
@@ -110,6 +126,7 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
             post.title,
             account.id.as("userId"),
             account.nickname.as("userNickname"),
+            account.profileImage.as("userProfile"),
             post.createDate,
             post.commentCount, post.likeCount, post.viewCount);
   }
