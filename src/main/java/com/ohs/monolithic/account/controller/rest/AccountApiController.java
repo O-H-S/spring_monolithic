@@ -89,9 +89,11 @@ public class AccountApiController {
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/me/notifications")
-  public ResponseEntity<?> getNotificationsMine(@AuthenticationPrincipal AppUser user, @RequestParam(value = "lastDateTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDateTime ) {
-    List<AccountNotificationResponse> result = notificationService.getNotifications(user, lastDateTime);
-    return ResponseEntity.ok().body(result);
+  public ResponseEntity<?> getNotificationsMine(@AuthenticationPrincipal AppUser user, @RequestParam(value = "lastDatetime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDateTime ) {
+    //List<AccountNotificationResponse> result = notificationService.getNotifications(user, lastDateTime);
+    AccountNotificationPaginationResponse response = notificationService.getNotifications(user, lastDateTime);
+
+    return ResponseEntity.ok().body(response);
   }
 
 /*  @PostMapping("/login")

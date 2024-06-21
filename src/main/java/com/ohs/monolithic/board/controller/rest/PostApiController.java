@@ -1,12 +1,12 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.rest;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.*;
 import com.ohs.monolithic.board.service.*;
-import com.ohs.monolithic.account.dto.AppUser;
-import com.ohs.monolithic.account.service.AccountService;
+import com.ohs.monolithic.auth.domain.AppUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,22 +23,37 @@ public class PostApiController {
 
   final private BoardService boardService;
   final private PostWriteService writeService;
-  final private AccountService accountService;
+  final private BoardAliasService boardAliasService;
   final private PostPaginationService postPaginationService;
-
+  final private PostTagService postTagService;
 
 
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping
   public ResponseEntity<?> createPost(@AuthenticationPrincipal AppUser user,
-                                      @PathVariable("boardId") Integer boardId,
+                                      @PathVariable("boardId") String boardId,
                                       @RequestBody @Valid PostForm postForm,
                                       @RequestParam(value = "includeData", defaultValue = "true",  required = false) Boolean includeData) {
-    Post result = writeService.create(boardId, postForm, user.getAccount());
+    PostDetailResponse result = writeService.create(boardAliasService.tryGetBoardId(boardId), postForm, user);
     if(!includeData)
       return ResponseEntity.status(HttpStatus.OK).build();
-    return ResponseEntity.status(HttpStatus.CREATED).body(PostDetailResponse.of(result, Boolean.TRUE, Boolean.FALSE));
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+  }
+
+  @GetMapping
+  public ResponseEntity<?> getPosts(@AuthenticationPrincipal AppUser user, @PathVariable("boardId") String boardId, @RequestParam(name="page", defaultValue = "0") Integer page, @RequestParam(name="pageSize", defaultValue = "10") Integer pageSize ){
+
+    Page<PostPaginationDto> result = postPaginationService.getListWithCovering(page, boardAliasService.tryGetBoardId(boardId), pageSize);
+
+    PostPaginationResponse response = new PostPaginationResponse();
+    response.setData(result.getContent());
+    response.setTotalCounts(result.getTotalElements());
+    response.setTotalPages((long)result.getTotalPages());
+
+
+    return ResponseEntity.ok(response);
   }
 
 

@@ -1,19 +1,22 @@
 package com.ohs.monolithic.common.exception;
 
-import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.account.exception.FailedAccountCreationException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.csrf.CsrfException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionHandler {
@@ -69,11 +72,56 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    /*@ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
+    }*/
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        Map<String, String> detail = new HashMap<>();
+        BindingResult result = ex.getBindingResult();
+
+        result.getFieldErrors().forEach(fieldError -> {
+            detail.put(fieldError.getField(), fieldError.getDefaultMessage());
+            //response.addValidationError(fieldError.getField(), fieldError.getDefaultMessage());
+        });
+
+        ErrorCode code = ErrorCode.INVALID_INPUT_VALUE;
+        ErrorResponse response = ErrorResponse.of(code);
+        response.setData(detail);
+        return new ResponseEntity<>(response, code.getStatus());
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+
+        ErrorResponse response = ErrorResponse.of(ErrorCode.ENTITY_NOT_FOUND);
+        response.setData(ex.getMessage());
+        return new ResponseEntity<>(response, ErrorCode.ENTITY_NOT_FOUND.getStatus());
+    }
+    // 상위 예외를 아래에 둔다. (순서에 영향을 받음)
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex){
+        ErrorResponse response = ex.getErrorResponse();
+        return new ResponseEntity<>(response, ex.getErrorCode().getStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        log.error("Non-business exception occurred: {} - {}", ex.getClass().getName(), ex.getLocalizedMessage(), ex);
+
+
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_ERROR);
+        Map<String, Object> content = new HashMap<>();
+        content.put("errorType", ex.getClass());
+        content.put("errorMessage", ex.getLocalizedMessage());
+        response.setData(content);
+        return new ResponseEntity<>(response, ErrorCode.INTERNAL_ERROR.getStatus());
+    }
+
+
 
     /*@ExceptionHandler(CsrfException.class)
     //@ResponseStatus(HttpStatus.FORBIDDEN) // 403 Forbidden 상태 코드 반환

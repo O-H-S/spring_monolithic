@@ -1,11 +1,11 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.rest;
 
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.service.PostLikeService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostWriteService;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
@@ -39,19 +39,20 @@ public class PostDetailApiController {
   @PutMapping
   public ResponseEntity<?> updatePost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id, @RequestBody @Valid PostForm postForm) {
 
-    writeService.modifyBy(id, user.getAccount(), postForm);
-    return ResponseEntity.status(HttpStatus.OK).build();
+
+    writeService.modifyBy(id, user, postForm);
+    Long accountId = user!=null ? user.getAccountId() : null;
+    PostDetailResponse response = readService.readPost(id, accountId);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
 
   }
 
-  @PreAuthorize("isAuthenticated()")
   @GetMapping
-  public ResponseEntity<?> getPost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id,
-                                   @RequestParam(value="determineLiked", defaultValue= "false") boolean determineLiked,
-                                   @RequestParam(value="determineMine", defaultValue= "false") boolean determineMine) {
+  public ResponseEntity<?> getPost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id) {
 
-    Long accoundId = user!=null ? user.getAccountId() : null;
-    PostDetailResponse response = readService.getPostReadOnly(id, accoundId, determineLiked, determineMine);
+
+    Long accountId = user!=null ? user.getAccountId() : null;
+    PostDetailResponse response = readService.readPost(id, accountId);
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
 
@@ -63,10 +64,14 @@ public class PostDetailApiController {
   public ResponseEntity<?> likePost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id) {
 
 
-    Pair<Boolean, Long> result = postLikeService.likePostEx(id, user.getAccount());
+    Pair<Boolean, Long> result = postLikeService.likePostEx(id, user);
     Long count = result.getSecond();
-    return ResponseEntity.status(HttpStatus.OK).body(Map.of("changed", result.getFirst(),
-            "count", count));
+    return ResponseEntity.status(HttpStatus.OK).body(
+            Map.of("id", id,
+                    "changed", result.getFirst(),
+                    "count", count
+            )
+    );
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -74,10 +79,14 @@ public class PostDetailApiController {
   public ResponseEntity<?> unlikePost(@AuthenticationPrincipal AppUser user, @PathVariable("id") Long id) {
 
 
-    Pair<Boolean, Long> result = postLikeService.unlikePostEx(id, user.getAccount());
+    Pair<Boolean, Long> result = postLikeService.unlikePostEx(id, user);
     Long count = result.getSecond();
-    return ResponseEntity.status(HttpStatus.OK).body(Map.of("changed", result.getFirst(),
-            "count", count));
+    return ResponseEntity.status(HttpStatus.OK).body(
+            Map.of("id", id,
+                    "changed", result.getFirst(),
+            "count", count
+            )
+    );
   }
 
 }

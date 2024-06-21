@@ -1,0 +1,1 @@
+CREATE INDEX idx_pp_notifications ON account_notifications (account_id, timestamp DESC, viewed);

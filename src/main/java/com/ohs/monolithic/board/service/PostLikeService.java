@@ -1,5 +1,6 @@
 package com.ohs.monolithic.board.service;
 
+import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostLike;
 import com.ohs.monolithic.board.repository.PostLikeRepository;
@@ -38,9 +39,10 @@ public class PostLikeService {
 
 
   @Transactional
-  public Boolean likePost(Long postId, Account member) {
+  public Boolean likePost(Long postId, AppUser user) {
+    Account accountRef = em.getReference(Account.class, user.getAccountId());
     //commentLikeRepository.findB
-    Optional<PostLike> postLikeOp = postLikeRepository.findPostLikeWithLock(postId, member);
+    Optional<PostLike> postLikeOp = postLikeRepository.findPostLikeWithLock(postId, accountRef);
     if (postLikeOp.isPresent()) {
       PostLike postLike = postLikeOp.get();
       if (!postLike.getValid()) {
@@ -55,7 +57,7 @@ public class PostLikeService {
 
     PostLike newPostLike = PostLike.builder()
             .post(em.getReference(Post.class, postId))
-            .member(member)
+            .member(accountRef)
             .valid(Boolean.TRUE)
             .build();
 
@@ -65,8 +67,8 @@ public class PostLikeService {
   }
 
   @Transactional
-  public Pair<Boolean, Long> likePostEx(Long postId, Account member){
-    Boolean result = this.likePost(postId, member);
+  public Pair<Boolean, Long> likePostEx(Long postId, AppUser user){
+    Boolean result = this.likePost(postId, user);
     Optional<Post> post = this.postRepository.findById(postId);
     return Pair.of(result, post.get().getLikeCount());
   }
@@ -74,9 +76,9 @@ public class PostLikeService {
 
 
   @Transactional
-  public Boolean unlikePost(Long postId, Account member) {
+  public Boolean unlikePost(Long postId, AppUser user) {
     //commentLikeRepository.findB
-    Optional<PostLike> postLikeOp = postLikeRepository.findPostLikeWithLock(postId, member);
+    Optional<PostLike> postLikeOp = postLikeRepository.findPostLikeWithLock(postId, em.getReference(Account.class, user.getAccountId()));
     if (postLikeOp.isPresent()) {
       PostLike postLike = postLikeOp.get();
       if (postLike.getValid()) {
@@ -90,8 +92,8 @@ public class PostLikeService {
   }
 
   @Transactional
-  public Pair<Boolean, Long> unlikePostEx(Long postId, Account member){
-    Boolean result = this.unlikePost(postId, member);
+  public Pair<Boolean, Long> unlikePostEx(Long postId, AppUser user){
+    Boolean result = this.unlikePost(postId, user);
     Optional<Post> post = this.postRepository.findById(postId);
     return Pair.of(result, post.get().getLikeCount());
   }
