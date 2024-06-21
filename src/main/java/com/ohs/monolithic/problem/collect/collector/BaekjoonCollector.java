@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Deprecated
 public class BaekjoonCollector extends ProblemCollector {
   int detail_maxIterCount = 10;
   public BaekjoonCollector( ProblemCollectorHandler handler) {

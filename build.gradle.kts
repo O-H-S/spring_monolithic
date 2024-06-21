@@ -66,6 +66,7 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 
 
+	// Deprecated, 외부로 분리됨
 	// 크롤링 관련(selenium)
 	implementation("org.seleniumhq.selenium:selenium-java:4.19.1")
 	implementation("io.github.bonigarcia:webdrivermanager:5.8.0")

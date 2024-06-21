@@ -1,0 +1,1 @@
+CREATE INDEX idx_problem_upsert ON problem (platform, platform_id, collector_version);

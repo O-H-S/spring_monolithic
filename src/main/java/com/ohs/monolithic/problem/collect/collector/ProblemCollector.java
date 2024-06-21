@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.List;
 
+@Deprecated
 @RequiredArgsConstructor
 public abstract class ProblemCollector {
   @Getter
@@ -48,9 +49,6 @@ public abstract class ProblemCollector {
 
   }
 
-  protected void globalCollect(){
-
-  }
 
   protected void sleep(long time) {
     try {

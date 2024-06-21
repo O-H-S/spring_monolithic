@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class SWEACollector extends ProblemCollector {
 
   private int cachedLastPage;

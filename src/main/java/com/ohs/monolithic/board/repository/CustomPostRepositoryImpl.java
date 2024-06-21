@@ -4,6 +4,8 @@ import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import com.ohs.monolithic.board.domain.*;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
 import com.ohs.monolithic.common.utils.DefaultBulkInsertableRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -154,7 +156,7 @@ public class CustomPostRepositoryImpl extends DefaultBulkInsertableRepository<Po
   }
 
   @Override
-  protected void initStatement(Post post, PreparedStatement ps) throws SQLException {
+  protected void initStatement(Post post, PreparedStatement ps, int queryId) throws SQLException {
 
     ps.setString(1, post.getTitle());
     ps.setString(2, post.getContent());

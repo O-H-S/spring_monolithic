@@ -6,7 +6,8 @@ import java.sql.SQLException;
 public abstract class AbstractBulkInsertableRepository<T, ID> implements BulkInsertableRepository<T, ID> {
 
   protected abstract String initQuery();
-  protected abstract void initStatement(T target, PreparedStatement ps) throws SQLException;
+  protected abstract String[] initQueries();
+  protected abstract void initStatement(T target, PreparedStatement ps, int queryId) throws SQLException;
 
 
 }

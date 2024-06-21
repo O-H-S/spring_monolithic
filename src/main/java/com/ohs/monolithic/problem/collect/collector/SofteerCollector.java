@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class SofteerCollector extends ProblemCollector {
   private int cachedLastPage;
   public SofteerCollector(ProblemCollectorHandler handler) {

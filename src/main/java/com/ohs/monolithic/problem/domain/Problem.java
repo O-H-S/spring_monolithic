@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
         // id가 기본 키이고 클러스터드 인덱스로 사용되고 있다면, 단독으로 id만을 위한 인덱스는 필요하지 않습니다. 그러나 복합 인덱스를 설계할 때는 id를 포함하는 것이 다양한 쿼리 시나리오에서 성능 이점을 제공
         indexes = {
                 @Index(name = "idx_problem_found_date_id", columnList = "found_date DESC, id"),
+                @Index(name = "idx_problem_upsert", columnList = "platform, platform_id, collector_version"),
         }
 )
 public class Problem {
@@ -64,10 +65,12 @@ public class Problem {
 
 
   @Builder
-  public Problem(String platform, String platformId, String title, String difficulty, String link, LocalDateTime foundDate, Integer version){
+  public Problem(String platform, String platformId, String title, String difficulty, String link, LocalDateTime foundDate, Integer postCount,Integer version){
 
     if (foundDate == null)
       foundDate = LocalDateTime.now();
+    if(postCount == null)
+      postCount = 0;
 
     this.platform = platform;
     this.platformId = platformId;
