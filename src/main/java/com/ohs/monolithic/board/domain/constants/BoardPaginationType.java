@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board;
+package com.ohs.monolithic.board.domain.constants;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

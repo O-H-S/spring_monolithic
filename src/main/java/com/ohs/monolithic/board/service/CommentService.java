@@ -1,10 +1,11 @@
 package com.ohs.monolithic.board.service;
 
 
+import com.ohs.monolithic.account.repository.AccountRepository;
+import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.dto.CommentForm;
-import com.ohs.monolithic.board.dto.CommentPaginationDto;
+import com.ohs.monolithic.board.dto.*;
 import com.ohs.monolithic.board.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
@@ -26,16 +27,34 @@ import java.util.Optional;
 public class CommentService {
     final CommentRepository cRepo;
     final PostRepository pRepo;
+    final AccountRepository accountRepository;
     @PersistenceContext
     EntityManager em;
 
 
     @Transactional(readOnly = true)
-    public List<CommentPaginationDto> getCommentsAsPage(Long postID, Account viewer){
+    public List<CommentPaginationDto> getCommentsAsPage(Long postID, AppUser viewer){
         Post targetPost = em.getReference(Post.class, postID);
-        return cRepo.getCommentsByPost(targetPost, viewer);
+        return cRepo.getCommentsByPost(targetPost, accountRepository.getReferenceById(viewer.getAccountId()));
     }
 
+    @Transactional(readOnly = true)
+    public CommentPaginationDto getCommentBy(Long commentId, Long accountId){
+        return cRepo.getCommentById(commentId, accountId);
+    }
+
+    @Transactional(readOnly = true)
+    public CommentPaginationResponse getComments(Long postID, AppUser user){
+        Post targetPost = em.getReference(Post.class, postID);
+        List<CommentPaginationDto> comments = cRepo.getCommentsByPost(targetPost, accountRepository.getReferenceById(user.getAccountId()));
+        CommentPaginationResponse response = new CommentPaginationResponse();
+
+        response.setData(comments);
+        response.setTotalCounts(0L);
+        response.setTotalPages(0L);
+
+        return response;
+    }
 
     @Transactional
     public Comment create(Post post, String content, Account account) {
@@ -52,7 +71,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment createByID(Long postId, String content, Long accountId) {
+    public CommentCreationResponse createByID(Long postId, String content, Long accountId) {
         Post post = em.getReference(Post.class, postId);
         Account account = em.getReference(Account.class, accountId);
         pRepo.updateCommentCount(postId, 1);
@@ -64,38 +83,48 @@ public class CommentService {
                 .build();
         cRepo.save(newComment);
 
-        return newComment;
+        CommentCreationResponse response = new CommentCreationResponse();
+        response.setCommentCount((long)post.getCommentCount());
+        response.setCommentData(CommentPaginationDto.of(newComment));
+
+        return response;
     }
 
 
 
 
     @Transactional
-    public void deleteCommentBy(Long commentId, Account operator)  {
+    public CommentDeleteResponse deleteCommentBy(Long commentId, AppUser user)  {
 
         Comment targetComment = cRepo.getComment(commentId);
         if(targetComment == null){
             throw new DataNotFoundException("존재하지 않는 댓글입니다.");
         }
 
-        if (!targetComment.getAuthor().getId().equals(operator.getId())) {
+        if (!targetComment.getAuthor().getId().equals(user.getAccountId())) {
             throw new RuntimeException("댓글 삭제 권한이 없습니다");
         }
 
+        Post post = targetComment.getPost();
         targetComment.setDeleted(Boolean.TRUE);
         cRepo.save(targetComment);
-        pRepo.updateCommentCount(targetComment.getPost().getId(), -1);
+        pRepo.updateCommentCount(post.getId(), -1);
+
+        CommentDeleteResponse response = new CommentDeleteResponse();
+        response.setPostId(post.getId());
+        response.setCommentCount(post.getCommentCount());
+        return response;
     }
 
     @Transactional
-    public void modifyCommentBy(Long commentId, Account operator, CommentForm form)  {
+    public void modifyCommentBy(Long commentId, AppUser user, CommentForm form)  {
 
         Comment targetComment = cRepo.getComment(commentId);
         if(targetComment == null){
             throw new DataNotFoundException("존재하지 않는 댓글입니다.");
         }
 
-        if (!targetComment.getAuthor().getId().equals(operator.getId())) {
+        if (!targetComment.getAuthor().getId().equals(user.getAccountId())) {
             throw new AccessDeniedException("댓글 수정 권한이 없습니다");
         }
 

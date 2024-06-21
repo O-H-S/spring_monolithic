@@ -1,9 +1,8 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.rest;
 
-import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.dto.*;
 import com.ohs.monolithic.board.service.CommentService;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,12 +22,17 @@ public class CommentApiController {
   public ResponseEntity<?> createComment(@AuthenticationPrincipal AppUser user,
                                       @PathVariable("postID") Long postId,
                                       @RequestBody @Valid CommentForm commentForm) {
-    Comment result = commentService.createByID(postId, commentForm.getContent(), user.getAccountId());
+    CommentCreationResponse result = commentService.createByID(postId, commentForm.getContent(), user.getAccountId());
 
-    CommentCreationResponse response = new CommentCreationResponse(result.getId());
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
+  @GetMapping
+  public ResponseEntity<?> getComments(@AuthenticationPrincipal AppUser user, @PathVariable("postID") Long postId, @RequestParam(name="page", defaultValue = "0") Integer page, @RequestParam(name="pageSize", defaultValue = "10") Integer pageSize ){
+    CommentPaginationResponse response = commentService.getComments(postId, user);
+
+    return ResponseEntity.ok(response);
+  }
 
 
 

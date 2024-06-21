@@ -1,6 +1,6 @@
 package com.ohs.monolithic.board.exception;
 
-import com.ohs.monolithic.board.controller.BoardApiController;
+import com.ohs.monolithic.board.controller.rest.BoardApiController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
@@ -37,39 +38,55 @@ public class CustomCommentRepositoryImpl extends QuerydslRepositorySupport imple
                             .where(comment.deleted.isFalse(), comment.post.id.eq(post.getId()))
                                     .orderBy(comment.createDate.desc())
                                             .fetch();
+
+    return fetchDtoList(ids, viewer!=null? viewer.getId() : null);
+  }
+
+  @Override
+  public CommentPaginationDto getCommentById(Long commentId, Long accountId) {
+    List<CommentPaginationDto> result = fetchDtoList(Collections.singletonList(commentId), accountId);
+    if(result.isEmpty()){
+      throw new EntityNotFoundException("no comment found");
+    }
+    return result.get(0);
+  }
+
+  List<CommentPaginationDto> fetchDtoList(List<Long> ids, Long viewerId){
     if(ids.isEmpty()){
       return Collections.emptyList();
     }
-    //Projections.constructor 인자들의 순서가 중요함. (DTO 생성자 변경시 수정필요)
+
+    //Projections.constructor 는 인자들의 순서가 중요함. (DTO 생성자 변경시 수정필요)
     //Projections.fields는 순서 상관 없음. 이름으로 판별
 
-    BooleanExpression likedExpression = viewer != null
-            ? commentLike.member.id.eq(viewer.getId()).and(commentLike.valid.eq(true))
+    BooleanExpression likedExpression = viewerId != null
+            ? commentLike.member.id.eq(viewerId).and(commentLike.valid.eq(true))
             : Expressions.asBoolean(false);
 
     List<CommentPaginationDto> results;
-
     JPAQuery<CommentPaginationDto> query = queryFactory.
             select(
                     Projections.fields(CommentPaginationDto.class,
                             comment.id,
                             comment.content,
+                            comment.post.id.as("postId"),
                             account.id.as("writerId"),
                             account.nickname.as("writerNickname"),
+                            account.profileImage.as("writerProfile"),
                             comment.likeCount,
                             likedExpression.as("liked"),
                             comment.createDate,
                             comment.modifyDate
-                            )
+                    )
             )
             .from(comment)
             .leftJoin(comment.author, account);
-    if(viewer != null) {
+    if(viewerId != null) {
       query = query.leftJoin(commentLike).on(comment.id.eq(commentLike.comment.id)
-                      .and(commentLike.member.id.eq(viewer.getId())));
+              .and(commentLike.member.id.eq(viewerId)));
     }
 
-    results = query.where(comment.id.in(ids))
+    results = query.where(comment.id.in(ids), comment.deleted.isFalse())
             .orderBy(comment.createDate.desc())
             .fetch();
 
@@ -82,4 +99,5 @@ public class CustomCommentRepositoryImpl extends QuerydslRepositorySupport imple
 
     return results;
   }
+
 }

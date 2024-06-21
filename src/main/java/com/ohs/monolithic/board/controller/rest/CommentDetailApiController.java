@@ -1,9 +1,11 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.rest;
 
+import com.ohs.monolithic.board.dto.CommentDeleteResponse;
 import com.ohs.monolithic.board.dto.CommentForm;
+import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.service.CommentLikeService;
 import com.ohs.monolithic.board.service.CommentService;
-import com.ohs.monolithic.account.dto.AppUser;
+import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,17 @@ public class CommentDetailApiController {
   final private CommentService commentService;
   final private CommentLikeService commentLikeService;
 
+
+  @GetMapping
+  public ResponseEntity<?> getComment(@AuthenticationPrincipal AppUser user, @PathVariable("commentID") Long id) {
+
+
+    Long accountId = user!=null ? user.getAccountId() : null;
+    CommentPaginationDto response = commentService.getCommentBy(id, accountId);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+
+  }
 
   // 통합 테스트 존재
   @PreAuthorize("isAuthenticated()")
@@ -53,15 +66,15 @@ public class CommentDetailApiController {
   public ResponseEntity<?> deleteComment(@AuthenticationPrincipal AppUser user, @PathVariable("commentID") Long commentId) {
 
 
-    commentService.deleteCommentBy(commentId, user.getAccount());
-    return ResponseEntity.status(HttpStatus.OK).build();
+    CommentDeleteResponse response = commentService.deleteCommentBy(commentId, user);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @PreAuthorize("isAuthenticated()")
   @PutMapping
   public ResponseEntity<?> updateCommentContent(@AuthenticationPrincipal AppUser user, @PathVariable("commentID") Long commentId, @RequestBody @Valid CommentForm commentForm) {
 
-    commentService.modifyCommentBy(commentId, user.getAccount(), commentForm);
+    commentService.modifyCommentBy(commentId, user, commentForm);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 

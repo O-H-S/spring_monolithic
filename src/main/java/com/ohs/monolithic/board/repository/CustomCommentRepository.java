@@ -11,4 +11,6 @@ public interface CustomCommentRepository {
 
   List<CommentPaginationDto> getCommentsByPost(Post post, Account viewer);
 
+  CommentPaginationDto getCommentById(Long commentId, Long accountId);
+
 }

@@ -1,7 +1,9 @@
 package com.ohs.monolithic.board.service;
 
 
-import com.ohs.monolithic.board.BoardPaginationType;
+import com.ohs.monolithic.account.domain.UserRole;
+import com.ohs.monolithic.auth.domain.AppUser;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
@@ -13,17 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 @RequiredArgsConstructor
 @Service
 public class BoardService {
-  final BoardRepository bRepo;
+  final BoardRepository boardRepository;
+  final BoardPermissionService boardPermissionService;
   private ConcurrentHashMap<Integer, Long> postCountCache;
 
   public void registerPostCountCache(ConcurrentHashMap<Integer, Long> cache) {
@@ -84,7 +85,7 @@ public class BoardService {
       if (postCountCache.containsKey(board.getId()))
         board.setPostCount(postCountCache.getOrDefault(board.getId(), 0L));
     });
-    bRepo.saveAll(boards);
+    boardRepository.saveAll(boards);
   }
 
   @Transactional
@@ -103,7 +104,7 @@ public class BoardService {
             .build();
 
 
-    Board resultBoard = bRepo.save(newBoard);
+    Board resultBoard = boardRepository.save(newBoard);
     TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
       @Override
       public void afterCompletion(int status) {
@@ -123,7 +124,7 @@ public class BoardService {
     target.setTitle(form.getTitle());
     target.setDescription(form.getDesc());
     target.setPaginationType(form.getPaginationType());
-    bRepo.save(target);
+    boardRepository.save(target);
     return BoardResponse.fromEntity(target, getPostCount(boardId));
   }
 
@@ -146,7 +147,7 @@ public class BoardService {
             });*/
       target.setPostCount(oldCount);
       target.setDeleted(true);
-      bRepo.save(target);
+      boardRepository.save(target);
     } catch (Exception e) {
       if (oldCount > -1)
         postCountCache.put(id, oldCount);
@@ -162,12 +163,12 @@ public class BoardService {
   }
 
   public List<Board> getBoardsRaw() {
-    return bRepo.findAll();
+    return boardRepository.findAll();
   }
 
   @Transactional(readOnly = true)
   public List<BoardResponse> getBoardsReadOnly(boolean includeTitle, boolean includeDesc) {
-    List<BoardResponse> result = bRepo.getAllBoards(includeTitle, includeDesc);
+    List<BoardResponse> result = boardRepository.getAllBoards(includeTitle, includeDesc);
     result.forEach(x -> x.setPostCounts(this.getPostCount(x.getId())));
     return result;
   }
@@ -182,7 +183,7 @@ public class BoardService {
   public List<BoardResponse> getBoards() {
 
     List<BoardResponse> results = new ArrayList<>();
-    bRepo.findAll().forEach(board -> {
+    boardRepository.findAll().forEach(board -> {
               results.add(
                       BoardResponse.builder()
                               .id(board.getId())
@@ -206,18 +207,23 @@ public class BoardService {
     if (count == null)
       throw new BoardNotFoundException(id, "존재하지 않는 게시판입니다.");
     try {
-      return bRepo.findById(id).get();
+      return boardRepository.findById(id).get();
     } catch (Exception e) {
       throw new BoardNotFoundException(id, "internal error");
     }
   }
 
   @Transactional(readOnly = true)
-  public BoardResponse getBoardReadOnly(Integer id) throws BoardNotFoundException {
+  public BoardResponse getBoardReadOnly(Integer id, AppUser user) throws BoardNotFoundException {
     assertBoardExists(id);
 
-    Board target = bRepo.findById(id).get();
-    return BoardResponse.fromEntity(target, postCountCache.get(id));
+    Board target = boardRepository.findById(id).get();
+    if(user == null)
+      return BoardResponse.fromEntity(target, postCountCache.get(id));
+    var response = boardPermissionService.getPermissionResponse(id, user.isAdmin()? UserRole.ADMIN:UserRole.USER);
+
+    return BoardResponse.fromEntity(target, postCountCache.get(id), response.isRoleWritable, response.writableMethods);
+
   }
 
 
@@ -226,6 +232,11 @@ public class BoardService {
       throw new IllegalArgumentException("올바르지 않은 Board id 입니다.");
     }
     return postCountCache.containsKey(id);
+  }
+
+  @Transactional(readOnly = true)
+  public Board getBoardFromTitle(String title){
+    return boardRepository.findByTitle(title);
   }
 
   public void assertBoardExists(Integer id) {
@@ -239,7 +250,7 @@ public class BoardService {
   }
 
   public void save(Board target) {
-    bRepo.save(target);
+    boardRepository.save(target);
   }
 
 

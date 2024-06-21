@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.controller;
+package com.ohs.monolithic.board.controller.mvc;
 
 
 import com.ohs.monolithic.board.domain.Board;
@@ -42,7 +42,7 @@ public class BoardController {
     @GetMapping("/{id}") // 게시판 리스트의 최초 진입
     public String showBoard(Model model , @PathVariable("id") Integer id){
 
-        BoardResponse curBoard = this.bService.getBoardReadOnly(id);
+        BoardResponse curBoard = this.bService.getBoardReadOnly(id, null);
         model.addAttribute("title", curBoard.getTitle());
         model.addAttribute("desc", curBoard.getDescription());
         model.addAttribute("board", id);

@@ -1,7 +1,7 @@
 package com.ohs.monolithic.board.dto;
 
 
-import com.ohs.monolithic.board.BoardPaginationType;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;

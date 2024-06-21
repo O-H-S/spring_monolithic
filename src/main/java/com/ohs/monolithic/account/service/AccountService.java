@@ -32,6 +32,8 @@ public class AccountService {
     private final OAuth2CredentialRepository oauth2CredentialRepository;
     private final PasswordEncoder passwordEncoder;
 
+    final ApplicationEventPublisher eventPublisher;
+
     @Value("${app.admin-key}")
     private String adminKey;
 
@@ -188,6 +190,7 @@ public class AccountService {
         userRepository.save(target);
 
 
+        eventPublisher.publishEvent(new AccountDataChangeEvent());
         return AccountResponse.of(target);
     }
 

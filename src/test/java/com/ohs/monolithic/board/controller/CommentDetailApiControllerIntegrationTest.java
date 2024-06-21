@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.controller;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.CommentCreationResponse;
 import com.ohs.monolithic.board.dto.CommentForm;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
@@ -38,7 +39,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
     Account writer = initSecurityUserAccount();
     //given
     Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
-    Comment targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
 
     CommentForm form = new CommentForm();
     form.setContent("modified content");
@@ -48,7 +49,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .put(
-                            String.format("/api/comments/%d", targetComment.getId() )
+                            String.format("/api/comments/%d", targetComment.getCommentData().getId() )
                     )
                     .content(gson.toJson(form))
                     .with(csrf())
@@ -72,7 +73,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
     Account writer = initSecurityUserAccount();
     //given
     Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
-    Comment targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", givens.b.getId());
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", givens.b.getId());
 
     CommentForm form = new CommentForm();
     form.setContent("modified content");
@@ -82,7 +83,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .put(
-                            String.format("/api/comments/%d", targetComment.getId() )
+                            String.format("/api/comments/%d", targetComment.getCommentData().getId() )
                     )
                     .content(gson.toJson(form))
                     .with(csrf())
@@ -115,12 +116,12 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
     Account writer = initSecurityUserAccount();
     //given
     Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
-    Comment targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
     // when
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .delete(
-                            String.format("/api/comments/%d", targetComment.getId() )
+                            String.format("/api/comments/%d", targetComment.getCommentData().getId() )
                     )
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
