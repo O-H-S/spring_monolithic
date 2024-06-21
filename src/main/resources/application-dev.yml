@@ -2,6 +2,7 @@ client:
   origin: http://localhost:3000
 
 server:
+  port: 80 # 지정하지 않으면, 기본 포트가 8080으로 설정됨. (http://localhost/로 접속 불가능, 포트 명시해야함)
   ssl:
     enabled: false # 스프링 부트가 자동으로 ssl를 활성화하려 시도할수있음.
   servlet:

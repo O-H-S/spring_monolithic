@@ -1,7 +1,5 @@
 server:
-  port: 443
-
-
+  port: 80
   servlet:
     session:
       cookie:
