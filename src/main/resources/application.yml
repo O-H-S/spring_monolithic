@@ -4,6 +4,13 @@ server:
     session:
       cookie:
         domain: ohs.kr
+    ssl:
+      #key-store: classpath:keystore.p12
+      #key-store-password: ****
+      #key-store-type: PKCS12
+      #key-alias: tomcat
+      enabled: false # AWS ALB에서 HTTPS로 브라우저들과 통신하고, WAS(EC2)와 ALB가 같은 VPC 이므로 필요없어짐.
+
 client:
   origin: https://ohs.kr
 
@@ -13,8 +20,7 @@ client:
 spring:
   config:
     import:
-    - classpath:application-secret_common.yml
-    - classpath:application-secret.yml
+    - classpath:application_common.yml
   flyway:
     enabled: true
     baseline-on-migrate: false # 최초 적용시에만 true로 설정, 적용 후에는 false로 바꾸기.

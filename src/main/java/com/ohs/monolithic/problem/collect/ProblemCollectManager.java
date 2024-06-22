@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 
 
 @Deprecated
-@Service
+//@Service
 @RequiredArgsConstructor
 public class ProblemCollectManager {
   final CollectProgressRepository collectProgressRepository;

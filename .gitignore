@@ -1,4 +1,3 @@
-HELP.md
 .gradle
 docker-elk/elk-compose.yml
 gradle.properties
@@ -6,11 +5,11 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-application-secret.yml
-**/application-secret_*.yml
+
 .p12
 .pem
-.env
+environment/dev.env
+environment/prod.env
 
 ### STS ###
 .apt_generated

@@ -9,12 +9,12 @@ server:
     session:
       cookie:
         domain: localhost
+        secure: false
 
 spring:
   config:
     import:
-      - classpath:application-secret_common.yml
-      - classpath:application-secret_dev.yml
+      - classpath:application_common.yml
   flyway:
     enabled: true
     baseline-on-migrate: false # 최초 적용시에만 true로 설정, 적용 후에는 false로 바꾸기.
@@ -28,6 +28,16 @@ spring:
       hibernate:
         format_sql: true
         jdbc.batch_size: 1000
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            redirect-uri: http://localhost/login/oauth2/code/kakao
+          naver:
+            redirect-uri: http://localhost/login/oauth2/code/naver
+          google:
+            redirect-uri: http://localhost/login/oauth2/code/google
 
 
 logging:
