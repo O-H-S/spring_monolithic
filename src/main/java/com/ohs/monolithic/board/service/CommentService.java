@@ -46,7 +46,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public CommentPaginationResponse getComments(Long postID, AppUser user){
         Post targetPost = em.getReference(Post.class, postID);
-        List<CommentPaginationDto> comments = cRepo.getCommentsByPost(targetPost, accountRepository.getReferenceById(user.getAccountId()));
+        List<CommentPaginationDto> comments = cRepo.getCommentsByPost(targetPost, user  != null ?accountRepository.getReferenceById(user.getAccountId()):null);
         CommentPaginationResponse response = new CommentPaginationResponse();
 
         response.setData(comments);
