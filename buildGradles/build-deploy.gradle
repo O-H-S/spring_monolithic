@@ -16,11 +16,11 @@ tasks.bootJar {
     // 중간자 공격 위험
 }*/
 
-tasks.register("deployDockerImage") {
+/*tasks.register("[deprecated]deployDockerImage") {
     dependsOn 'exportDockerImage'
-    String hostProp = project.property('EC2_HOST')
-    String userProp = project.property('EC2_USER')
-    def pemFile = file("${project.rootDir}/${project.property('EC2_SSH_PEM')}")
+    String hostProp = System.getenv('EC2_HOST')
+    String userProp = System.getenv('EC2_USER')
+    def pemFile = file("${project.rootDir}/${System.getenv('EC2_SSH_PEM')}")
     def ec2Server = remotes {
         ec2Server {
             host = hostProp
@@ -40,7 +40,7 @@ tasks.register("deployDockerImage") {
 
                 execute 'sudo docker stop web-server || true'
                 execute 'sudo docker rm web-server || true'
-                execute 'sudo docker run -d -p 443:443 --name web-server com.ohs/app:latest'
+                execute 'sudo docker run --init -d -p 443:443 --name web-server com.ohs/app:latest'
                 //execute 'sudo docker logs web-server-container'
 
 
@@ -51,9 +51,12 @@ tasks.register("deployDockerImage") {
 
 
 tasks.register("reloadProductionServer") {
-    String hostProp = project.property('EC2_HOST')
-    String userProp = project.property('EC2_USER')
-    def pemFile = file("${project.rootDir}/${project.property('EC2_SSH_PEM')}")
+    String hostProp = System.getenv('EC2_HOST')
+    String userProp = System.getenv('EC2_USER')
+
+    String addr = System.getenv('REGISTRY_ADDRESS')
+    String resultImageName = "${addr}/com.ohs/app:latest"
+    def pemFile = file("${project.rootDir}/${System.getenv('EC2_SSH_PEM')}")
     def ec2Server = remotes {
         ec2Server {
             host = hostProp
@@ -67,10 +70,33 @@ tasks.register("reloadProductionServer") {
             session(ec2Server){
                 execute 'sudo docker stop web-server || true'
                 execute 'sudo docker rm web-server || true'
-                execute 'sudo docker run -d -p 443:443 --name web-server com.ohs/app:latest'
+                execute "sudo docker run --init -d -p 443:443 --name web-server ${resultImageName}"
                 //execute 'sudo docker logs web-server-container'
 
 
+            }
+        }
+    }
+}
+
+
+
+tasks.register("logProductionServer") {
+    String hostProp = System.getenv('EC2_HOST')
+    String userProp = System.getenv('EC2_USER')
+    def pemFile = file("${project.rootDir}/${System.getenv('EC2_SSH_PEM')}")
+    def ec2Server = remotes {
+        ec2Server {
+            host = hostProp
+            user = userProp
+            identity = pemFile
+        }
+    }
+
+    doLast {
+        ssh.run{
+            session(ec2Server){
+                execute 'sudo docker logs web-server'
             }
         }
     }
@@ -88,8 +114,8 @@ docker {
 dockerPrepare{
     dependsOn bootJar
 }
-
-tasks.register('exportDockerImage', Exec) {
+// 레이어 캐시를 이용하지 못하는 방법. (배포에 시간과 비용이 많이듦)
+tasks.register('[deprecated]exportDockerImage', Exec) {
     dependsOn 'docker'
     // Docker image name
     //def imageName = "${project.group}/app:${project.version}"
@@ -108,6 +134,129 @@ tasks.register('exportDockerImage', Exec) {
         println "Docker image saved to $outputFile"
     }
 }
+*//*
+
+docker run -d ^
+  -p 443:5000 ^
+  --restart=always ^
+  --name myregistry ^
+  -v C:\Certbot\archive\registry.ohs.kr:/certs ^
+  -v C:\Users\82104\Downloads\sdfsdf:/auth ^
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/fullchain1.pem ^
+  -e REGISTRY_HTTP_TLS_KEY=/certs/privkey1.pem ^
+  -e "REGISTRY_AUTH=htpasswd" ^
+  -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" ^
+  -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" ^
+  registry:2
+
+
+
+https://bloggerpilot.com/en/tools/htpasswd-generator/ 에서 bcyrpt로 생성
+계정 정보 : 345hbq3fvsefvewf  // a456m45tgb34tgb43t
+*
+ *//*
+task connectToShell{
+    String hostProp = System.getenv('EC2_BASTATION_HOST')
+    String userProp = System.getenv('EC2_BASTATION_USER')
+    def pemFile = file("${project.rootDir}/${System.getenv('EC2_BASTATION_SSH_PEM')}")
+    def ec2Server = remotes {
+        ec2Server {
+            host = hostProp
+            user = userProp
+            identity = pemFile
+            //agentForwarding = true
+        }
+    }
+
+    doLast {
+        ssh.run {
+            session(ec2Server) {
+                //agentForwarding = true
+                // Bastion 호스트에서 프라이빗 인스턴스로 SSH 접속
+                //execute "sudo ssh ubuntu@10.0.142.189"
+            }
+        }
+    }
+
+}
+
+
+task deployDockerImageToEC2 {
+    dependsOn 'docker'
+
+    String addr = System.getenv('REGISTRY_ADDRESS')
+    String username = System.getenv('REGISTRY_USERNAME')
+    String password = System.getenv('REGISTRY_PASSWORD')
+
+    String resultImageName = "${addr}/com.ohs/app:latest"
+
+    String hostProp = System.getenv('EC2_HOST')
+    String userProp = System.getenv('EC2_USER')
+    def pemFile = file("${project.rootDir}/${System.getenv('EC2_SSH_PEM')}")
+    def ec2Server = remotes {
+        ec2Server {
+            host = hostProp
+            user = userProp
+            identity = pemFile
+        }
+    }
+
+    doLast {
+        exec {
+            commandLine 'docker', 'login', addr, '--username', username, '--password', password
+        }
+        exec {
+            commandLine 'docker', 'tag', 'com.ohs/app:latest', resultImageName
+        }
+        exec {
+            commandLine 'docker', 'push', resultImageName
+        }
+        ssh.run{
+            session(ec2Server) {
+                // 전송할 docker-compose.yml 파일의 경로
+                def composeFile = file("${project.rootDir}/docker-deploy/docker-compose.yml")
+                def envFile = file("${project.rootDir}/docker-deploy/.env")
+                def filebeatFile = file("${project.rootDir}/docker-deploy/filebeat.yml")
+                // EC2 인스턴스의 대상 경로를 지정
+                def targetComposeDir = "/home/${userProp}/app"
+                // 디렉토리가 없으면 생성합니다.
+                execute "mkdir -p ${targetComposeDir}"
+                // docker-compose.yml 파일을 EC2 서버로 전송
+                put from: composeFile, into: "${targetComposeDir}/"
+                put from: envFile, into: "${targetComposeDir}/"
+                put from: filebeatFile, into: "${targetComposeDir}/"
+                //put(composeFile.absolutePath, "${targetComposeDir}/docker-compose.yml")
+                //put(envFile.absolutePath, "${targetComposeDir}/.env")
+                //put(filebeatFile.absolutePath, "${targetComposeDir}/filebeat.yml")
+
+                // Docker 레지스트리에 로그인합니다.
+                execute "sudo docker login ${addr} --username ${username} --password ${password}"
+
+                // Docker Compose를 사용하여 컨테이너를 중지하고 제거합니다.
+                execute "cd ${targetComposeDir} && sudo docker-compose down || true"
+
+                // 새로운 이미지를 가져옵니다.
+                execute "cd ${targetComposeDir} && sudo docker-compose pull"
+
+                // Docker Compose를 사용하여 컨테이너를 다시 시작합니다.
+                execute "cd ${targetComposeDir} && sudo docker-compose up -d"
+
+                // 사용하지 않는 Docker 리소스를 정리합니다.
+                execute "sudo docker system prune -f"
+
+
+                *//*execute "sudo docker stop web-server || true"
+                execute "sudo docker rm web-server || true"
+                execute "sudo docker login ${addr} --username ${username} --password ${password}"
+                execute "sudo docker pull ${resultImageName}"
+                execute "sudo docker run --init -d -p 443:443 --name web-server ${resultImageName}"
+                execute "sudo docker system prune -f"*//*
+            }
+        }
+
+    }
+}*/
+
 
 /*tasks.dockerPrepare.configure {
     dependsOn("${project.rootDir}\\build\\libs\\app.jar")
