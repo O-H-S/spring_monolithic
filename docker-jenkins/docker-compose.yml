@@ -1,0 +1,23 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    build: .
+
+    ports:
+      - "8080:8080" # Jenkins 웹 UI 포트
+      - "50000:50000" # Jenkins 마스터와 에이전트 간의 통신을 담당하는 기본 포트, JNLP 에이전트 포트. 단일 서버를 사용할 것이므로 굳이 필요하진 않음.
+    volumes:
+      - jenkins_home:/var/jenkins_home # 이 디렉토리는 Jenkins의 설정, 플러그인, 빌드 작업, 로그 등을 포함한 모든 데이터를 저장하는 위치
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- /usr/bin/docker:/usr/bin/docker
+      #- /mnt/wsl/Ubuntu/var/run/docker.sock:/var/run/docker.sock
+      #- /mnt/wsl/Ubuntu/usr/bin/docker:/usr/bin/docker
+      #- "C:/Program Files/Docker/Docker/resources/bin/docker.exe:/usr/bin/docker"
+      #- "/var/run/docker.sock:/var/run/docker.sock"
+      #- C:\Program Files\Docker\Docker\resources\bin:/var/run/docker.sock
+      #- /var/run/docker.sock:/var/run/docker.sock # 컨테이너가 HOST의 docker(데몬)을 사용하여, 이미지 빌드, 컨테이너 실행 하도록, 윈도우에서는 생략 가능?, ./가 아닌 / 이므로 절대경로를 나타냄.
+volumes:
+  jenkins_home: # 호스트 시스템의 Docker 볼륨 관리 디렉토리에 해당 데이터를 저장 (Windows: C:\ProgramData\Docker\volumes, Linux: /var/lib/docker/volumes/)
+
+#Windows 10에서 WSL2(Windows Subsystem for Linux 2)를 활성화하면 Docker Desktop은 가상화된 리눅스 환경에서 Docker 데몬을 실행합니다. 이로 인해 Docker가 리눅스 환경에서 동작하는 것처럼 보입니다.

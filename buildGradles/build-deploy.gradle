@@ -1,9 +1,6 @@
 
 
 
-bootJar {
-    archiveFileName = 'app.jar'
-}
 
 /* kotlin dsl
 tasks.bootJar {

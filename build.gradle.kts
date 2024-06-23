@@ -73,6 +73,11 @@ dependencies {
 }
 
 
+tasks.bootJar {
+	archiveFileName.set("app.jar")
+}
+
+
 apply(from = "./buildGradles/build-docs.gradle")
 //apply(from = "./buildGradles/build-deploy.gradle")
 apply(from = "./buildGradles/build-querydsl.gradle")
