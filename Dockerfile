@@ -8,7 +8,7 @@ LABEL authors="OHS"
 WORKDIR /app
 
 # Copy the application JAR file into the working directory
-COPY app.jar .
+COPY build/libs/app.jar app.jar
 
 # Set the entrypoint to launch the Java application
 ENTRYPOINT ["java", "-jar", "app.jar"]

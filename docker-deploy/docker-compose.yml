@@ -1,0 +1,27 @@
+#version: '3.8' # docker compose의 파일 버전. (cli 도구의 버전과는 다르다)
+
+services:
+  web-server:
+    image: ${SERVER_IMAGE} # 사설 레지스트리 서버에서 가져오므로, 인증된 상태에서 compose 해야함.
+    container_name: web-server
+    ports:
+      - "443:443"
+    #init: true
+    volumes:
+      - logs:/app/logs
+    restart: always
+
+  filebeat:
+    container_name: filebeat
+    image: docker.elastic.co/beats/filebeat:7.17.16 # logstash 버전과 일치해야함
+    #user: root # 컨테이너 내부에서 프로세스를 실행할 사용자를 지정
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - logs:/var/log/springboot
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    depends_on:
+      - web-server
+    restart: always
+
+volumes:
+  logs:
