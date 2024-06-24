@@ -4,8 +4,10 @@ services:
   web-server:
     image: ${SERVER_IMAGE} # 사설 레지스트리 서버에서 가져오므로, 인증된 상태에서 compose 해야함.
     container_name: web-server
+    env_file:
+      - prod.env
     ports:
-      - "443:443"
+      - "80:80"
     #init: true
     volumes:
       - logs:/app/logs
