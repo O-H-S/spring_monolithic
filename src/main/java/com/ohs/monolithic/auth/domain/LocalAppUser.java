@@ -26,7 +26,6 @@ public class LocalAppUser extends User implements AppUser {
   private String nickname;
 
   @Setter
-  @Getter
   private Long accountId;
 
   public LocalAppUser(Long accountId, String username, String password, String nickname ,Collection<? extends GrantedAuthority> authorities) {

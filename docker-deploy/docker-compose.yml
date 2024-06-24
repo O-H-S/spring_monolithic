@@ -6,6 +6,7 @@ services:
     container_name: web-server
     env_file:
       - prod.env
+      - .env
     ports:
       - "80:80"
     #init: true
