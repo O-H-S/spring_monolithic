@@ -7,8 +7,8 @@ import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostPaginationService;
 import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.account.service.AccountService;
-import com.ohs.monolithic.account.domain.UserRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,5 +48,9 @@ public class MainController {
     model.addAttribute("boardToLatestPosts", boardToLatestPosts);
 
     return "index";
+  }
+  @GetMapping("/health")
+  public ResponseEntity<String> healthCheck() {
+    return ResponseEntity.ok("OK");
   }
 }
