@@ -1,7 +1,7 @@
 package com.ohs.monolithic.common.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.flywaydb.core.Flyway;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 @Configuration
 public class FlywayConfig {
-  final Flyway flyway;
+  //final Flyway flyway;
 
-  @Value("${spring.custom.repair-on-start}")
+  @Value("${spring.flyway.custom.repair-on-start}")
   private boolean repairOnStart;
 
   @Bean
