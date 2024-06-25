@@ -3,6 +3,7 @@ package com.ohs.monolithic.board;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.board.service.BoardService;
@@ -58,7 +59,7 @@ public class PostCountCacheUpdateTest {
 
                 //List<Post> createdPosts = Collections.synchronizedList(new ArrayList<>());
                 for (int j = 0; j < postsPerBoardToCreate; j++) {
-                    Post post = postWriteService.create(board.getId(), PostForm.builder().content("abc").subject("abc").build(), null);
+                    PostDetailResponse post = postWriteService.create(board.getId(), PostForm.builder().content("abc").subject("abc").build(), null);
                     //System.out.println( String.format("%d", threadIndex));
                     //createdPosts.add(post);
                 }

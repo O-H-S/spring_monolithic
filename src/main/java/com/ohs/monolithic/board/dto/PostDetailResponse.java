@@ -2,6 +2,7 @@ package com.ohs.monolithic.board.dto;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostTag;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @Setter
+@Getter
 public class PostDetailResponse extends PostPaginationDto {
 
   public Integer boardId;

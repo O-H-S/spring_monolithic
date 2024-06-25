@@ -2,7 +2,7 @@ package com.ohs.monolithic.board.controller;
 
 
 import com.nimbusds.jose.shaded.gson.JsonObject;
-import com.ohs.monolithic.board.BoardPaginationType;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.service.BoardService;

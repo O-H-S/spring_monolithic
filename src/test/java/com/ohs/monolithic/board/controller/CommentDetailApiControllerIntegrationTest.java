@@ -5,6 +5,7 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.CommentCreationResponse;
 import com.ohs.monolithic.board.dto.CommentForm;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.domain.Account;
@@ -38,7 +39,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void modifyPost_0() throws Exception {
     Account writer = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
     CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
 
     CommentForm form = new CommentForm();
@@ -72,7 +73,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void modifyPost_1() throws Exception {
     Account writer = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
     CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", givens.b.getId());
 
     CommentForm form = new CommentForm();
@@ -115,7 +116,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void deleteComment_0() throws Exception {
     Account writer = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
     CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "Test Comment", writer.getId());
     // when
     ResultActions result = mockMvc.perform(
@@ -152,14 +153,14 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void createBoard_0() throws Exception {
     initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "test", givens.b.getId());
 
     // when
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .post(
-                            String.format("/api/comments/%d/commentLikes", targetComment.getId() )
+                            String.format("/api/comments/%d/commentLikes", targetComment.getCommentData().getId() )
                     )
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -181,16 +182,16 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void createBoard_1() throws Exception {
     Account viewer = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
-    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "test", givens.b.getId());
 
-    helper.commentLikeService.likeComment(targetComment.getId(), viewer.getId());
+    helper.commentLikeService.likeComment(targetComment.getCommentData().getId(), viewer.getId());
 
     // when
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .post(
-                            String.format("/api/comments/%d/commentLikes", targetComment.getId() )
+                            String.format("/api/comments/%d/commentLikes", targetComment.getCommentData().getId() )
                     )
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -214,15 +215,15 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void createBoard_2() throws Exception {
     initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "test", givens.b.getId());
 
 
     // when
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .post(
-                            String.format("/api/comments/%d/commentLikes", targetComment.getId() )
+                            String.format("/api/comments/%d/commentLikes", targetComment.getCommentData().getId() )
                     )
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -243,7 +244,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void createBoard_3() throws Exception {
     initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
 
     // when
     ResultActions result = mockMvc.perform(
@@ -279,15 +280,15 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void unlikeComment_0() throws Exception {
     Account operator = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
-    Comment targetComment = helper.commentService.create(givens.c, "test", givens.b);
-    helper.commentLikeService.likeComment(targetComment.getId(), operator.getId());
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "test", givens.b.getId());
+    helper.commentLikeService.likeComment(targetComment.getCommentData().getId(), operator.getId());
 
     // when
     ResultActions result = mockMvc.perform(
             MockMvcRequestBuilders
                     .delete(
-                            String.format("/api/comments/%d/commentLikes", targetComment.getId() )
+                            String.format("/api/comments/%d/commentLikes", targetComment.getCommentData().getId() )
                     )
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)

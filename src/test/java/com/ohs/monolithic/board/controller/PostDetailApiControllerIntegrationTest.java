@@ -2,10 +2,12 @@ package com.ohs.monolithic.board.controller;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.utils.WithMockCustomUserContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -36,8 +38,8 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = initSecurityUserAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(), writer,1);
-    Post targetPost = posts.get(0);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(), writer,1);
+    PostDetailResponse targetPost = posts.get(0);
 
     // when
     ResultActions result = mockMvc.perform(
@@ -65,8 +67,8 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = initSecurityUserAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(), writer,1);
-    Post targetPost = posts.get(0);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(), writer,1);
+    PostDetailResponse targetPost = posts.get(0);
 
     // when
     ResultActions result = mockMvc.perform(
@@ -102,7 +104,7 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = initSecurityUserAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
 
     // when
     ResultActions result = mockMvc.perform(
@@ -131,7 +133,7 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = helper.simpleAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
 
     // when
     ResultActions result = mockMvc.perform(
@@ -165,7 +167,7 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = initSecurityUserAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
 
     PostForm form = PostForm.builder()
             .subject("New Title")
@@ -207,7 +209,7 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = helper.simpleAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
 
     // when
     ResultActions result = mockMvc.perform(
@@ -239,9 +241,9 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = helper.simpleAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
-    Post targetPost = posts.get(0);
-    helper.postLikeService.likePost(targetPost.getId(), voter);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    PostDetailResponse targetPost = posts.get(0);
+    helper.postLikeService.likePost(targetPost.getId(), WithMockCustomUserContext.getAppUser());
 
     // when
     ResultActions result = mockMvc.perform(
@@ -274,9 +276,9 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = helper.simpleAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
-    Post targetPost = posts.get(0);
-    helper.postLikeService.likePost(targetPost.getId(), voter);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    PostDetailResponse targetPost = posts.get(0);
+    helper.postLikeService.likePost(targetPost.getId(), WithMockCustomUserContext.getAppUser());
 
     // when
     ResultActions result = mockMvc.perform(
@@ -308,8 +310,8 @@ public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase
     Account writer = helper.simpleAccount();
     //given
     BoardResponse targetBoard = helper.simpleBoard();
-    List<Post> posts =  helper.simplePost(targetBoard.getId(),writer,1);
-    Post targetPost = posts.get(0);
+    List<PostDetailResponse> posts =  helper.simplePost(targetBoard.getId(),writer,1);
+    PostDetailResponse targetPost = posts.get(0);
 
     // when
     ResultActions result = mockMvc.perform(

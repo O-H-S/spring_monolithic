@@ -55,20 +55,7 @@ public class CommentService {
 
         return response;
     }
-
-    @Transactional
-    public Comment create(Post post, String content, Account account) {
-        pRepo.updateCommentCount(post.getId(), 1);
-
-        Comment newComment = Comment.builder()
-                .author(account)
-                .post(post)
-                .content(content)
-                .build();
-        cRepo.save(newComment);
-
-        return newComment;
-    }
+    
 
     @Transactional
     public CommentCreationResponse createByID(Long postId, String content, Long accountId) {

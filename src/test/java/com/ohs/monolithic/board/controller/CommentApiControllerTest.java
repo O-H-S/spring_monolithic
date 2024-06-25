@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.controller;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.CommentForm;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.domain.Account;
@@ -34,9 +35,9 @@ public class CommentApiControllerTest extends IntegrationTestBase {
   public void createBoard_0() throws Exception {
     initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
 
-    Post targetPost = givens.c;
+    PostDetailResponse targetPost = givens.c;
 
     CommentForm form = new CommentForm();
     form.setContent("Test Content");

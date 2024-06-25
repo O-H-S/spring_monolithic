@@ -2,6 +2,7 @@ package com.ohs.monolithic.board.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.ohs.monolithic.SecurityConfigForUnitTest;
+import com.ohs.monolithic.board.controller.mvc.PostViewController;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.service.CommentService;
 import com.ohs.monolithic.board.service.PostReadService;
@@ -82,16 +83,16 @@ class PostViewControllerTest {
 
   PostDetailResponse dummyResponse(){
     PostDetailResponse response = new PostDetailResponse();
-    response.id = 1L;
-    response.boardID = 1;
-    response.authorID = 1L;
-    response.authorName = "author";
-    response.title = "hello world";
-    response.content = "blah blah";
-    response.createDate = LocalDateTime.now();
-    response.modifyDate = LocalDateTime.now();
-    response.likeCount = 0L;
-    response.viewCount = 0L;
+    response.setId(1L);
+    response.setBoardId(1);
+    response.setUserId(1L);
+    response.setUserNickname("author");
+    response.setTitle("hello world");
+    response.setContent( "blah blah");
+    response.setCreateDate(LocalDateTime.now());
+    response.setModifyDate( LocalDateTime.now());
+    response.setLikeCount(0L);
+    response.setViewCount(0L);
 
 
     return response;

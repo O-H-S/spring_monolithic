@@ -4,6 +4,8 @@ package com.ohs.monolithic.board.service;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.CommentPaginationDto;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.account.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
@@ -24,8 +26,8 @@ public class CommentLikeServiceIntegrationTest extends IntegrationTestBase {
   @DisplayName("likeComment(Comment, Account) : 최초 댓글 추천시 True 리턴, 이미 추천되어 있으면 False 리턴 ")
   void likeComment_0(){
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
-    Comment comment = commentService.create(givens.c, "test", givens.b);
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
+    CommentPaginationDto comment = commentService.createByID(givens.c.getId(), "test", givens.b.getId()).getCommentData();
 
     //when
     Boolean changed = commentLikeService.likeComment(comment.getId(), givens.b.getId());
@@ -42,12 +44,13 @@ public class CommentLikeServiceIntegrationTest extends IntegrationTestBase {
   @DisplayName("unlikeComment(Comment, Account) : 댓글 추천 취소, 추천 된 상태여야만 True 리턴 ")
   void unlikeComment_0(){
     //given
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
 
-    Comment comment = commentService.create(givens.c, "test", givens.b);
+    CommentPaginationDto comment = commentService.createByID(givens.c.getId(), "test", givens.b.getId()).getCommentData();
+
     commentLikeService.likeComment(comment.getId(), givens.b.getId());
 
-    Comment comment_ignored = commentService.create(givens.c, "test2", givens.b);
+    CommentPaginationDto comment_ignored = commentService.createByID(givens.c.getId(), "test2", givens.b.getId()).getCommentData();
 
     //when
     Boolean changed = commentLikeService.unlikeComment(comment.getId(), givens.b.getId());

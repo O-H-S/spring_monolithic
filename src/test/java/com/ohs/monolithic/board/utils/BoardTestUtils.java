@@ -59,7 +59,7 @@ public class BoardTestUtils {
     return new Triple<>(simplePost, simpleAccount, simepleBoard);
   }
 
-  static void setEntityID(Object targetObject, String fieldName, Object value) {
+  public static void setEntityID(Object targetObject, String fieldName, Object value) {
     try {
       Field field = targetObject.getClass().getDeclaredField(fieldName);
       field.setAccessible(true);  // private 필드 접근을 위해 필요

@@ -2,6 +2,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.account.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
@@ -21,7 +22,7 @@ public class PostWriteServiceIntegrationTest extends IntegrationTestBase {
   @Test
   @DisplayName("creatAllAsync() : ")
   void createAllAsync_0(){
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
     BoardResponse targetBoard = givens.a;
     Account writer = givens.b;
 

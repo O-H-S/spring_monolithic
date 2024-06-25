@@ -3,7 +3,8 @@ package com.ohs.monolithic.board.controller;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.ohs.monolithic.SecurityConfigForUnitTest;
-import com.ohs.monolithic.board.BoardPaginationType;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
+import com.ohs.monolithic.board.controller.rest.BoardApiController;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
@@ -212,7 +213,7 @@ class BoardApiControllerTest {
     public void getBoard_0() throws Exception {
         // given, when
 
-        when(bService.getBoardReadOnly(anyInt())).thenThrow(new BoardNotFoundException(1, "Not exists"));
+        when(bService.getBoardReadOnly(anyInt(), null)).thenThrow(new BoardNotFoundException(1, "Not exists"));
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -232,7 +233,7 @@ class BoardApiControllerTest {
     public void getBoard_1() throws Exception {
         // given, when
 
-        when(bService.getBoardReadOnly(anyInt())).thenReturn(BoardResponse.fromEntity( BoardTestUtils.createBoardSimple(1, "자유", "자유롭게 작성하시오."), 10L));
+        when(bService.getBoardReadOnly(anyInt(), null)).thenReturn(BoardResponse.fromEntity( BoardTestUtils.createBoardSimple(1, "자유", "자유롭게 작성하시오."), 10L));
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders

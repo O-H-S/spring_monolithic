@@ -1,8 +1,11 @@
 package com.ohs.monolithic.utils;
 
 
+import com.ohs.monolithic.account.domain.UserRole;
+import com.ohs.monolithic.auth.domain.LocalAppUser;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.repository.*;
 import com.ohs.monolithic.board.service.*;
@@ -13,11 +16,12 @@ import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
 import com.ohs.monolithic.account.service.AccountService;
 import org.antlr.v4.runtime.misc.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import javax.management.relation.Role;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -63,17 +67,32 @@ public class IntegrationTestHelper {
   PostLikeRepository postLikeRepository;
 
 
-  public Triple<BoardResponse, Account, Post> InitDummy_BoardAccountPost()
+  public Triple<BoardResponse, Account, PostDetailResponse> InitDummy_BoardAccountPost()
   {
     return InitDummy_BoardAccountPost("DummyBoard", "DummyUser", "DummyPost");
   }
 
-  public Triple<BoardResponse, Account, Post> InitDummy_BoardAccountPost(String boardTitle, String userName, String postTitle) {
+  public Triple<BoardResponse, Account, PostDetailResponse> InitDummy_BoardAccountPost(String boardTitle, String userName, String postTitle) {
     BoardResponse newBoard = boardService.createBoard(boardTitle,"Test");
     Account newUser = accountService.createAsLocal(userName,"test@abc.ddd", userName, "blah");
-    Post post = postWriteService.create(newBoard.getId(), PostForm.builder().subject("abc").content("abc").build() , newUser);
+
+    PostForm newPostForm = PostForm.builder()
+                    .subject("hello")
+                            .content("my name is oh")
+                                    .build();
+
+
+    PostDetailResponse post = postWriteService.create(newBoard.getId(), newPostForm, getDummyAppUser(newUser));
 
     return new Triple<>(newBoard, newUser, post);
+  }
+
+  LocalAppUser getDummyAppUser(Account account){
+    Set<GrantedAuthority> authorities = new HashSet<>();
+    authorities.add(new SimpleGrantedAuthority(UserRole.USER.toString()));
+
+    LocalAppUser appUser = new LocalAppUser(account.getId(), account.getNickname(), "blah", account.getNickname(), authorities);
+    return appUser;
   }
 
 
@@ -95,14 +114,25 @@ public class IntegrationTestHelper {
     return newUser;
   }
 
-  public List<Post> simplePost(Integer boardId, Account writer ,Integer count){
+  public List<PostDetailResponse> simplePost(Integer boardId, Account writer ,Integer count){
     Random random = new Random();
-    List<Post> posts = new ArrayList<>();
+    List<PostDetailResponse> posts = new ArrayList<>();
     if(writer == null)
       writer = simpleAccount();
+
+
+
     for (int i = 0; i < count; i++) {
       int randomValue = random.nextInt();
-      Post post = postWriteService.create(boardId, PostForm.builder().subject("dummy(" + i +")"+ randomValue).content("abc").build(), writer);
+
+      PostForm newPostForm = PostForm.builder()
+              .subject("dummy(" + i +")"+ randomValue)
+              .content("my name is oh")
+              .build();
+
+
+
+      PostDetailResponse post = postWriteService.create(boardId, newPostForm, getDummyAppUser(writer));
       posts.add(post);
     }
 

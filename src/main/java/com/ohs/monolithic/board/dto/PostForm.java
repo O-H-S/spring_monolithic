@@ -25,7 +25,7 @@ public class PostForm {
     @NotEmpty(message="내용은 필수항목입니다.")
     private String content;
 
-    private String method;
+    private String method; // problem. direct 가능
     private List<String> normalTags;
     private List<String>  highlightTags;
 
@@ -43,6 +43,19 @@ public class PostForm {
             return Pair.of(tagNames, tagTypes);
         }
         return null;
+    }
+
+    @Builder
+    public PostForm(String subject, String content, String method, List<String> normalTags, List<String> highlightTags){
+        if(method == null)
+            method = "direct";
+
+        this.subject = subject;
+        this.content = content;
+        this.method = method;
+        this.normalTags = normalTags;
+        this.highlightTags = highlightTags;
+
     }
 
 

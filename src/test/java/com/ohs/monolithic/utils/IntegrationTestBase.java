@@ -3,7 +3,7 @@ package com.ohs.monolithic.utils;
 import com.nimbusds.jose.shaded.gson.Gson;
 
 import com.ohs.monolithic.account.domain.Account;
-import com.ohs.monolithic.account.dto.LocalAppUser;
+import com.ohs.monolithic.auth.domain.LocalAppUser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @Tag("base")
 @Tag("integrate")
 public class IntegrationTestBase {
+
+  static final ThreadLocal<Account> accountHolder = new ThreadLocal<>();
 
   @Autowired
   protected MockMvc mockMvc;
@@ -47,8 +49,8 @@ public class IntegrationTestBase {
       LocalAppUser localAppUser = (LocalAppUser) authentication.getPrincipal();
       //helper.accountRepository.
       //helper.accountRepository.save(localAppUser.getAccount());
-      Account newAccount = helper.accountRepository.save(localAppUser.getAccount());
-      localAppUser.setAccount(newAccount);
+      Account newAccount = helper.accountRepository.save(WithMockCustomUserContext.getAccount());
+
       return newAccount;
      // helper.accountRepository.flush();
     }

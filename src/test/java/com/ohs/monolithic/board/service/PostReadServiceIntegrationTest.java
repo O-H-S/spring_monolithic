@@ -23,8 +23,8 @@ public class PostReadServiceIntegrationTest extends IntegrationTestBase {
   @Test
   @DisplayName("readPost(Integer, Account): 게시글을 조회하면, viewCount가 증가하고, PostView 가 추가된다.")
   public void readPost(){
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
-    Post targetPost = givens.c;
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
+    PostDetailResponse targetPost = givens.c;
     Account viewer = givens.b;
 
     long oldCount = givens.c.getViewCount();
@@ -40,17 +40,17 @@ public class PostReadServiceIntegrationTest extends IntegrationTestBase {
     assertThat(postInDB.getViewCount()).isEqualTo(oldCount + 1); // DB에는 증가가 적용되어 있으므로, 다시 불러오면 증가된 값이 나온다.
     assertThat(postViewRepository.findByPostIdAndUserId(targetPost.getId(), viewer.getId())).isNotNull(); // PostView가 추가되어 있어야한다.
 
-    assertThat(targetPost.getId()).isEqualTo(response.id);
-    assertThat(targetPost.getBoard().getId()).isEqualTo(response.boardID);
-    assertThat(targetPost.getAuthor().getId()).isEqualTo(response.authorID);
+    assertThat(targetPost.getId()).isEqualTo(response.getId());
+    assertThat(targetPost.getBoardId()).isEqualTo(response.getBoardId());
+    assertThat(targetPost.getUserId()).isEqualTo(response.getUserId());
     //assertThat(response.viewCount).isEqualTo(postInDB.getViewCount());
   }
 
   @Test
   @DisplayName("readPost(Integer, Account): 같은 사람이 여러번 조회하면, viewCount는 변화 없고 PostView의 count만 증가한다.")
   public void readPost_0(){
-    Triple<BoardResponse, Account, Post> givens = helper.InitDummy_BoardAccountPost();
-    Post targetPost = givens.c;
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost();
+    PostDetailResponse targetPost = givens.c;
     Account viewer = givens.b;
 
     PostDetailResponse response = postReadService.readPost(targetPost.getId(), viewer.getId());

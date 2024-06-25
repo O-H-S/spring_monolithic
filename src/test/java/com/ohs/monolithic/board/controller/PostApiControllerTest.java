@@ -2,6 +2,7 @@ package com.ohs.monolithic.board.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.ohs.monolithic.SecurityConfigForUnitTest;
+import com.ohs.monolithic.board.controller.rest.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
 import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.service.*;

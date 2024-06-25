@@ -3,7 +3,8 @@ package com.ohs.monolithic.utils;
 
 import com.ohs.monolithic.account.domain.Account;
 import com.ohs.monolithic.account.domain.AuthenticationType;
-import com.ohs.monolithic.account.dto.LocalAppUser;
+import com.ohs.monolithic.auth.domain.LocalAppUser;
+import com.ohs.monolithic.board.utils.BoardTestUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -27,12 +28,14 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
             .role(customUser.role())
             .build();
 
-    //BoardTestUtils.setEntityID(account, "id", Long.valueOf (customUser.accountId()));
-    LocalAppUser principal = new LocalAppUser(account , customUser.username(), "pass", authorities); //
+    BoardTestUtils.setEntityID(account, "id", 1L);
+    LocalAppUser principal = new LocalAppUser(account.getId(), customUser.username(), "pass", customUser.nickname(),authorities); //
 
     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, "password", authorities);
     context.setAuthentication(auth);
 
+    WithMockCustomUserContext.setAccount(account);
+    WithMockCustomUserContext.setAppUser(principal);
     return context;
   }
 }
