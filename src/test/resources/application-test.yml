@@ -1,6 +1,31 @@
-  # 이 파일에 설정 후, 아래와 같이 사용 가능.
-  #@SpringBootTest
-  #  @ActiveProfiles("test")
-  #  public class UserRepositoryTest {
-  #  // 테스트 메서드들
-  #}
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: info
+        type:
+          descriptor:
+            sql: TRACE
+
+spring:
+  flyway:
+    enabled: false
+  datasource:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    show-sql: true
+
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+
+
+

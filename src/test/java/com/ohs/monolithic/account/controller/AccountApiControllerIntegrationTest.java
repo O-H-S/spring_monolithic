@@ -1,6 +1,7 @@
 package com.ohs.monolithic.account.controller;
 
 import com.ohs.monolithic.account.domain.Account;
+
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import org.junit.jupiter.api.DisplayName;
@@ -115,7 +116,7 @@ public class AccountApiControllerIntegrationTest  extends IntegrationTestBase {
     ).andDo(print());
 
     // then
-    result.andExpect(status().isBadRequest());
+    result.andExpect(status().isForbidden());
     //result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
     result.andDo(document("accounts/patch/failed-violation",

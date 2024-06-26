@@ -14,13 +14,14 @@ import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
 public class ProfileImageService {
   //final private S3Client s3Client;
-  final private S3Presigner s3Presigner;
+  final private Optional<S3Presigner> s3Presigner;
 
   public ProfileImageUploadDto.Response getPresignedUrl(Long accountId, ProfileImageUploadDto.Request request, AppUser user){
     ProfileImageUploadDto.Response response = new ProfileImageUploadDto.Response();

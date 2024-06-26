@@ -20,8 +20,37 @@ dependencies {
     testImplementation 'com.h2database:h2'
 }
 
+def loadEnvVars = { file ->
+    def envVars = [:]
+    if (file.exists()) {
+        file.eachLine { line ->
+            if (!line.startsWith("#") && line.contains("=")) {
+                def (key, value) = line.split("=", 2)
+                envVars[key.trim()] = value.trim()
+            }
+        }
+    }
+    return envVars
+}
+
+// Load the test.env file
+def envFile = file("environment/test.env")
+def envVars = loadEnvVars(envFile)
+
+
+
 tasks.withType(Test) {
     useJUnitPlatform()
+
+    environment envVars
+
+    // Print environment variables for debugging
+    doFirst {
+        println "Environment Variables:"
+        environment.each { key, value ->
+            println "${key}=${value}"
+        }
+    }
 }
 
 /* kotlin
