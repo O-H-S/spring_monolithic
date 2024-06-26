@@ -58,7 +58,7 @@ public class ProfileImageService {
             .signatureDuration(Duration.ofMinutes(5))
             .build();
 
-    return s3Presigner.presignPutObject(presignRequest).url().toString();
+    return s3Presigner.get().presignPutObject(presignRequest).url().toString();
   }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @Tag("base")
 @Tag("integrate")
+@ActiveProfiles("test")
 public class IntegrationTestBase {
 
   static final ThreadLocal<Account> accountHolder = new ThreadLocal<>();
@@ -28,8 +30,12 @@ public class IntegrationTestBase {
   protected MockMvc mockMvc;
   protected Gson gson; // json 직렬화,역직렬화
 
+
   @Autowired
   protected IntegrationTestHelper helper;
+
+
+
 
   @BeforeEach
   public void init() {
@@ -49,7 +55,10 @@ public class IntegrationTestBase {
       LocalAppUser localAppUser = (LocalAppUser) authentication.getPrincipal();
       //helper.accountRepository.
       //helper.accountRepository.save(localAppUser.getAccount());
-      Account newAccount = helper.accountRepository.save(WithMockCustomUserContext.getAccount());
+      Account newAccount = helper.accountService.createAsLocal(localAppUser.getNickname(), WithMockCustomUserContext.getAccount().getEmail(), localAppUser.getUsername(), localAppUser.getPassword());
+
+      WithMockCustomUserContext.setAccount(newAccount);
+     // Account newAccount = helper.accountRepository.save(WithMockCustomUserContext.getAccount());
 
       return newAccount;
      // helper.accountRepository.flush();
