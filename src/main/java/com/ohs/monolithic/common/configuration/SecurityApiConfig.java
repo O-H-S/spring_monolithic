@@ -37,6 +37,9 @@ public class SecurityApiConfig {
   @Value("${client.origin}")
   private String origin;
 
+  @Value("${API_SERVER_URL}")
+  private String apiServerUrl;
+
   final ObjectMapper objectMapper;
   @Bean
   @Order(1)
@@ -112,7 +115,7 @@ public class SecurityApiConfig {
               .clientSecret(registration.getClientSecret())
               .clientAuthenticationMethod(registration.getClientAuthenticationMethod())
               .authorizationGrantType(registration.getAuthorizationGrantType())
-              .redirectUri("{baseUrl}/api/login/oauth2/code/" + registration.getRegistrationId())
+              .redirectUri(apiServerUrl+ "/api/login/oauth2/code/" + registration.getRegistrationId())
               .scope(registration.getScopes().toArray(new String[0]))
               .authorizationUri(registration.getProviderDetails().getAuthorizationUri())
               .tokenUri(registration.getProviderDetails().getTokenUri())

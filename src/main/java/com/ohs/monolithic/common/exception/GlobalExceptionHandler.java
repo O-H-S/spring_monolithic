@@ -22,12 +22,12 @@ import java.util.Map;
 @ControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AccessDeniedException.class)
+    /*@ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException e) {
         //System.out.println(e.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-    }
+    }*/
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {

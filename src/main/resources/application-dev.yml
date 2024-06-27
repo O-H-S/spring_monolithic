@@ -1,33 +1,15 @@
-client:
-  origin: http://localhost:3000
 
-server:
-  port: 80 # 지정하지 않으면, 기본 포트가 8080으로 설정됨. (http://localhost/로 접속 불가능, 포트 명시해야함)
-  ssl:
-    enabled: false # 스프링 부트가 자동으로 ssl를 활성화하려 시도할수있음.
-  servlet:
-    session:
-      cookie:
-        domain: localhost
-        secure: false
 
 spring:
   config:
     import:
       - classpath:application_common.yml
-  flyway:
-    enabled: true
-    baseline-on-migrate: false # 최초 적용시에만 true로 설정, 적용 후에는 false로 바꾸기.
-    baseline-version: 1
-
   jpa:
     show_sql: true
-    hibernate:
-      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-        jdbc.batch_size: 1000
+
   security:
     oauth2:
       client:
@@ -39,6 +21,16 @@ spring:
           google:
             redirect-uri: http://localhost/login/oauth2/code/google
 
+client:
+  origin: http://localhost:3000
+
+server:
+  servlet:
+    session:
+      cookie:
+        domain: localhost
+        secure: false
+        same-site: lax
 
 logging:
   config: classpath:logback-dev.xml
