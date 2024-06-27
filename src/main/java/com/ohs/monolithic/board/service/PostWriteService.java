@@ -4,8 +4,6 @@ package com.ohs.monolithic.board.service;
 import com.ohs.monolithic.account.domain.UserRole;
 import com.ohs.monolithic.account.repository.AccountRepository;
 import com.ohs.monolithic.auth.domain.AppUser;
-import com.ohs.monolithic.board.domain.PostTag;
-import com.ohs.monolithic.board.domain.constants.PostTagType;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.event.PostCreateEvent;
 import com.ohs.monolithic.board.event.PostDeleteEvent;
@@ -13,8 +11,7 @@ import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BulkInsertResponse;
 import com.ohs.monolithic.board.dto.PostForm;
-import com.ohs.monolithic.board.exception.DataNotFoundException;
-import com.ohs.monolithic.board.exception.InvalidPostTagNameException;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.account.domain.Account;
 import com.ohs.monolithic.common.utils.BulkInsertableRepository.BatchProcessor;
@@ -37,8 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.LongFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @RequiredArgsConstructor
@@ -233,7 +228,7 @@ public class PostWriteService {
 
     Optional<Post> postOp = pRepo.findById(id);
     if (postOp.isEmpty())
-      throw new DataNotFoundException("존재하지 않는 게시물입니다");
+      throw new DataNotFoundException("post","존재하지 않는 게시물입니다");
     return postOp.get();
   }
 
@@ -243,7 +238,7 @@ public class PostWriteService {
 
     Optional<Post> postOp = pRepo.findByIdWithWriteLock(id);
     if (postOp.isEmpty())
-      throw new DataNotFoundException("존재하지 않는 게시물입니다");
+      throw new DataNotFoundException("post","존재하지 않는 게시물입니다");
     return postOp.get();
   }
 
@@ -253,7 +248,7 @@ public class PostWriteService {
 
     Optional<Post> postOp = pRepo.findByIdWithReadLock(id);
     if (postOp.isEmpty())
-      throw new DataNotFoundException("존재하지 않는 게시물입니다");
+      throw new DataNotFoundException("post","존재하지 않는 게시물입니다");
     return postOp.get();
   }
 

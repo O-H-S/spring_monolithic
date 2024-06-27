@@ -15,16 +15,15 @@ spring:
 
   jpa:
     show-sql: true
-
     generate-ddl: true
     hibernate:
       ddl-auto: create-drop
 
-    open-in-view: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
+        #globally_quoted_identifiers: true
 
 
 

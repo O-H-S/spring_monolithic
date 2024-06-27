@@ -5,7 +5,7 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.domain.PostTag;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.repository.PostRepository;
-import com.ohs.monolithic.board.exception.DataNotFoundException;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,7 +69,7 @@ public class PostReadService {
         if (question.isPresent()) {
             return question.get();
         } else {
-            throw new DataNotFoundException("question not found");
+            throw new DataNotFoundException("post", "게시글이 존재하지 않습니다");
         }
     }
 

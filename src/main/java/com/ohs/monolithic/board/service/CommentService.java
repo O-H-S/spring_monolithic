@@ -6,11 +6,12 @@ import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.*;
-import com.ohs.monolithic.board.exception.DataNotFoundException;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.account.domain.Account;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -85,7 +86,7 @@ public class CommentService {
 
         Comment targetComment = cRepo.getComment(commentId);
         if(targetComment == null){
-            throw new DataNotFoundException("존재하지 않는 댓글입니다.");
+            throw new DataNotFoundException("comment", "존재하지 않는 댓글입니다.");
         }
 
         if (!targetComment.getAuthor().getId().equals(user.getAccountId())) {
@@ -108,7 +109,7 @@ public class CommentService {
 
         Comment targetComment = cRepo.getComment(commentId);
         if(targetComment == null){
-            throw new DataNotFoundException("존재하지 않는 댓글입니다.");
+            throw new DataNotFoundException("comment","존재하지 않는 댓글입니다.");
         }
 
         if (!targetComment.getAuthor().getId().equals(user.getAccountId())) {
@@ -129,7 +130,7 @@ public class CommentService {
         if (answer.isPresent()) {
             return answer.get();
         } else {
-            throw new DataNotFoundException("entity(comment) not found");
+            throw new EntityNotFoundException("entity(comment) not found");
         }
     }
 

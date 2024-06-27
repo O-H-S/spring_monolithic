@@ -3,18 +3,14 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.exception.BoardNotFoundException;
-import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Before;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Optional;
@@ -94,7 +90,7 @@ public class BoardServiceTest {
 
     // when, then
 
-    Exception exception = assertThrows(BoardNotFoundException.class, () -> {
+    Exception exception = assertThrows(DataNotFoundException.class, () -> {
       target.deleteBoard(targetID);
     });
 

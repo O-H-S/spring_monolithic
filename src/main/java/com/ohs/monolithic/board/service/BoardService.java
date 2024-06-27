@@ -7,8 +7,8 @@ import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.repository.BoardRepository;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -199,22 +199,22 @@ public class BoardService {
     return results;
   }
 
-  public Board getBoard(Integer id) throws BoardNotFoundException {
+  public Board getBoard(Integer id) throws DataNotFoundException {
     if (id == null || id < 0) {
-      throw new BoardNotFoundException(id, "올바르지 않은 ID 형식 입니다.");
+      throw new DataNotFoundException("board", "올바르지 않은 ID 형식 입니다.");
     }
     Long count = postCountCache.get(id);
     if (count == null)
-      throw new BoardNotFoundException(id, "존재하지 않는 게시판입니다.");
+      throw new DataNotFoundException("board", "존재하지 않는 게시판입니다.");
     try {
       return boardRepository.findById(id).get();
     } catch (Exception e) {
-      throw new BoardNotFoundException(id, "internal error");
+      throw new DataNotFoundException("board", "internal error");
     }
   }
 
   @Transactional(readOnly = true)
-  public BoardResponse getBoardReadOnly(Integer id, AppUser user) throws BoardNotFoundException {
+  public BoardResponse getBoardReadOnly(Integer id, AppUser user) throws DataNotFoundException {
     assertBoardExists(id);
 
     Board target = boardRepository.findById(id).get();
@@ -242,10 +242,10 @@ public class BoardService {
   public void assertBoardExists(Integer id) {
     try {
       if (!isExist(id)) {
-        throw new BoardNotFoundException(id, "존재하지 않는 게시판입니다.");
+        throw new DataNotFoundException("board", "존재하지 않는 게시판입니다.");
       }
     } catch (Exception e) {
-      throw new BoardNotFoundException(id, "올바르지 않은 포맷입니다.");
+      throw new DataNotFoundException("board", "올바르지 않은 포맷입니다.");
     }
   }
 

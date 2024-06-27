@@ -7,9 +7,9 @@ import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.controller.rest.BoardApiController;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
-import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -213,7 +213,7 @@ class BoardApiControllerTest {
     public void getBoard_0() throws Exception {
         // given, when
 
-        when(bService.getBoardReadOnly(anyInt(), null)).thenThrow(new BoardNotFoundException(1, "Not exists"));
+        when(bService.getBoardReadOnly(anyInt(), null)).thenThrow(new DataNotFoundException("board", "Not exists"));
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -278,7 +278,7 @@ class BoardApiControllerTest {
     public void deleteBoard_1() throws Exception {
         // given, when
 
-        doThrow(new BoardNotFoundException(1, "Not exists")).when(bService).deleteBoard(anyInt());
+        doThrow(new DataNotFoundException("board", "Not exists")).when(bService).deleteBoard(anyInt());
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders

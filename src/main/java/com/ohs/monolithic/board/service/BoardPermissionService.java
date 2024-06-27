@@ -24,11 +24,16 @@ import java.util.Set;
 public class BoardPermissionService {
   final BoardPermissionRepository boardPermissionRepository;
   final BoardRepository boardRepository;
+
+  // 게시판 쓰기 권한을 검사한다.
   @Transactional(readOnly = true)
   public void validateWritePermission(Integer boardId, UserRole role, String method){
+    // 어드민이면 허용
     if(role == UserRole.ADMIN)
       return;
+    // 특정 role에 대한 게시판 권한을 조회한다.
     PermissionResponse response = getPermissionResponse(boardId, role);
+    // 조회 결과를 통해,
     String reasonForWrite = response.getReasonFailedToWrite(method);
     if(reasonForWrite != null)
       throw new BoardPermissionException(boardId, reasonForWrite);
@@ -81,5 +86,31 @@ public class BoardPermissionService {
       writeMethods.add("*");
 
     return new PermissionResponse(role, Boolean.TRUE, writeMethods);
+  }
+
+  @Transactional
+  public void addWritePermission(Integer id, UserRole role, String method){
+    BoardPermission writablePermission = boardPermissionRepository.findByBoardAndNameAndValue(boardRepository.getReferenceById(id), "post_write_role", role.toString());
+    if(writablePermission == null) {
+      writablePermission = BoardPermission.builder()
+              .board(boardRepository.getReferenceById(id))
+              .name("post_write_role")
+              .value(role.toString())
+              .build();
+      boardPermissionRepository.save(writablePermission);
+    }
+    List<BoardPermission> methodPermissionList = boardPermissionRepository.findByBoardAndNameLike(boardRepository.getReferenceById(id), "post_write_method");
+    if(methodPermissionList.isEmpty())
+      return;
+    for(BoardPermission p : methodPermissionList){
+      String existMethod = p.getValue();
+      if(existMethod.equals("*") || existMethod.equals(method))
+        return;
+    }
+    boardPermissionRepository.save(BoardPermission.builder()
+            .board(boardRepository.getReferenceById(id))
+            .name("post_write_method")
+            .value(method)
+            .build());
   }
 }

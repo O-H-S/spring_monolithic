@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface BoardPermissionRepository extends JpaRepository<BoardPermission, Long> {
   BoardPermission findByBoardAndNameAndValue(Board board, String name, String value);
+  BoardPermission findByBoardAndName(Board board, String name);
 
   List<BoardPermission> findByBoardAndNameLike(Board board, String name);
 

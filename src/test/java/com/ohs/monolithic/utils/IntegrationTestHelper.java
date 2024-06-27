@@ -30,6 +30,10 @@ public class IntegrationTestHelper {
   public BoardService boardService;
   @Autowired
   public AccountService accountService;
+
+  @Autowired
+  public BoardPermissionService boardPermissionService;
+
   @Autowired
   public PostWriteService postWriteService;
   @Autowired
@@ -62,6 +66,8 @@ public class IntegrationTestHelper {
   @Autowired
   BoardRepository boardRepository;
   @Autowired
+  BoardPermissionRepository boardPermissionRepository;
+  @Autowired
   PostViewRepository postViewRepository;
   @Autowired
   PostLikeRepository postLikeRepository;
@@ -74,6 +80,7 @@ public class IntegrationTestHelper {
 
   public Triple<BoardResponse, Account, PostDetailResponse> InitDummy_BoardAccountPost(String boardTitle, String userName, String postTitle) {
     BoardResponse newBoard = boardService.createBoard(boardTitle,"Test");
+    boardPermissionService.addWritePermission(newBoard.getId(), UserRole.USER, "*");
     Account newUser = accountService.createAsLocal(userName,"test@abc.ddd", userName, "blah");
 
     PostForm newPostForm = PostForm.builder()
@@ -101,7 +108,7 @@ public class IntegrationTestHelper {
     int randomValue = random.nextInt();
 
     BoardResponse newBoard = boardService.createBoard("dummyBoard" + randomValue,"");
-
+    boardPermissionService.addWritePermission(newBoard.getId(), UserRole.USER, "*");
     return newBoard;
   }
 
@@ -157,6 +164,7 @@ public class IntegrationTestHelper {
     localCredentialRepository.deleteAll();
     oAuth2CredentialRepository.deleteAll();
     accountRepository.deleteAll();
+    boardPermissionRepository.deleteAll();
     boardRepository.deleteAll();
     System.out.println("--------------------------------------------");
   }

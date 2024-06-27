@@ -4,8 +4,8 @@ import com.nimbusds.jose.shaded.gson.Gson;
 import com.ohs.monolithic.SecurityConfigForUnitTest;
 import com.ohs.monolithic.board.controller.rest.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
-import com.ohs.monolithic.board.exception.BoardNotFoundException;
 import com.ohs.monolithic.board.service.*;
+import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
@@ -166,7 +166,7 @@ public class PostApiControllerTest {
         List<Integer> tryIDs = List.of(-1,0,2);
         for(Integer idx : tryIDs) {
             //doThrow(new BoardNotFoundException(idx, "Not Exist")).when(boardService).assertBoardExists(intThat(argument -> argument != 1));
-            doThrow(new BoardNotFoundException(idx, "Not Exist")).when(boardService).assertBoardExists(idx);
+            doThrow(new DataNotFoundException("board", "Not Exist")).when(boardService).assertBoardExists(idx);
         }
             //lenient().doThrow(true).when(boardService).assertBoardExists(1); // lenient : 엄격 모드(strictness)를 조절
 
