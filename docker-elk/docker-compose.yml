@@ -1,0 +1,73 @@
+# cmd에서 환경변수 지정 후, 컴포즈 up
+# (필요시) set LOG_PATH=C:\Users\82104\Desktop\Web\Portfolio\Monolithic\logs
+# docker-compose --env-file ./.env -f docker-compose.yml up -d
+
+networks:
+  elk:
+    driver: bridge
+
+services:
+  # Elastic search 설정
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:7.17.16
+    ports:
+      - 9200:9200
+      - 9300:9300
+    # compose 파일 위치 기준
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./elasticsearch:/usr/share/elasticsearch/data
+    # Elastic search 계정정보
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      discovery.type: single-node
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+
+    networks:
+      - elk
+    restart: unless-stopped
+
+  # Logstash 설정, elasticsearch healthcheck 추가하기(condition: service_healthy 이용)
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:7.17.16
+    ports:
+      - 5044:5044
+      - 9600:9600
+    volumes: # pipeline에는 conf 파일만 존재해야 하는 듯.
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+
+  # Kibana 설정 , elasticsearch healthcheck 추가하기
+  kibana:
+    container_name: kibana
+    image: kibana:7.17.16
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    networks:
+      - elk
+  # FileBeat 설정 (개발 서버 로그만 추적함), logstash healthcheck 추가하기
+  filebeat:
+    container_name: filebeat
+    image: docker.elastic.co/beats/filebeat:7.17.16
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ${LOG_PATH}:/var/log/springboot  # 스프링부트 로그 경로
+    depends_on:
+      - logstash
+    networks:
+      - elk
