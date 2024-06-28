@@ -11,6 +11,8 @@ public enum ErrorCode {
   HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "C006", "Access is Denied"),
   ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "Entity Not Found"),
 
+  //DATA_INTEGRITY_VIOLATION(HttpStatus.BAD_REQUEST, "C050", "DB : 제약조건 위반"),
+
   INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C100", "알 수 없는 오류가 발생하였습니다."),
   NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED, "C101", "아직 구현되지 않은 요청입니다"),
 

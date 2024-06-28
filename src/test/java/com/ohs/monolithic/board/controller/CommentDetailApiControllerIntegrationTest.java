@@ -153,7 +153,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void createBoard_0() throws Exception {
     initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "minsu", "dum");
     CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "test", givens.b.getId());
 
     // when
@@ -280,7 +280,7 @@ class CommentDetailApiControllerIntegrationTest extends IntegrationTestBase {
   public void unlikeComment_0() throws Exception {
     Account operator = initSecurityUserAccount();
     //given
-    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "hyeonsu", "dum");
+    Triple<BoardResponse, Account, PostDetailResponse> givens = helper.InitDummy_BoardAccountPost("dum", "dum", "dum");
     CommentCreationResponse targetComment = helper.commentService.createByID(givens.c.getId(), "test", givens.b.getId());
     helper.commentLikeService.likeComment(targetComment.getCommentData().getId(), operator.getId());
 

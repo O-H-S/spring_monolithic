@@ -30,16 +30,18 @@ public class GlobalExceptionHandler {
     }*/
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
 
        Throwable cause = e.getCause();
        if(cause instanceof ConstraintViolationException detailException){
-           if(detailException.getSQLException().getSQLState().equals( "23505") || detailException.getSQLException().getSQLState().equals( "23000"))
+           if(detailException.getSQLException().getSQLState().equals( "23505") || detailException.getSQLException().getSQLState().equals( "23000")){
                // 23505는 H2에서 발생
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("중복된 값 입니다");
+               ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE);
+               response.setMessage("중복된 값입니다.");
+               return new ResponseEntity<>(response, ErrorCode.INVALID_INPUT_VALUE.getStatus());
+           }
        }
-
-       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        throw e;
     }
 
 
@@ -101,6 +103,14 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.of(ErrorCode.ENTITY_NOT_FOUND);
         response.setData(ex.getMessage());
         return new ResponseEntity<>(response, ErrorCode.ENTITY_NOT_FOUND.getStatus());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleEAccessDeniedException(AccessDeniedException ex) {
+
+        ErrorResponse response = ErrorResponse.of(ErrorCode.HANDLE_ACCESS_DENIED);
+        response.setData(ex.getMessage());
+        return new ResponseEntity<>(response, ErrorCode.HANDLE_ACCESS_DENIED.getStatus());
     }
     // 상위 예외를 아래에 둔다. (순서에 영향을 받음)
     @ExceptionHandler(BusinessException.class)

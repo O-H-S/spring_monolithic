@@ -2,8 +2,8 @@ package com.ohs.monolithic.utils;
 
 
 import com.ohs.monolithic.account.domain.UserRole;
+import com.ohs.monolithic.account.service.LocalAccountService;
 import com.ohs.monolithic.auth.domain.LocalAppUser;
-import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
@@ -16,11 +16,11 @@ import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
 import com.ohs.monolithic.account.service.AccountService;
 import org.antlr.v4.runtime.misc.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import javax.management.relation.Role;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,6 +30,8 @@ public class IntegrationTestHelper {
   public BoardService boardService;
   @Autowired
   public AccountService accountService;
+  @Autowired
+  public LocalAccountService localAccountService;
 
   @Autowired
   public BoardPermissionService boardPermissionService;
@@ -72,6 +74,11 @@ public class IntegrationTestHelper {
   @Autowired
   PostLikeRepository postLikeRepository;
 
+  /*RedisTemplate<String, String>의 편의성 버전입니다.
+  키와 값 모두 자동으로 String으로 처리되도록 사전 설정되어 있습니다.*/
+
+  @Autowired
+  StringRedisTemplate stringRedisTemplate;
 
   public Triple<BoardResponse, Account, PostDetailResponse> InitDummy_BoardAccountPost()
   {
@@ -81,7 +88,8 @@ public class IntegrationTestHelper {
   public Triple<BoardResponse, Account, PostDetailResponse> InitDummy_BoardAccountPost(String boardTitle, String userName, String postTitle) {
     BoardResponse newBoard = boardService.createBoard(boardTitle,"Test");
     boardPermissionService.addWritePermission(newBoard.getId(), UserRole.USER, "*");
-    Account newUser = accountService.createAsLocal(userName,"test@abc.ddd", userName, "blah");
+    Account newUser = accountService.createAsLocal(userName, "test@abc.ddd", userName, "blah");
+
 
     PostForm newPostForm = PostForm.builder()
                     .subject("hello")
@@ -152,6 +160,15 @@ public class IntegrationTestHelper {
   public void release(){
     System.out.println("---------------helper.release-------------");
     boardService.registerPostCountCache(new ConcurrentHashMap<Integer, Long>());
+
+    // 로컬 레디스 정리.
+    Set<String> keys = stringRedisTemplate.keys("*");
+    if (keys != null && !keys.isEmpty()) {
+      stringRedisTemplate.delete(keys);
+    }
+
+    WithMockCustomUserContext.clear();
+
 
     // 외래키 제약으로 인해, delete의 순서가 중요하다. (에러 발생함)
     // TODO : trancate 명령어 사용하기.

@@ -18,4 +18,8 @@ public class WithMockCustomUserContext {
   public static AppUser getAppUser() {
     return appUserHolder.get();
   }
+  public static void clear(){
+    accountHolder .remove();
+    appUserHolder.remove();
+  }
 }

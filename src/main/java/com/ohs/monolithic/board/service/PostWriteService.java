@@ -14,6 +14,7 @@ import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.common.exception.PermissionException;
 import com.ohs.monolithic.common.utils.BulkInsertableRepository.BatchProcessor;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -216,7 +217,7 @@ public class PostWriteService {
   public void deleteBy(Long id, Long accountId) throws Exception {
     Post targetPost = getPost(id);
     if (!targetPost.getAuthor().getId().equals(accountId)) {
-      throw new AccessDeniedException("게시글 삭제 권한이 없습니다");
+      throw new PermissionException("게시글 삭제 권한이 없습니다");
     }
     delete(id);
   }

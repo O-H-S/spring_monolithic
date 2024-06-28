@@ -10,6 +10,7 @@ import com.ohs.monolithic.account.exception.FailedAdminLoginException;
 import com.ohs.monolithic.account.repository.AccountRepository;
 import com.ohs.monolithic.account.repository.LocalCredentialRepository;
 import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
+import com.ohs.monolithic.common.exception.PermissionException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -160,7 +161,7 @@ public class AccountService {
 
     public void assertPermission(AppUser operator, Long targetId){
         if(!operator.getAccountId().equals(targetId) && !operator.isAdmin())
-            throw new AccessDeniedException("(Account Failed) 해당 요청의 권한이 없습니다.");
+            throw new PermissionException("(Account Failed) 해당 요청의 권한이 없습니다.");
     }
     @Transactional
     public AccountResponse updateAccount(Long id, Map<String, String> data, AppUser operator){

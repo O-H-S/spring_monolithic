@@ -10,6 +10,7 @@ import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.CommentRepository;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.common.exception.PermissionException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -90,7 +91,7 @@ public class CommentService {
         }
 
         if (!targetComment.getAuthor().getId().equals(user.getAccountId())) {
-            throw new RuntimeException("댓글 삭제 권한이 없습니다");
+            throw new PermissionException("댓글 삭제 권한이 없습니다");
         }
 
         Post post = targetComment.getPost();
@@ -113,7 +114,7 @@ public class CommentService {
         }
 
         if (!targetComment.getAuthor().getId().equals(user.getAccountId())) {
-            throw new AccessDeniedException("댓글 수정 권한이 없습니다");
+            throw new PermissionException("댓글 수정 권한이 없습니다");
         }
 
         targetComment.setContent(form.getContent());

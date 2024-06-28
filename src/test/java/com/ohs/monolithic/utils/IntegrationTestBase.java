@@ -57,7 +57,9 @@ public class IntegrationTestBase {
       //helper.accountRepository.save(localAppUser.getAccount());
       Account newAccount = helper.accountService.createAsLocal(localAppUser.getNickname(), WithMockCustomUserContext.getAccount().getEmail(), localAppUser.getUsername(), localAppUser.getPassword());
 
+      helper.localAccountService.reload(null);
       WithMockCustomUserContext.setAccount(newAccount);
+      WithMockCustomUserContext.setAppUser( (LocalAppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
      // Account newAccount = helper.accountRepository.save(WithMockCustomUserContext.getAccount());
 
       return newAccount;

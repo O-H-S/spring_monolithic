@@ -116,7 +116,7 @@ public class AccountApiControllerIntegrationTest  extends IntegrationTestBase {
     ).andDo(print());
 
     // then
-    result.andExpect(status().isForbidden());
+    result.andExpect(status().isBadRequest());
     //result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
     result.andDo(document("accounts/patch/failed-violation",

@@ -28,6 +28,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
             .role(customUser.role())
             .build();
 
+    // 단위 테스트를 위함.
     BoardTestUtils.setEntityID(account, "id", 1L);
     LocalAppUser principal = new LocalAppUser(account.getId(), customUser.username(), "pass", customUser.nickname(),authorities); //
 

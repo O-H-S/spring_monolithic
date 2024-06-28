@@ -1,6 +1,7 @@
 package com.ohs.monolithic.problem.collect.service;
 
 import com.ohs.monolithic.auth.domain.AppUser;
+import com.ohs.monolithic.common.exception.PermissionException;
 import com.ohs.monolithic.problem.collect.domain.CollectProgress;
 import com.ohs.monolithic.problem.collect.dto.CollectProgressResponse;
 import com.ohs.monolithic.problem.collect.dto.CollectProgressUpdateForm;
@@ -32,7 +33,7 @@ public class ProblemCollectService {
   @Transactional(readOnly = true)
   public CollectProgressResponse getProgress(AppUser user, String target, int version) {
     if(!user.isAdmin()){
-      throw new AccessDeniedException("권한이 없습니다");
+      throw new PermissionException("권한이 없습니다");
     }
 
     CollectProgress result = collectProgressRepository.findByPlatformAndCollectorVersion(target, version);
