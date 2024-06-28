@@ -1,0 +1,17 @@
+여기서 index는 elasticsearch의 인덱스를 설정한다.
+index는 rdbms의 테이블과 유사한 개념.
+
+
+보안을 위해 SSL/TLS 설정 필요함. (SSL의 "클라이언트 인증"을 통해, 특정 클라이언트만 접근할 수 있도록하기)
+
+인바운드 규칙에 5044 추가해야함.
+
+input {
+  beats {
+    port => 5044
+  }
+}
+Logstash에는 다양한 input 플러그인이 있으며, 각 플러그인은 특정 유형의 데이터를 수신하는 역할을 합니다.
+beats : Lumberjack 프로토콜을 사용하여 Filebeat 및 기타 Beats 제품군의 데이터를 수신
+http: HTTP/HTTPS를 사용하여 데이터를 수신
+등등..

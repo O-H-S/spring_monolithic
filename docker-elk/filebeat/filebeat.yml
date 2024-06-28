@@ -1,0 +1,19 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/springboot/app.log
+      - /var/log/springboot/app-*.log
+    # 하나의 로그 출력에 스택 트레이스와 같은 메세지가 추가되면, 여러 개의 라인이 발생함. 이에 대한 설정이다.
+    multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} '
+    multiline.negate: true
+    multiline.match: after
+
+fields:
+  environment: dev
+
+# output. 뒤에는 특정 출력 유형의 이름이 와야함. (ex. console, kafka, file, ...)
+output.logstash:
+  hosts: ["logstash:5044"]
+
+

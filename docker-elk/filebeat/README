@@ -1,0 +1,26 @@
+Filebeat가 실제로 내보내는 데이터의 내용은 수집된 로그 데이터와 함께 몇 가지 메타데이터를 포함합니다.
+기본적으로 Filebeat는 각 로그 이벤트를 JSON 형식으로 내보냄.
+  {
+    "@timestamp": "2024-06-08T08:45:32.000Z",
+    "log": {
+      "file": {
+        "path": "/var/log/springboot/app.log"
+      },
+      "offset": 12345
+    },
+    "message": "2024-06-08 08:45:32.123 INFO 12345 --- [main] com.example.MyClass: This is a log message",
+    "input": {
+      "type": "log"
+    },
+    "host": {
+      "name": "myhost"
+    },
+    "agent": {
+      "name": "myhost",
+      "type": "filebeat",
+      "version": "7.17.16"
+    },
+    "ecs": {
+      "version": "1.6.0"
+    }
+  }

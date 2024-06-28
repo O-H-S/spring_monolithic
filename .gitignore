@@ -1,5 +1,5 @@
 .gradle
-docker-elk/elk-compose.yml
+docker-elk/.env
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -10,6 +10,7 @@ build/
 environment/dev.env
 environment/prod.env
 environment/deploy.env
+environment/test.env
 
 ### STS ###
 .apt_generated
