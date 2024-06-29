@@ -4,7 +4,8 @@ import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.CommentPaginationDto;
-import com.ohs.monolithic.board.utils.BoardRepositoryTestHelper;
+import com.ohs.monolithic.utils.RepositoryTestBase;
+import com.ohs.monolithic.utils.RepositoryTestHelper;
 import com.ohs.monolithic.common.configuration.QuerydslConfig;
 import com.ohs.monolithic.account.domain.Account;
 import org.junit.jupiter.api.AfterEach;
@@ -21,20 +22,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@DataJpaTest // 각 테스트 실행 후에 롤백, @Transactional 적용되어 있음.
-@Tag("base")
-@Tag("integrate-limited")
-@Import({QuerydslConfig.class, BoardRepositoryTestHelper.class})
-// @DataJpaTest에서는 직접 BoardRepositoryTestHelper 를 지정해줘야 빈이 로드된다.
-// BoardIntegrationTestHelper는 Service 빈들에 의존하고 있는데, DataJpaTest에서는 Service 빈들을 위한 의존성들을 해결하지 않는다.
-public class CommentRepositoryTest {
+
+public class CommentRepositoryTest extends RepositoryTestBase {
 
   @Autowired
   CommentRepository commentRepository;
 
-
-  @Autowired
-  BoardRepositoryTestHelper helper;
 
   @AfterEach
   void teardown(){

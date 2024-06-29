@@ -5,7 +5,8 @@ import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Comment;
 import com.ohs.monolithic.board.domain.CommentLike;
 import com.ohs.monolithic.board.domain.Post;
-import com.ohs.monolithic.board.utils.BoardRepositoryTestHelper;
+import com.ohs.monolithic.utils.RepositoryTestBase;
+import com.ohs.monolithic.utils.RepositoryTestHelper;
 import com.ohs.monolithic.common.configuration.QuerydslConfig;
 import com.ohs.monolithic.account.domain.Account;
 import groovy.lang.Tuple3;
@@ -22,19 +23,15 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@Tag("base")
-@Tag("integrate-limited")
-@Import({QuerydslConfig.class, BoardRepositoryTestHelper.class})
-public class CommentLikeRepositoryTest {
+
+public class CommentLikeRepositoryTest extends RepositoryTestBase {
 
   @Autowired // datajpatest 어노테이션이 관련 context를 로드하기 때문에 가능하다.
   CommentLikeRepository commentLikeRepository;
 
   @Autowired
   CommentRepository commentRepository;
-  @Autowired
-  BoardRepositoryTestHelper helper;
+
 
 
 

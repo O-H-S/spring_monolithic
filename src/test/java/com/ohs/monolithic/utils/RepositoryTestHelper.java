@@ -1,4 +1,4 @@
-package com.ohs.monolithic.board.utils;
+package com.ohs.monolithic.utils;
 
 
 import com.ohs.monolithic.board.domain.Board;
@@ -31,7 +31,7 @@ import java.util.Random;
 // Service 레이어를 거치지 않고, DB 데이터 자체의 환경을 구현하기 위함.
 @Component
 @Transactional
-public class BoardRepositoryTestHelper {
+public class RepositoryTestHelper {
   @Autowired
   public LocalCredentialRepository localCredentialRepository;
   @Autowired

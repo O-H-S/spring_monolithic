@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles("test")
 public class IntegrationTestBase {
 
-  static final ThreadLocal<Account> accountHolder = new ThreadLocal<>();
 
   @Autowired
   protected MockMvc mockMvc;
