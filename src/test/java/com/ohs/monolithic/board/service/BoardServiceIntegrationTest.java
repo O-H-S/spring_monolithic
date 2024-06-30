@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-public class BoardServiceIntegrationTest extends IntegrationTestBase {
+public class BoardServiceIntegrationTest extends IntegrationTestWithH2 {
 
   @Autowired
   private BoardService boardService;

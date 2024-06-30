@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.controller;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class PostApiControllerIntegrationTest  extends IntegrationTestBase {
+public class PostApiControllerIntegrationTest  extends IntegrationTestWithH2 {
 
    /*================================================================================
 

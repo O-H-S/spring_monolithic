@@ -3,23 +3,24 @@ package com.ohs.monolithic.board.controller;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.ohs.monolithic.SecurityConfigForUnitTest;
+import com.ohs.monolithic.account.service.OAuth2AccountService;
 import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.controller.rest.BoardApiController;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
+import com.ohs.monolithic.board.service.BoardAliasService;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
+
 import com.ohs.monolithic.common.exception.DataNotFoundException;
+import com.ohs.monolithic.utils.ControllerTestBase;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
+
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -35,30 +36,23 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@AutoConfigureRestDocs
+
 @WebMvcTest(BoardApiController.class)
-@EnableMethodSecurity(prePostEnabled = true)
-@Import(SecurityConfigForUnitTest.class)
-//@Import({OAuth2LoginConfig.class, SecurityConfig.class})
-//@ImportAutoConfiguration(exclude = {OAuth2ClientAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})
-@Tag("base")
-@Tag("unit")
-class BoardApiControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+class BoardApiControllerTest extends ControllerTestBase {
 
     @MockBean
     private BoardService bService;
+    @MockBean
+    private BoardAliasService boardAliasService;
 
-    private Gson gson; // json 직렬화,역직렬화
 
 
-
-    @BeforeEach
-    public void init() {
-
-        gson = new Gson();
-
+    @Override
+    public void beforeEach() {
+        when(boardAliasService.tryGetBoardId(anyString())).thenAnswer(invocation -> {
+            String id = invocation.getArgument(0);
+            return Integer.parseInt(id);
+        });
     }
 
 
@@ -213,7 +207,8 @@ class BoardApiControllerTest {
     public void getBoard_0() throws Exception {
         // given, when
 
-        when(bService.getBoardReadOnly(anyInt(), null)).thenThrow(new DataNotFoundException("board", "Not exists"));
+        when(bService.getBoardReadOnly(anyInt(), isNull())).thenThrow(new DataNotFoundException("board", "Not exists"));
+
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -233,7 +228,7 @@ class BoardApiControllerTest {
     public void getBoard_1() throws Exception {
         // given, when
 
-        when(bService.getBoardReadOnly(anyInt(), null)).thenReturn(BoardResponse.fromEntity( BoardTestUtils.createBoardSimple(1, "자유", "자유롭게 작성하시오."), 10L));
+        when(bService.getBoardReadOnly(anyInt(), isNull())).thenReturn(BoardResponse.fromEntity( BoardTestUtils.createBoardSimple(1, "자유", "자유롭게 작성하시오."), 10L));
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders

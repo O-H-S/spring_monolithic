@@ -8,6 +8,7 @@ import com.ohs.monolithic.board.service.CommentService;
 import com.ohs.monolithic.board.service.PostReadService;
 import com.ohs.monolithic.board.service.PostViewService;
 import com.ohs.monolithic.account.service.AccountService;
+import com.ohs.monolithic.utils.ControllerTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -31,14 +32,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(PostViewController.class)
-@EnableMethodSecurity(prePostEnabled = true)
-@Import(SecurityConfigForUnitTest.class)
-@Tag("base")
-@Tag("unit")
-class PostViewControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+class PostViewControllerTest extends ControllerTestBase {
+
+
 
   @MockBean
   private PostReadService postReadService;
@@ -48,12 +45,7 @@ class PostViewControllerTest {
   private AccountService accountService;
   @MockBean
   private CommentService commentService; // legacy
-  private Gson gson; // json 직렬화,역직렬화
 
-  @BeforeEach
-  public void init() {
-    gson = new Gson();
-  }
 
   @Test
   @DisplayName("GET /post/{id} : 미인증 유저도 요청 가능 - 200 ")

@@ -23,7 +23,7 @@ server:
 spring:
   flyway:
     enabled: true
-    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:false} # 최초 적용시에만 true로 설정, 적용 후에는 false로 바꾸기.
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:false} #
     baseline-version: ${FLYWAY_BASELINE_VERSION:1}
     outOfOrder: true # true로 설정하면 Flyway는 버전 순서에 상관없이 아직 적용되지 않은 모든 마이그레이션 파일을 실행합니다. 이는 마이그레이션이 순서대로 적용되지 않아도 모든 마이그레이션이 데이터베이스에 반영되도록 합니다.
     custom:

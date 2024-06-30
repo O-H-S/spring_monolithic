@@ -8,6 +8,7 @@ import com.ohs.monolithic.board.dto.CommentPaginationDto;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class CommentLikeServiceIntegrationTest extends IntegrationTestBase {
+public class CommentLikeServiceIntegrationTest extends IntegrationTestWithH2 {
 
   @Autowired
   private CommentLikeService commentLikeService;

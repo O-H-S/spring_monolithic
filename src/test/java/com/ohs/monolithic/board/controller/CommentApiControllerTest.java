@@ -5,6 +5,7 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.CommentForm;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.domain.Account;
 import org.antlr.v4.runtime.misc.Triple;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CommentApiControllerTest extends IntegrationTestBase {
+public class CommentApiControllerTest extends IntegrationTestWithH2 {
 
   /*================================================================================
 

@@ -61,7 +61,7 @@ public class PostViewController {
 
     void baseModelMapping(Model model, Long id, AppUser viewer, CommentForm commentForm)
     {
-        AccountResponse accountData = accountService.getAccount(viewer.getAccountId(), viewer);
+        AccountResponse accountData = viewer != null ? accountService.getAccount(viewer.getAccountId(), viewer) : null;
         PostDetailResponse response = this.readService.readPost(id, viewer != null? viewer.getAccountId() : null);
         List<CommentPaginationDto> comments = this.commentService.getCommentsAsPage(id, viewer);
 

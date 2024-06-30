@@ -5,6 +5,7 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.utils.IntegrationTestBase;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import org.antlr.v4.runtime.misc.Triple;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class PostWriteServiceIntegrationTest extends IntegrationTestBase {
+public class PostWriteServiceIntegrationTest extends IntegrationTestWithH2 {
 
   @Autowired
   private PostWriteService postWriteService;

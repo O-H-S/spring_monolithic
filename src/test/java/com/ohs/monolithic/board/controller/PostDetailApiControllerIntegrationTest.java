@@ -5,6 +5,7 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.domain.Account;
 import com.ohs.monolithic.utils.WithMockCustomUserContext;
@@ -23,7 +24,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class PostDetailApiControllerIntegrationTest  extends IntegrationTestBase {
+public class PostDetailApiControllerIntegrationTest  extends IntegrationTestWithH2 {
 
    /*================================================================================
 

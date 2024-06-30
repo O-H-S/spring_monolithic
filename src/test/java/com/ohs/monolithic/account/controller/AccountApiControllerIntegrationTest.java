@@ -3,6 +3,7 @@ package com.ohs.monolithic.account.controller;
 import com.ohs.monolithic.account.domain.Account;
 
 import com.ohs.monolithic.utils.IntegrationTestBase;
+import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AccountApiControllerIntegrationTest  extends IntegrationTestBase {
+public class AccountApiControllerIntegrationTest  extends IntegrationTestWithH2 {
 
   /*================================================================================
 

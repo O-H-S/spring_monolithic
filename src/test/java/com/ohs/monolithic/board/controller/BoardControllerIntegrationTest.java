@@ -6,7 +6,8 @@ import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.dto.BoardCreationForm;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.service.BoardService;
-import com.ohs.monolithic.utils.IntegrationTestBase;
+
+import com.ohs.monolithic.utils.IntegrationTestWithMySQL;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-public class BoardControllerIntegrationTest extends IntegrationTestBase {
+public class BoardControllerIntegrationTest extends IntegrationTestWithMySQL {
 
     @Autowired
     private BoardService boardService;

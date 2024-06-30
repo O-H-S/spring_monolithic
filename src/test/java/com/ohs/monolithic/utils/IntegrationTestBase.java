@@ -21,9 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @Tag("base")
 @Tag("integrate")
-@ActiveProfiles("test")
-public class IntegrationTestBase {
-
+public abstract class IntegrationTestBase {
+  abstract protected String getDatabaseType(); //
 
   @Autowired
   protected MockMvc mockMvc;

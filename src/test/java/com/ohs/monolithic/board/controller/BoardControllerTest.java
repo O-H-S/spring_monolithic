@@ -4,6 +4,7 @@ import com.nimbusds.jose.shaded.gson.Gson;
 import com.ohs.monolithic.board.controller.mvc.BoardController;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostPaginationService;
+import com.ohs.monolithic.utils.ControllerTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -26,35 +27,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 //@ExtendWith(MockitoExtension.class)
 
-@AutoConfigureRestDocs
+
 @WebMvcTest(BoardController.class)
-@EnableMethodSecurity(prePostEnabled = true)
-@Tag("base")
-@Tag("unit")
-public class BoardControllerTest {
+public class BoardControllerTest  extends ControllerTestBase {
 
-
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private BoardService bService;
     @MockBean
     private PostPaginationService postPaginationService;
-
-
-    private Gson gson; // json 직렬화,역직렬화
-
-    @BeforeEach
-    public void init() {
-        gson = new Gson();
-        /*mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();*/
-
-    }
 
 
     /*================================================================================

@@ -6,6 +6,7 @@ import com.ohs.monolithic.board.controller.rest.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
 import com.ohs.monolithic.board.service.*;
 import com.ohs.monolithic.common.exception.DataNotFoundException;
+import com.ohs.monolithic.utils.ControllerTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
 import com.ohs.monolithic.account.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,16 +37,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureRestDocs
 @WebMvcTest(PostApiController.class)
-@EnableMethodSecurity(prePostEnabled = true)
-@Import(SecurityConfigForUnitTest.class)
-@Tag("base")
-@Tag("unit")
-public class PostApiControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class PostApiControllerTest extends ControllerTestBase {
 
     @MockBean
     private AccountService accountService;
@@ -62,15 +55,8 @@ public class PostApiControllerTest {
     private PostPaginationService postPaginationService;
 
 
-    private Gson gson; // json 직렬화,역직렬화
 
     private String url;
-    @BeforeEach
-    public void init() {
-        gson = new Gson();
-
-        url="/api/posts/1/bulk";
-    }
 
 
     /*================================================================================
