@@ -25,7 +25,7 @@ public class PostApiController {
   final private PostWriteService writeService;
   final private BoardAliasService boardAliasService;
   final private PostPaginationService postPaginationService;
-  final private PostTagService postTagService;
+
 
 
 

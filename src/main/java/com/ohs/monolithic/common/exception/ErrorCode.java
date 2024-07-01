@@ -8,6 +8,7 @@ public enum ErrorCode {
   // Common
   INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", " Invalid Input Value"),
   METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "C002", " Invalid Input Value"),
+  REQUEST_REQUIRED_BODY(HttpStatus.BAD_REQUEST, "C003", " Required request body is missing"),
   HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "C006", "Access is Denied"),
   ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "Entity Not Found"),
 

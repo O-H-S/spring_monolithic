@@ -9,6 +9,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,7 +45,12 @@ public class GlobalExceptionHandler {
         throw e;
     }
 
-
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_REQUIRED_BODY);
+        response.setMessage(e.getMessage());
+        return new ResponseEntity<>(response, ErrorCode.REQUEST_REQUIRED_BODY.getStatus());
+    }
 
 
 

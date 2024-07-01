@@ -40,16 +40,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(PostApiController.class)
 public class PostApiControllerTest extends ControllerTestBase {
 
-    @MockBean
-    private AccountService accountService;
-    @MockBean
-    private PostLikeService postLikeService;
+
     @MockBean
     private PostWriteService writeService;
-    @MockBean
-    private PostReadService readService;
+
     @MockBean
     private BoardService boardService;
+
+    @MockBean
+    private BoardAliasService boardAliasService;
 
     @MockBean
     private PostPaginationService postPaginationService;
@@ -65,8 +64,8 @@ public class PostApiControllerTest extends ControllerTestBase {
 
 
     @Test
-    @DisplayName("POST /api/{board}/posts/bulk : form 누락이면 실패 - 403 ")
-    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    @DisplayName("POST /api/{board}/posts/bulk : form 누락이면 실패 - 400 ")
+    @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_실패_form누락() throws Exception {
 
         // given, when
@@ -87,7 +86,7 @@ public class PostApiControllerTest extends ControllerTestBase {
 
     @Test
     @DisplayName("POST /api/{board}/posts/bulk : 어드민이 아니면 실패 - 403 ")
-    @WithMockUser(username = "hyeonsu", authorities = "USER")
+    @WithMockCustomUser(username = "hyeonsu", authorities = "USER")
     public void bulkInsert_실패_어드민아님() throws Exception {
 
         // given, when
@@ -114,8 +113,8 @@ public class PostApiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    @DisplayName("POST /api/{board}/posts/bulk  : form 검증 실패 - 422 ")
-    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    @DisplayName("POST /api/{board}/posts/bulk  : form 검증 실패 - 400 ")
+    @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_실패_FORM() throws Exception {
 
         // given, when
@@ -135,7 +134,7 @@ public class PostApiControllerTest extends ControllerTestBase {
         ).andDo(print());
 
         // then
-        result.andExpect(status().isUnprocessableEntity());
+        result.andExpect(status().isBadRequest());
         result.andDo(document("posts/{board}/bulk-failed-notverified",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
@@ -143,7 +142,7 @@ public class PostApiControllerTest extends ControllerTestBase {
 
     @Test
     @DisplayName("POST /api/{board}/posts/bulk  : 게시판이 존재하지 않으면 실패- 404 ")
-    @WithMockUser(username = "hyeonsu", authorities = "ADMIN")
+    @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_실패_게시판없음() throws Exception {
 
         // given, when
