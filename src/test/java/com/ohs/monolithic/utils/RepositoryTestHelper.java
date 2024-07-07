@@ -17,15 +17,22 @@ import com.ohs.monolithic.account.domain.UserRole;
 
 import com.ohs.monolithic.account.repository.LocalCredentialRepository;
 import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
+import com.ohs.monolithic.problem.domain.Problem;
+import com.ohs.monolithic.problem.dto.ProblemPaginationDto;
+import com.ohs.monolithic.problem.dto.ProblemPaginationResponse;
+import com.ohs.monolithic.problem.repository.ProblemRepository;
 import groovy.lang.Tuple;
 import groovy.lang.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 // Service 레이어를 거치지 않고, DB 데이터 자체의 환경을 구현하기 위함.
@@ -49,18 +56,22 @@ public class RepositoryTestHelper {
   public PostRepository postRepository;
   @Autowired
   public CommentLikeRepository commentLikeRepository;
+  @Autowired
+  public ProblemRepository problemRepository;
 
 
   int dummyMemberCount;
   int dummyBoardCount;
   int dummyPostCount;
   int dummyCommentCount;
+  int dummyProblemCount;
 
   public void resetCounts() {
     dummyMemberCount = 0;
     dummyBoardCount = 0;
     dummyPostCount = 0;
     dummyCommentCount = 0;
+    dummyProblemCount = 0;
   }
 
   public Tuple3<Post, Account, Board> createPostAccountBoard(){
@@ -107,6 +118,20 @@ public class RepositoryTestHelper {
     return newBoard;
   }
 
+  public Problem establishProblem(String platform, String title){
+    dummyProblemCount += 1;
+    Problem newProblem = Problem.builder()
+                    .platform(platform)
+                            .title(title)
+                                    .platformId(String.valueOf(dummyProblemCount))
+            .version(0)
+            .foundDate(LocalDateTime.now())
+            .link("https://test.com")
+            .build();
+    problemRepository.save(newProblem);
+    return newProblem;
+  }
+
 
   public Post writePostTo(Board targetBoard, Account author) {
     dummyPostCount += 1;
@@ -150,10 +175,6 @@ public class RepositoryTestHelper {
     return newCommentLike;
   }
 
-  public List<Post> writePostsTo(Board targetBoard) {
-    return null;
-  }
-
   public List<Comment> writeCommentsTo(Post targetPost, List<Account> authors, Integer count) {
     List<Comment> comments = new ArrayList<>();
     Random random = new Random();
@@ -163,6 +184,12 @@ public class RepositoryTestHelper {
       comments.add(newComment);
     }
     return comments;
+  }
+
+  public void assertProblemDto(Problem source, ProblemPaginationDto target){
+    assertThat(source.getTitle()).isEqualTo(target.getTitle());
+    assertThat(source.getLevel()).isEqualTo(target.getLevel());
+    //assertThat(source.get)
   }
 
 

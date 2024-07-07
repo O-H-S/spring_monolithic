@@ -14,15 +14,21 @@ import com.ohs.monolithic.account.repository.AccountRepository;
 import com.ohs.monolithic.account.repository.LocalCredentialRepository;
 import com.ohs.monolithic.account.repository.OAuth2CredentialRepository;
 import com.ohs.monolithic.account.service.AccountService;
+import com.ohs.monolithic.problem.domain.Problem;
+import com.ohs.monolithic.problem.repository.ProblemRepository;
+import com.ohs.monolithic.problem.service.ProblemService;
 import org.antlr.v4.runtime.misc.Triple;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @Component
 public class IntegrationTestHelper {
@@ -50,6 +56,9 @@ public class IntegrationTestHelper {
   @Autowired
   public CommentLikeService commentLikeService;
 
+  @Autowired
+  public ProblemService problemService;
+
   // repos
   @Autowired
   CommentLikeRepository commentLikeRepository;
@@ -73,6 +82,8 @@ public class IntegrationTestHelper {
   PostViewRepository postViewRepository;
   @Autowired
   PostLikeRepository postLikeRepository;
+  @Autowired
+  ProblemRepository problemRepository;
 
   /*RedisTemplate<String, String>의 편의성 버전입니다.
   키와 값 모두 자동으로 String으로 처리되도록 사전 설정되어 있습니다.*/
@@ -153,6 +164,35 @@ public class IntegrationTestHelper {
 
     return posts;
   }
+  public List<Problem> simpleProblem(String platform, String title, Integer count){
+
+    return simpleProblem(platform, title, null, null,null,count);
+  }
+  public List<Problem> simpleProblem(String platform, String title, String difficulty, Float level, Consumer<Problem> customizer, Integer count){
+    List<Problem> problems = new ArrayList<>();
+    Random random = new Random();
+    for (int i = 0; i < count; i++) {
+      int randomValue = random.nextInt();
+      Problem newProblem = Problem.builder()
+              .platform(platform)
+              .title(title + i)
+              .platformId(String.valueOf(randomValue))
+              .version(0)
+              .difficulty(difficulty != null? difficulty : String.valueOf(random.nextInt(100)))
+              //.difficulty(String.valueOf(random.nextInt(100)))
+              .level(level != null ? level : random.nextFloat(5.0f))
+              .foundDate(LocalDateTime.now())
+              .link("https://test.com")
+              .build();
+
+      if(customizer != null)
+        customizer.accept(newProblem);
+
+      problemRepository.save(newProblem);
+      problems.add(newProblem);
+    }
+    return problems;
+  }
 
 
   //public List<Account> InitDummy_WriteComment(Post targetPost, Integer c)
@@ -172,6 +212,8 @@ public class IntegrationTestHelper {
 
     // 외래키 제약으로 인해, delete의 순서가 중요하다. (에러 발생함)
     // TODO : trancate 명령어 사용하기.
+    problemRepository.deleteAll();
+
     postLikeRepository.deleteAll();
     postViewRepository.deleteAll();
     commentLikeRepository.deleteAll();

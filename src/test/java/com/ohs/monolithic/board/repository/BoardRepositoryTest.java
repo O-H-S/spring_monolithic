@@ -7,6 +7,7 @@ import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
 import com.ohs.monolithic.utils.RepositoryTestBase;
+import com.ohs.monolithic.utils.RepositoryTestWithH2;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 
-class BoardRepositoryTest extends RepositoryTestBase {
+class BoardRepositoryTest extends RepositoryTestWithH2 {
 
     @Autowired // datajpatest 어노테이션이 관련 context를 로드하기 때문에 가능하다.
     BoardRepository boardRepository;

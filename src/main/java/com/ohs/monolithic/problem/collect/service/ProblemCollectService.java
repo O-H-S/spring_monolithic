@@ -9,6 +9,7 @@ import com.ohs.monolithic.problem.collect.dto.ProblemDto;
 import com.ohs.monolithic.problem.collect.repository.CollectProgressRepository;
 import com.ohs.monolithic.problem.domain.Problem;
 import com.ohs.monolithic.problem.repository.ProblemRepository;
+import com.ohs.monolithic.problem.service.ProblemLevelService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class ProblemCollectService {
   final CollectProgressRepository collectProgressRepository;
   final ProblemRepository problemRepository;
-
+  final ProblemLevelService problemLevelService;
   @Transactional(readOnly = true)
   public CollectProgressResponse getProgress(AppUser user, String target, int version) {
     if(!user.isAdmin()){
@@ -69,7 +70,7 @@ public class ProblemCollectService {
       ids.add(dto.getPlatformId());
     }
 
-    // problemRepository.bulkInsert 의 동작은 기존에 데이터가 존재할 시, 덮어씌우기 때문에, 기존 데이터 필드의 유지를 위해 로드하여 재가공한다.
+    // problemRepository.bulkInsert 의 동작은 기존에 데이터가 존재할 시 덮어씌우기 때문에, 기존 데이터 필드의 유지를 위해 로드하여 재가공한다.
     List<Problem> existingProblems = problemRepository.findProblemsWithLock(platforms, ids);
     Map<Pair<String, String>, Problem> temp = new HashMap<>(); // 효율적으로 처리하기 위함.
     for(Problem p : existingProblems){
@@ -84,6 +85,7 @@ public class ProblemCollectService {
       String newTitle = dto.getTitle() != null ? dto.getTitle() : oldProblem != null ? oldProblem.getTitle() : null;
 
       String newDifficulty = dto.getDifficulty() != null ? dto.getDifficulty() : oldProblem != null ? oldProblem.getDifficulty() : null;
+      Float newLevel = problemLevelService.getLevel(dto.getPlatform(), newDifficulty);
 
       String newLink = dto.getLink() != null ? dto.getLink() : oldProblem != null ? oldProblem.getLink() : "";
 
@@ -94,6 +96,7 @@ public class ProblemCollectService {
               .platformId(dto.getPlatformId())
               .title(newTitle)
               .difficulty(newDifficulty)
+              .level(newLevel)
               .link(newLink)
               .foundDate(newFoundDate)
               .postCount(oldProblem != null ?oldProblem.getPostCount() : 0)

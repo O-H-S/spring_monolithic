@@ -8,6 +8,7 @@ import com.ohs.monolithic.utils.RepositoryTestBase;
 import com.ohs.monolithic.utils.RepositoryTestHelper;
 import com.ohs.monolithic.common.configuration.QuerydslConfig;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.utils.RepositoryTestWithH2;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 
-public class CommentRepositoryTest extends RepositoryTestBase {
+public class CommentRepositoryTest extends RepositoryTestWithH2 {
 
   @Autowired
   CommentRepository commentRepository;

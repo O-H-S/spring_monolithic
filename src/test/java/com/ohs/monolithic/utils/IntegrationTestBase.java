@@ -46,13 +46,13 @@ public abstract class IntegrationTestBase {
   }
 
 
+  // MockSercurityContext에 맞춰, 테스트 DB에 Account를 생성하는 메서드.
   public Account initSecurityUserAccount() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     if (authentication != null && authentication.getPrincipal() instanceof LocalAppUser) {
       LocalAppUser localAppUser = (LocalAppUser) authentication.getPrincipal();
-      //helper.accountRepository.
-      //helper.accountRepository.save(localAppUser.getAccount());
+
       Account newAccount = helper.accountService.createAsLocal(localAppUser.getNickname(), WithMockCustomUserContext.getAccount().getEmail(), localAppUser.getUsername(), localAppUser.getPassword());
 
       helper.localAccountService.reload(null);

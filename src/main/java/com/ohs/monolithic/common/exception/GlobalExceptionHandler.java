@@ -69,16 +69,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)// 400 Bad Request 상태 코드 반환
-    public ResponseEntity<String> handleIncorrectParams(IllegalArgumentException e, HttpServletRequest request) {
-        // 현재 요청의 정보 얻기
-        String requestURL = request.getRequestURL().toString();
-        String method = request.getMethod();
+    public ResponseEntity<ErrorResponse> handleIncorrectParams(IllegalArgumentException e, HttpServletRequest request) {
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_PARAM_VALUE);
+        response.setMessage(e.getMessage());
+        return new ResponseEntity<>(response, ErrorCode.INVALID_PARAM_VALUE.getStatus());
+    }
 
-        // 에러 메시지 생성
-        String errorMessage = String.format("Error in request %s %s: %s", method, requestURL, e.getMessage());
-
-        // 적절한 에러 처리 로직
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)// 400 Bad Request 상태 코드 반환
+    public ResponseEntity<ErrorResponse> handleIncorrectParams2(jakarta.validation.ConstraintViolationException e, HttpServletRequest request) {
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_PARAM_VALUE);
+        response.setMessage(e.getMessage());
+        return new ResponseEntity<>(response, ErrorCode.INVALID_PARAM_VALUE.getStatus());
     }
 
     /*@ExceptionHandler(MethodArgumentNotValidException.class)

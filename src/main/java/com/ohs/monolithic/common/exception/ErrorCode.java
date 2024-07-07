@@ -11,6 +11,7 @@ public enum ErrorCode {
   REQUEST_REQUIRED_BODY(HttpStatus.BAD_REQUEST, "C003", " Required request body is missing"),
   HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "C006", "Access is Denied"),
   ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "Entity Not Found"),
+  INVALID_PARAM_VALUE(HttpStatus.BAD_REQUEST, "C005", " Invalid Param Value"),
 
   //DATA_INTEGRITY_VIOLATION(HttpStatus.BAD_REQUEST, "C050", "DB : 제약조건 위반"),
 

@@ -19,6 +19,7 @@ public class ProblemPaginationDto {
   String platform;
   String title;
   String difficulty;
+  Float level;
   String link;
   LocalDateTime foundDate;
   Integer postCount;
@@ -29,6 +30,7 @@ public class ProblemPaginationDto {
                               String platform,
                               String title,
                               String difficulty,
+                              Float level,
                               String link,
                               Integer postCount,
                               LocalDateTime foundDate,
@@ -38,6 +40,7 @@ public class ProblemPaginationDto {
     this.title = title;
     this.difficulty = difficulty;
     this.link = link;
+    this.level = level;
     this.postCount = postCount;
     this.foundDate = foundDate;
     this.bookmarkType = bookmarkType;
@@ -50,6 +53,7 @@ public class ProblemPaginationDto {
       origin.getPlatform(),
       origin.getTitle(),
       origin.getDifficulty(),
+      origin.getLevel(),
       origin.getLink(),
       origin.getPostCount(),
       origin.getFoundDate(),

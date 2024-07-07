@@ -12,8 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 @Tag("base")
 @Tag("integrate-limited")
 @Import({QuerydslConfig.class, RepositoryTestHelper.class})
-@ActiveProfiles("repositorytest")
-public class RepositoryTestBase {
+public abstract class RepositoryTestBase {
+
+  abstract protected String getDatabaseType(); //
 
   @Autowired
   protected RepositoryTestHelper helper;

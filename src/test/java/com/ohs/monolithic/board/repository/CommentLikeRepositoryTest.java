@@ -9,6 +9,7 @@ import com.ohs.monolithic.utils.RepositoryTestBase;
 import com.ohs.monolithic.utils.RepositoryTestHelper;
 import com.ohs.monolithic.common.configuration.QuerydslConfig;
 import com.ohs.monolithic.account.domain.Account;
+import com.ohs.monolithic.utils.RepositoryTestWithH2;
 import groovy.lang.Tuple3;
 
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class CommentLikeRepositoryTest extends RepositoryTestBase {
+public class CommentLikeRepositoryTest extends RepositoryTestWithH2 {
 
   @Autowired // datajpatest 어노테이션이 관련 context를 로드하기 때문에 가능하다.
   CommentLikeRepository commentLikeRepository;

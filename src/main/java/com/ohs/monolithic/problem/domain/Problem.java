@@ -44,7 +44,11 @@ public class Problem {
 
   @Setter
   @Column(length = 64, nullable = true)
-  private String difficulty;
+  private String difficulty; // 플랫폼에서의 난이도
+
+  @Setter
+  @Column(nullable = true)
+  private Float level; // 정규화된 난이도. 배치 작업을 통해 업데이트될 예정.
 
   @Setter
   @Column(length = 255, nullable = false)
@@ -65,7 +69,7 @@ public class Problem {
 
 
   @Builder
-  public Problem(String platform, String platformId, String title, String difficulty, String link, LocalDateTime foundDate, Integer postCount,Integer version){
+  public Problem(String platform, String platformId, String title, String difficulty, Float level, String link, LocalDateTime foundDate, Integer postCount,Integer version){
 
     if (foundDate == null)
       foundDate = LocalDateTime.now();
@@ -76,6 +80,7 @@ public class Problem {
     this.platformId = platformId;
     this.title = title;
     this.difficulty = difficulty;
+    this.level = level;
     this.link = link;
     this.foundDate = foundDate;
     this.collectorVersion = version;

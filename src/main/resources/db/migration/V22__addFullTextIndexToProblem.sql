@@ -1,0 +1,1 @@
+ALTER TABLE problem ADD FULLTEXT INDEX fulltext_idx_problem(title) WITH PARSER ngram;

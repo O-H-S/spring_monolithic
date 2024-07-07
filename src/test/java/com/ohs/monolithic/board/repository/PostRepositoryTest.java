@@ -3,6 +3,7 @@ package com.ohs.monolithic.board.repository;
 
 import com.ohs.monolithic.common.configuration.QuerydslConfig;
 import com.ohs.monolithic.utils.RepositoryTestBase;
+import com.ohs.monolithic.utils.RepositoryTestWithH2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class PostRepositoryTest extends RepositoryTestBase {
+public class PostRepositoryTest extends RepositoryTestWithH2 {
 
     @Autowired // datajpatest 어노테이션이 관련 context를 로드하기 때문에 가능하다.
     PostRepository postRepository;
