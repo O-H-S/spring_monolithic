@@ -13,6 +13,11 @@ spring:
   datasource:
     driver-class-name: org.h2.Driver
 
+  # h2를 사용할 때는, data.sql을 실행하지 않도록하기
+  sql:
+    init:
+      mode: never
+
   jpa:
     show-sql: true
     #generate-ddl: true

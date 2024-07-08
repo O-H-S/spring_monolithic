@@ -1,10 +1,10 @@
 package com.ohs.monolithic.board.service;
 
 import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
-import com.ohs.monolithic.board.domain.Post;
+
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.utils.IntegrationTestBase;
+
 import com.ohs.monolithic.utils.IntegrationTestWithH2;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,7 +67,7 @@ public class PostPaginationServiceIntegrationTest extends IntegrationTestWithH2 
   @MethodSource("parameters_getPostListAsPage")
   @DisplayName("getPostListAsPage(boardId, page, count)")
   public void getPostListAsPage(TestParams testParams){
-    Integer boardId = helper.boardService.createBoard("", "", testParams.paginationType).getId(); // dummy board 생성
+    Integer boardId = helper.simpleBoard(testParams.paginationType).getId(); // dummy board 생성
     List<PostDetailResponse> posts = helper.simplePost(boardId, null, testParams.totalPosts); // dummy posts 생성
 
     // 예외 발생을 기대할 때

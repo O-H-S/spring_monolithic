@@ -4,6 +4,7 @@ package com.ohs.monolithic.utils;
 import com.ohs.monolithic.account.domain.UserRole;
 import com.ohs.monolithic.account.service.LocalAccountService;
 import com.ohs.monolithic.auth.domain.LocalAppUser;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
@@ -122,11 +123,15 @@ public class IntegrationTestHelper {
   }
 
 
-  public BoardResponse simpleBoard(){
+  public BoardResponse simpleBoard()
+  {
+    return simpleBoard(null);
+  }
+  public BoardResponse simpleBoard(BoardPaginationType paginationType){
     Random random = new Random();
     int randomValue = random.nextInt();
 
-    BoardResponse newBoard = boardService.createBoard("dummyBoard" + randomValue,"");
+    BoardResponse newBoard = boardService.createBoard("dummyBoard" + randomValue,"", paginationType);
     boardPermissionService.addWritePermission(newBoard.getId(), UserRole.USER, "*");
     return newBoard;
   }
