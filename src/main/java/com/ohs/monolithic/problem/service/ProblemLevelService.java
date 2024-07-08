@@ -59,7 +59,7 @@ public class ProblemLevelService {
 
   public Float getLevel(String platform, String difficulty){
     Map<String, Float> platformMap = levelTable.get(platform);
-    if (platformMap != null) {
+    if (platformMap != null && difficulty != null) {
       return platformMap.get(difficulty);
     }
     return null;
