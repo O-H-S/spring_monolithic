@@ -3,21 +3,20 @@
 > **Spring Boot** 학습 목적의 개인 프로젝트입니다.
 >
 > 
-> 기본적인 게시판 기능이 메인 서비스로, 대용량/대규모 트래픽의 시나리오에서 올바르게 동작할 수 있도록 구현하는 것이 최종 목표입니다. 비록 개인의 소규모 프로젝트이긴 하지만, 협업과 장기적인 유지보수를 가정하여 문서화와 리팩토링에 소홀히 하지 않고 있습니다.
-> 
-> (*) 이 프로젝트는 "점프 투 프로젝트(https://wikidocs.net/book/7601)" 을 따라하는 것부터 시작하여, 제가 개인적으로 학습한 백엔드 관련 지식들과 접목하여 개선 시키는 방향으로 진행하고 있습니다.
->
-> `[Before]` 참고한 자료의 결과물 : https://sbb.pybo.kr/  
-> `[ After]` 개선한 결과물(현재 프로젝트) : https://www.ohs.kr/
->
->
+> 여러 알고리즘 문제 사이트를 크롤링하여 최신 문제를 한 곳에서 확인할 수 있습니다.  
+> 또한, 키워드와 검색 옵션을 통해 다양한 방식으로 문제들을 탐색할 수 있습니다.  
+> 커뮤니티 기능을 제공하여 문제에 대해 토론할 수 있고, 북마크 기능을 통해 개인의 문제 진행도를 기록할 수 있습니다.
+
 ---
+|                                                           메인                                                           |                                                         소셜 로그인                                                         |                                                          커뮤니티                                                          |
+|:----------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------:|
+| ![화면 캡처 2024-07-28 035604.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20035604.png) | ![화면 캡처 2024-07-28 035622.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20035622.png) | ![화면 캡처 2024-07-28 035647.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20035647.png) |
+|                                                        게시글 리스트                                                         |                                                         상세 검색                                                          |                                                         북마크 설정                                                         |
+| ![화면 캡처 2024-07-28 035705.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20035705.png) | ![화면 캡처 2024-07-28 035757.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20035757.png) | ![화면 캡처 2024-07-28 035934.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20035934.png) |
+|                                                         프로필 수정                                                         |                                                         게시물 작성                                                         |                
+| ![화면 캡처 2024-07-28 040217.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20040217.png) | ![화면 캡처 2024-07-28 040643.png](documents%2Fimages%2F%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-07-28%20040643.png) |
 
 
-* `index` 페이지
-  ![indexPage.png](documents%2Fimages%2FindexPage.png)
-* `post list` 페이지
-  ![postListPage.png](documents%2Fimages%2FpostListPage.png)
 
 ## 프로젝트 환경 / 구조
 
@@ -25,68 +24,24 @@
 
 ![test_architecture.png](documents%2Fimages%2Ftest_architecture.png)
 
-### Deployment & Production
 
+### Deployment
+![deploy_architecture.png](documents%2Fimages%2Fdeploy_architecture.png)
+
+### Production & Monitoring
 ![prod_architecture.png](documents%2Fimages%2Fprod_architecture.png)
 
-### Stack
 
-`IntelliJ 2023.2` `Java17` `Gradle 8.2.1` `SpringBoot 3.1.3` `SpringDataJPA` `Hibernate`
-
-* test : (local)`org.h2.Driver`--- (in-memory) `H2`
-* dev : (local)`mysql-connector-j` --- (localhost:3306)`MySQL 8.0.34` `InnoDB`
-* prod : (aws ec2)`mysql-connector-j` --- (aws rds)`MySQL 8.0.34` `InnoDB`
-
-`SpringSecurity` `OAuth2.0`
-`Thymeleaf` `Bootstrap`
 
 ## Design
 
-### Use case diagram
-
-![UsecaseDiagram_overall.png](documents%2Fimages%2FUsecaseDiagram_overall.png)
 
 ### ERD
 
 ![ERD.png](documents%2Fimages%2FERD.png)
-
+<!--
 ### [REST Docs(클릭하여 이동)](https://www.ohs.kr/docs/index.html)
 
 ![restdocs_intro.png](documents%2Fimages%2Frestdocs_intro.png)
+-->
 
-## Features
-
-<details>
-  <summary>인증</summary>
-사용자는 비밀번호를 입력하여 서버에 직접 계정을 생성하거나, 카카오 계정으로 인증할 수 있습니다.
-</details>
-
-<details>  
-  <summary>Web UI 관리자 기능 </summary>
-
-[상세 페이지](documents%2Fadmin%2Fintroduction.md)
-
-어드민은 브라우저를 통해 인증하여 서버를 관리할 수 있습니다.
-
-</details>
-
-<details>
-  <summary>게시판(Board)</summary>
-
-</details>
-
-## 개발 노트
-
-* 대량의 게시글 Pagiantion 최적화
-* 게시글, 댓글 추천 기능의 동시성 고려
-* 대규모 데이터 Insert 성능 향상(+비동기 처리)
-* @Tag를 통한 테스트 코드 분류
-* N+1 문제 개선하기
-
-## 주석
-
-### Remote repository에서 제외된 파일
-
-> 보안에 민감한 일부 파일들은 gitignore에 설정되어 별도로 관리됩니다.
-> (연동 서버 정보, DB 계정, 빌드 파일 등등...)
-> 자세한 내용은 [IgnoredFiles.md](documents%2FIgnoredFiles.md) 에서 확인하실 수 있습니다.
