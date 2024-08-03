@@ -69,7 +69,7 @@ public class BoardController {
     @IncludeExecutionTime
     @GetMapping(value = "/{id}", params = "page")
     public String showBoardAsPage(Model model , @PathVariable("id") Integer id, @RequestParam(value="page", defaultValue="0") int page){
-        Board curBoard = this.bService.getBoard(id);
+        BoardResponse curBoard = this.bService.getBoardReadOnly(id,null);
         model.addAttribute("title", curBoard.getTitle());
         model.addAttribute("desc", curBoard.getDescription());
         model.addAttribute("board", id);
@@ -89,7 +89,8 @@ public class BoardController {
     @IncludeExecutionTime
     @GetMapping(value = "/{id}", params = "lastPostId")
     public String showBoardAsScroll(Model model , @PathVariable("id") Integer id, @RequestParam(value="lastPostId") Long lastId){
-        Board curBoard = this.bService.getBoard(id);
+        BoardResponse curBoard = this.bService.getBoardReadOnly(id,null);
+
         model.addAttribute("title", curBoard.getTitle());
         model.addAttribute("desc", curBoard.getDescription());
         model.addAttribute("board", id);
@@ -108,15 +109,16 @@ public class BoardController {
 
 
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    /*@PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/title")
     public String titleChange(@AuthenticationPrincipal UserDetails user, @PathVariable("id") Integer id, @RequestParam String boardTitle){
 
-        Board target = bService.getBoard(id);
+        BoardResponse target = this.bService.getBoardReadOnly(id,null);
+        bService.up
         target.setTitle(boardTitle);
         bService.save(target);
 
         return "redirect:/";
-    }
+    }*/
 
 }

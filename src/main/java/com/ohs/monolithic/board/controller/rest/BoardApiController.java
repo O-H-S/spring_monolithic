@@ -38,11 +38,11 @@ public class BoardApiController {
   }
 
 
-  @PreAuthorize("hasAuthority('ADMIN')")
-  @PutMapping("/{id}")
-  public ResponseEntity<BoardResponse> updateBoard(@PathVariable("id") String id, @Valid @ModelAttribute BoardCreationForm form) {
 
-    BoardResponse result = boardService.updateBoard(boardAliasService.tryGetBoardId(id), form);
+  @PutMapping("/{id}")
+  public ResponseEntity<BoardResponse> updateBoard(@AuthenticationPrincipal AppUser user, @PathVariable("id") String id, @Valid @ModelAttribute BoardCreationForm form) {
+
+    BoardResponse result = boardService.updateBoard(boardAliasService.tryGetBoardId(id), form, user);
     return ResponseEntity.ok(result);
   }
 
@@ -64,13 +64,12 @@ public class BoardApiController {
     return ResponseEntity.ok(target);
   }
 
-  @PreAuthorize("hasAuthority('ADMIN')")
   @DeleteMapping("/{id}")
-  public ResponseEntity<BoardResponse> deleteBoard(@PathVariable("id") String id) {
+  public ResponseEntity<BoardResponse> deleteBoard(@AuthenticationPrincipal AppUser user, @PathVariable("id") String id) {
     Integer id_int = boardAliasService.tryGetBoardId(id);
     BoardResponse target = BoardResponse.builder()
             .id(id_int).build();
-    boardService.deleteBoard(id_int);
+    boardService.deleteBoard(id_int, user);
     return ResponseEntity.ok(target);
   }
 

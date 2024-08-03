@@ -6,6 +6,7 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.repository.PostRepository;
+import com.ohs.monolithic.board.service.BoardInternalService;
 import com.ohs.monolithic.board.service.BoardService;
 import com.ohs.monolithic.board.service.PostWriteService;
 import com.ohs.monolithic.board.service.PostReadService;
@@ -35,6 +36,8 @@ public class PostCountCacheUpdateTest {
 
     @Autowired
     private BoardService boardService;
+    @Autowired
+    private BoardInternalService boardInternalService;
 
     @Test
     @DisplayName("비동기적 Post 생성 후, Cache 값과 실제 데이터베이스의 Post 레코드 수가 일치해야한다.")
@@ -73,7 +76,7 @@ public class PostCountCacheUpdateTest {
             throw new RuntimeException("테스트 실행 시간 초과");
         }
 
-        System.out.println(boardService.getPostCount(board.getId()));
+        System.out.println(boardInternalService.getPostCount(board.getId()));
         System.out.println(postReadService.calculateCount(board.getId()));
 
         // 10개의 쓰레드가 비동기적으로 각각 N개의 Post를 board에 create하고

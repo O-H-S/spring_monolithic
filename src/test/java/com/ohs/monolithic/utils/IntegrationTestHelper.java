@@ -34,6 +34,8 @@ import java.util.function.Consumer;
 @Component
 public class IntegrationTestHelper {
   @Autowired
+  public BoardInternalService boardInternalService;
+  @Autowired
   public BoardService boardService;
   @Autowired
   public AccountService accountService;
@@ -50,6 +52,8 @@ public class IntegrationTestHelper {
 
   @Autowired
   public PostLikeService postLikeService;
+  @Autowired
+  public PostTagService postTagService;
 
 
   @Autowired
@@ -83,6 +87,10 @@ public class IntegrationTestHelper {
   PostViewRepository postViewRepository;
   @Autowired
   PostLikeRepository postLikeRepository;
+
+  @Autowired
+  PostTagRepository postTagRepository;
+
   @Autowired
   ProblemRepository problemRepository;
 
@@ -204,7 +212,7 @@ public class IntegrationTestHelper {
 
   public void release(){
     System.out.println("---------------helper.release-------------");
-    boardService.registerPostCountCache(new ConcurrentHashMap<Integer, Long>());
+
 
     // 로컬 레디스 정리.
     Set<String> keys = stringRedisTemplate.keys("*");
@@ -219,6 +227,7 @@ public class IntegrationTestHelper {
     // TODO : trancate 명령어 사용하기.
     problemRepository.deleteAll();
 
+    postTagRepository.deleteAll();
     postLikeRepository.deleteAll();
     postViewRepository.deleteAll();
     commentLikeRepository.deleteAll();

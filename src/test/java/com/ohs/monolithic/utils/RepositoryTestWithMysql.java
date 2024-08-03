@@ -16,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@ActiveProfiles("testwithmysql")
+
 //@Import(FlywayConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // @DataJpaTest의 인메모리 데이터베이스 기본 동작을 제어함.
+@ActiveProfiles("testwithmysql")
 @Sql(scripts = "classpath:data.sql") // @DataJpaTest는 기본적으로 schema.sql과 data.sql을 자동으로 실행하지 않습니다.
 public class RepositoryTestWithMysql extends RepositoryTestBase{
   @Override

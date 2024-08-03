@@ -15,6 +15,7 @@ include::{snippets}/boards/get-succeeded-recommended/http-request.adoc[]
 Response
 include::{snippets}/boards/get-succeeded-recommended/http-response.adoc[]
 
+////
 
 === 성공
 ==== 파라미터가 누락 되어도 가능
@@ -35,7 +36,9 @@ include::{snippets}/boards/get-succeeded-emptyboards/http-request.adoc[]
 Response
 include::{snippets}/boards/get-succeeded-emptyboards/http-response.adoc[]
 
-=== 실패
+
+////
+
 
 
 [[anchor-getbyid]]

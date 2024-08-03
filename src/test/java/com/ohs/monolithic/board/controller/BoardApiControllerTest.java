@@ -273,7 +273,7 @@ class BoardApiControllerTest extends ControllerTestBase {
     public void deleteBoard_1() throws Exception {
         // given, when
 
-        doThrow(new DataNotFoundException("board", "Not exists")).when(bService).deleteBoard(anyInt());
+        doThrow(new DataNotFoundException("board", "Not exists")).when(bService).deleteBoard(anyInt(), any());
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -308,7 +308,7 @@ class BoardApiControllerTest extends ControllerTestBase {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
 
-        verify(bService).deleteBoard(1);
+        verify(bService).deleteBoard(1, null);
     }
 
 

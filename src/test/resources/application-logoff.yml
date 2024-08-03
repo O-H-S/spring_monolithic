@@ -1,12 +1,14 @@
 logging:
+  #config: null
   level:
     root: error
     org:
       springframework: error
       hibernate:
-        SQL: error
+        SQL: OFF
+        type: OFF
 
-        type: off
+
 
 spring:
   jpa:

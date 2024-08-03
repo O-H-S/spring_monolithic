@@ -6,6 +6,8 @@ import com.ohs.monolithic.board.dto.BoardResponse;
 import com.ohs.monolithic.board.repository.BoardRepository;
 import com.ohs.monolithic.board.utils.BoardTestUtils;
 import com.ohs.monolithic.common.exception.DataNotFoundException;
+import com.ohs.monolithic.utils.WithMockCustomUser;
+import com.ohs.monolithic.utils.WithMockCustomUserContext;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,12 +44,9 @@ public class BoardServiceTest {
   @Mock
   private BoardRepository mockRepository;
 
-  ConcurrentHashMap<Integer, Long> mockPostCountCache;
 
   @BeforeEach
   public void setUp() {
-    mockPostCountCache = new ConcurrentHashMap<>();
-    target.registerPostCountCache(mockPostCountCache);
 
     TransactionSynchronizationManager.initSynchronization();
 
@@ -77,12 +76,13 @@ public class BoardServiceTest {
     assertEquals(1, response.getId());
     assertEquals(title, response.getTitle());
     assertEquals(desc, response.getDescription());
-    assertEquals(mockPostCountCache.get(1), 0L);
+    //assertEquals(mockPostCountCache.get(1), 0L);
     verify(mockRepository).save(any(Board.class));
   }
 
   @Test
   @DisplayName("deleteBoard(ID) : 존재하지 않는 게시판이면 예외 발생")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
   public void deleteBoard() {
     // given
     //Board mockBoard = BoardTestUtils.createBoardSimple(1, "자유", "desc");
@@ -91,7 +91,7 @@ public class BoardServiceTest {
     // when, then
 
     Exception exception = assertThrows(DataNotFoundException.class, () -> {
-      target.deleteBoard(targetID);
+      target.deleteBoard(targetID, WithMockCustomUserContext.getAppUser());
     });
 
     assertThat(exception).isNotNull();
@@ -100,6 +100,7 @@ public class BoardServiceTest {
 
   @Test
   @DisplayName("deleteBoard(ID) : 삭제 성공시, deleted 컬럼이 true로 변경되고 캐시가 제거됨.")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
   public void deleteBoard_0() {
     // given
     Integer targetID = 1;
@@ -109,21 +110,22 @@ public class BoardServiceTest {
 
 
     Long oldCount = 5L;
-    mockPostCountCache.put(targetID, oldCount);
+    //mockPostCountCache.put(targetID, oldCount);
 
     // when
-    target.deleteBoard(targetID);
+    target.deleteBoard(targetID, WithMockCustomUserContext.getAppUser());
 
     // then
     assertEquals(mockBoard.getDeleted(), true);
     assertEquals(mockBoard.getPostCount(), 5L);
-    assertFalse(mockPostCountCache.containsKey(targetID));
+    //assertFalse(mockPostCountCache.containsKey(targetID));
   }
 
   // unit test에서는 TransactionSynchronizationManager가 실제처럼 동작하지 않기 때문에 테스트 불가능
 
   @Test
   @DisplayName("deleteBoard(ID) : 트랜잭션 도중 예외 발생시, 캐시 정상적으로 되돌림.")
+  @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
   public void deleteBoard_1() {
     // given
     Integer targetID = 1;
@@ -133,16 +135,16 @@ public class BoardServiceTest {
 
 
     Long oldCount = 5L;
-    mockPostCountCache.put(targetID, oldCount);
+    //mockPostCountCache.put(targetID, oldCount);
 
     doThrow(new RuntimeException()).when(mockRepository).save(mockBoard);
 
     // when
-    assertThrows(RuntimeException.class, ()-> target.deleteBoard(targetID));
+    assertThrows(RuntimeException.class, ()-> target.deleteBoard(targetID, WithMockCustomUserContext.getAppUser()));
 
     // then
 
-    assertTrue(mockPostCountCache.containsKey(targetID));
+    //assertTrue(mockPostCountCache.containsKey(targetID));
   }
 
 

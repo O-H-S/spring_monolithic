@@ -1,5 +1,6 @@
 package com.ohs.monolithic.common.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +32,8 @@ public class RedisConfig {
   private String password;
 
 
-  final ModuleConfig moduleConfig;
+  //final ModuleConfig moduleConfig;
+  final ObjectMapper objectMapper;
   @Bean
   public RedisConnectionFactory redisConnectionFactory(){
     RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
@@ -52,6 +54,25 @@ public class RedisConfig {
     return ConfigureRedisAction.NO_OP;
   }
 
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+    ObjectMapper extendedMapper = objectMapper.copy();
+    extendedMapper = extendedMapper.activateDefaultTyping(
+            extendedMapper.getPolymorphicTypeValidator(),
+            ObjectMapper.DefaultTyping.NON_FINAL,
+            JsonTypeInfo.As.PROPERTY
+    );
+
+    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(extendedMapper);
+
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(serializer);
+    template.setHashKeySerializer(new StringRedisSerializer());
+    template.setHashValueSerializer(serializer);
+    return template;
+  }
 
   // "템플릿 메소드 패턴(Template Method Pattern)"을 구현하는 데서 그 이름이 유래합니다. 이 패턴은 객체지향 디자인에서 특정 작업을 수행하는 과정에서 고정된 프로세스를 정의하고, 변화하는 부분만 서브클래스에서 확장할 수 있게 하는 구조를 말합니다.
  /* @Bean

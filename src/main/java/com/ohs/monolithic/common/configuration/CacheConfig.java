@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -29,8 +30,18 @@ public class CacheConfig {
     }*/
     final ObjectMapper objectMapper;
     @Bean
+    @Primary
     public CacheManager cacheManager(RedisConnectionFactory factory) {
 
+        return createCacheManager(factory, Duration.ofMinutes(1L));
+    }
+    @Bean
+    public CacheManager permanentCacheManager(RedisConnectionFactory factory) {
+
+        return createCacheManager(factory, Duration.ZERO);
+    }
+
+    CacheManager createCacheManager(RedisConnectionFactory factory, Duration ttl){
         ObjectMapper extendedMapper = objectMapper.copy();
 
         // 직렬화된 JSON 데이터가 다양한 타입의 객체를 포함할 수 있으므로, 역직렬화 시 정확한 타입으로 변환되어야 합니다. 타입 정보가 없다면, 기본적으로 LinkedHashMap으로 역직렬화될 수 있으며, 이는 ClassCastException을 유발
@@ -46,7 +57,7 @@ public class CacheConfig {
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
-                .entryTtl(Duration.ofMinutes(1L));
+                .entryTtl(ttl);
 
         return RedisCacheManager
                 .RedisCacheManagerBuilder

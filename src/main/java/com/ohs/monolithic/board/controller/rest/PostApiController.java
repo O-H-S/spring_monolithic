@@ -78,7 +78,7 @@ public class PostApiController {
   public ResponseEntity<?> bulkInsertPosts(@AuthenticationPrincipal AppUser user, @Valid @RequestBody BulkInsertForm form, @PathVariable("boardId") Integer boardId/* BindingResult bindingResult*/) {
 
 
-    boardService.assertBoardExists(boardId);
+
 
 
     // 리팩토링 필요.

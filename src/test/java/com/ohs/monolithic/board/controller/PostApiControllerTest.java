@@ -1,27 +1,17 @@
 package com.ohs.monolithic.board.controller;
 
-import com.nimbusds.jose.shaded.gson.Gson;
-import com.ohs.monolithic.SecurityConfigForUnitTest;
 import com.ohs.monolithic.board.controller.rest.PostApiController;
 import com.ohs.monolithic.board.dto.BulkInsertForm;
+
 import com.ohs.monolithic.board.service.*;
 import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.utils.ControllerTestBase;
 import com.ohs.monolithic.utils.WithMockCustomUser;
-import com.ohs.monolithic.account.service.AccountService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -46,6 +36,9 @@ public class PostApiControllerTest extends ControllerTestBase {
 
     @MockBean
     private BoardService boardService;
+
+    @MockBean
+    private BoardInternalService boardInternalService;
 
     @MockBean
     private BoardAliasService boardAliasService;
@@ -151,7 +144,7 @@ public class PostApiControllerTest extends ControllerTestBase {
         List<Integer> tryIDs = List.of(-1,0,2);
         for(Integer idx : tryIDs) {
             //doThrow(new BoardNotFoundException(idx, "Not Exist")).when(boardService).assertBoardExists(intThat(argument -> argument != 1));
-            doThrow(new DataNotFoundException("board", "Not Exist")).when(boardService).assertBoardExists(idx);
+            doThrow(new DataNotFoundException("board", "Not Exist")).when(boardInternalService).assertBoardExists(idx);
         }
             //lenient().doThrow(true).when(boardService).assertBoardExists(1); // lenient : 엄격 모드(strictness)를 조절
 
@@ -188,7 +181,7 @@ public class PostApiControllerTest extends ControllerTestBase {
     @WithMockCustomUser(username = "hyeonsu", authorities = "ADMIN")
     public void bulkInsert_성공() throws Exception {
 
-        doNothing().when(boardService).assertBoardExists(anyInt());
+        doNothing().when(boardInternalService).assertBoardExists(anyInt());
         //when(accountService.getAccount(anyString())).thenReturn(Account.builder().nickname("test").build());
         // given, when
 
