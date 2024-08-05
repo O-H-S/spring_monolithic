@@ -32,7 +32,7 @@ public class PostTag {
 
   @Setter
   @JoinColumn(nullable = false)
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   private Tag tag;
 
   @Setter

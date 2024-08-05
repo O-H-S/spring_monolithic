@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
-<title>API</title>
+<title>Problem API</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -440,307 +440,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>API</h1>
+<h1>Problem API</h1>
 <div class="details">
 <span id="revnumber">version 0.0.1-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_back_to_the_home">Back to the Home</a></li>
-<li><a href="#_board게시판">Board(게시판)</a></li>
-<li><a href="#_post게시글">Post(게시글)</a></li>
-<li><a href="#_comment댓글">Comment(댓글)</a></li>
-<li><a href="#_account계정">Account(계정)</a></li>
-<li><a href="#_problem문제">Problem(문제)</a></li>
+<li><a href="#anchor-get">Back to the main</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_back_to_the_home"><a href="https://ohs.kr">Back to the Home</a></h2>
+<h2 id="anchor-get"><a href="/docs/index.html">Back to the main</a></h2>
 <div class="sectionbody">
-<hr>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>이 문서는 작성 중이며 최신 정보를 반영하지 않을 수 있습니다.<br></p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>(*) 표시는 생략 가능한 데이터를 뜻합니다<br>
-자세한 정보는 각 Description를 클릭하면 확인할 수 있습니다.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_board게시판"><a href="boards.html">Board(게시판)</a></h2>
-<div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre>게시판 관련 데이터(제목, 설명, 게시글 수 등등..)에 대한 API 입니다.</pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 12.5%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 37.5%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Method</th>
-<th class="tableblock halign-left valign-top">URL</th>
-<th class="tableblock halign-left valign-top">Input</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/boards</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(*)query</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="boards.html#anchor-get">전체 게시판 조회</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/boards/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="boards.html#anchor-getbyid">특정 게시판 조회</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DELETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/boards/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="boards.html#anchor-deletebyid">특정 게시판 삭제</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/boards</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="boards.html#anchor-post">게시판 생성</a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_post게시글"><a href="posts.html">Post(게시글)</a></h2>
-<div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre>게시판에 종속되는 게시글과 관련된 API입니다. 특정된 게시글은 boardId가 결정되므로, 경로에 boardId가 생략됩니다.</pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 12.5%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 37.5%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Method</th>
-<th class="tableblock halign-left valign-top">URL</th>
-<th class="tableblock halign-left valign-top">Input</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/{boardId}/posts/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">query</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-getlist">게시글 list 조회</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/{boardId}/posts/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-create">게시글 생성</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DELETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/posts/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-delete">특정 게시글 삭제</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/posts/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(*)query</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-getbyid">특정 게시글 상세 조회</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PUT</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/posts/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-updatebyid">특정 게시글 수정</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/posts/{id}/postLikes</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-likebyid">특정 게시글 추천</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DELETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/posts/{id}/postLikes</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-unlikebyid">특정 게시글 추천 취소</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/posts/{boardID}/bulk</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="posts.html#anchor-post-bulk">Bulk Insert</a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_comment댓글"><a href="comments.html">Comment(댓글)</a></h2>
-<div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre>게시글에 종속되는 댓글과 관련된 API입니다. 특정된 댓글은 postId가 결정되므로, 경로에 postId가 생략됩니다.</pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 12.5%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 37.5%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Method</th>
-<th class="tableblock halign-left valign-top">URL</th>
-<th class="tableblock halign-left valign-top">Input</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/{postId}/comments/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="comments.html#anchor-create">댓글 생성</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PUT</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/comments/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="comments.html#anchor-update">특정 댓글 변경</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DELETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/comments/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="comments.html#anchor-create">특정 댓글 삭제</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/comments/{id}/commentLikes</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="comments.html#anchor-likebyid">특정 댓글 추천</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DELETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/comments/{id}/commentLikes</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="comments.html#anchor-unlikebyid">특정 댓글 추천 취소</a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_account계정"><a href="accounts.html">Account(계정)</a></h2>
-<div class="sectionbody">
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 12.5%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 37.5%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Method</th>
-<th class="tableblock halign-left valign-top">URL</th>
-<th class="tableblock halign-left valign-top">Input</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PATCH</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/accounts/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">body</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="accounts.html#anchor-patch">계정 정보 부분 변경</a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_problem문제"><a href="accounts.html">Problem(문제)</a></h2>
-<div class="sectionbody">
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 12.5%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 37.5%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Method</th>
-<th class="tableblock halign-left valign-top">URL</th>
-<th class="tableblock halign-left valign-top">Input</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/problems/{id}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(*)query</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="problems.html#anchor-patch">전체 문제 조회</a></p></td>
-</tr>
-</tbody>
-</table>
+
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-07-29 09:08:02 +0900
+Last updated 2024-07-29 02:18:11 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

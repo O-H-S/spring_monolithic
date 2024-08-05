@@ -23,6 +23,9 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long>, BulkIns
   @EntityGraph(attributePaths = {"tag"})
   List<PostTag> findAllByPost(Post post);
 
+  @Query("SELECT pt FROM PostTag pt WHERE pt.post = :post")
+  List<PostTag> findAllByPostWithoutTagLoad(@Param("post") Post post);
+
 
   // pt.tag.name 으로 바로 접근하였더니 오류 발생하여, 서브 쿼리를 통해 명시적으로 정의함.
   @Modifying

@@ -7,16 +7,26 @@
 :toc: left
 :toclevels: 3
 
-== link:/[Back to the Home]
+== link:https://ohs.kr[Back to the Home]
 
 ---
 
-NOTE: (*) 표시는 생략 가능한 데이터를 뜻합니다 +
-자세한 정보는 각 Description를 클릭하면 확인할 수 있습니다.
+[CAUTION]
+====
+이 문서는 작성 중이며 최신 정보를 반영하지 않을 수 있습니다. +
+====
 
-NOTE: 쿠키-세션 인증 시, POST API는 CSRF 토큰("_csrf")을 포함해야합니다. +
-JWT로 인증하거나, 외부 시스템에서 API 호출 시 CSRF 토큰은 생략 가능합니다. +
-문서 내의 모든 요청은 쿠키-세션 인증을 가정하였고, jsessionid 쿠키는 요청 메세지에서 생략 하였습니다.
+[NOTE]
+====
+(*) 표시는 생략 가능한 데이터를 뜻합니다 +
+자세한 정보는 각 Description를 클릭하면 확인할 수 있습니다.
+====
+
+
+
+
+
+
 
 
 == link:boards.html[Board(게시판)]
@@ -39,15 +49,15 @@ JWT로 인증하거나, 외부 시스템에서 API 호출 시 CSRF 토큰은 생
 |===
 | Method | URL | Input | Description
 
-| GET | `/api/{boardId}/posts/` | path, query  | link:posts.html#anchor-getlist[게시글 list 조회]
-| POST | `/api/{boardId}/posts/` | path, body  | link:posts.html#anchor-create[게시글 생성]
-| DELETE | `/api/posts/{id}` | path  | link:posts.html#anchor-delete[특정 게시글 삭제]
-| GET | `/api/posts/{id}` | path, (*)query  | link:posts.html#anchor-getbyid[특정 게시글 상세 조회]
-| PUT | `/api/posts/{id}` | path, body  | link:posts.html#anchor-updatebyid[특정 게시글 수정]
-| POST | `/api/posts/{id}/postLikes` | path  | link:posts.html#anchor-likebyid[특정 게시글 추천]
-| DELETE | `/api/posts/{id}/postLikes` | path  | link:posts.html#anchor-unlikebyid[특정 게시글 추천 취소]
+| GET | `/api/{boardId}/posts/` |  query  | link:posts.html#anchor-getlist[게시글 list 조회]
+| POST | `/api/{boardId}/posts/` |  body  | link:posts.html#anchor-create[게시글 생성]
+| DELETE | `/api/posts/{id}` |   | link:posts.html#anchor-delete[특정 게시글 삭제]
+| GET | `/api/posts/{id}` | (*)query  | link:posts.html#anchor-getbyid[특정 게시글 상세 조회]
+| PUT | `/api/posts/{id}` |  body  | link:posts.html#anchor-updatebyid[특정 게시글 수정]
+| POST | `/api/posts/{id}/postLikes` |   | link:posts.html#anchor-likebyid[특정 게시글 추천]
+| DELETE | `/api/posts/{id}/postLikes` |   | link:posts.html#anchor-unlikebyid[특정 게시글 추천 취소]
 
-| POST | `/api/posts/{boardID}/bulk` | path, body |link:posts.html#anchor-post-bulk[Bulk Insert]
+| POST | `/api/posts/{boardID}/bulk` |  body |link:posts.html#anchor-post-bulk[Bulk Insert]
 |===
 
 
@@ -56,16 +66,14 @@ JWT로 인증하거나, 외부 시스템에서 API 호출 시 CSRF 토큰은 생
 [options="header", cols="1,2,2,3"]
 |===
 | Method | URL | Input | Description
-| POST | `/api/{postId}/comments/` | path, body  | link:comments.html#anchor-create[댓글 생성]
-| PUT | `/api/comments/{id}` | path, body  | link:comments.html#anchor-update[특정 댓글 변경]
-| DELETE | `/api/comments/{id}` | path  | link:comments.html#anchor-create[특정 댓글 삭제]
-| POST | `/api/comments/{id}/commentLikes` | path  | link:comments.html#anchor-likebyid[특정 댓글 추천]
-| DELETE | `/api/comments/{id}/commentLikes` | path  | link:comments.html#anchor-unlikebyid[특정 댓글 추천 취소]
+| POST | `/api/{postId}/comments/` | body  | link:comments.html#anchor-create[댓글 생성]
+| PUT | `/api/comments/{id}` | body  | link:comments.html#anchor-update[특정 댓글 변경]
+| DELETE | `/api/comments/{id}` |   | link:comments.html#anchor-create[특정 댓글 삭제]
+| POST | `/api/comments/{id}/commentLikes` |   | link:comments.html#anchor-likebyid[특정 댓글 추천]
+| DELETE | `/api/comments/{id}/commentLikes` |   | link:comments.html#anchor-unlikebyid[특정 댓글 추천 취소]
 
 
 |===
-
-
 
 
 
@@ -73,5 +81,13 @@ JWT로 인증하거나, 외부 시스템에서 API 호출 시 CSRF 토큰은 생
 [options="header", cols="1,2,2,3"]
 |===
 | Method | URL | Input | Description
-| PATCH | `/api/accounts/{id}` | path, body  | link:accounts.html#anchor-patch[계정 정보 부분 변경]
+| PATCH | `/api/accounts/{id}` | body  | link:accounts.html#anchor-patch[계정 정보 부분 변경]
 |===
+
+== link:accounts.html[Problem(문제)]
+[options="header", cols="1,2,2,3"]
+|===
+| Method | URL | Input | Description
+| GET | `/api/problems/{id}` | (*)query  | link:problems.html#anchor-patch[전체 문제 조회]
+|===
+

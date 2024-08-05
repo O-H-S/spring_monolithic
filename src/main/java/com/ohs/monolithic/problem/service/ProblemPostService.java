@@ -3,6 +3,7 @@ package com.ohs.monolithic.problem.service;
 
 import com.ohs.monolithic.auth.domain.AppUser;
 import com.ohs.monolithic.board.domain.PostTag;
+import com.ohs.monolithic.board.domain.constants.BoardPaginationType;
 import com.ohs.monolithic.board.domain.constants.PostTagType;
 import com.ohs.monolithic.board.event.PostDeleteEvent;
 import com.ohs.monolithic.board.domain.Board;
@@ -10,10 +11,7 @@ import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.PostDetailResponse;
 import com.ohs.monolithic.board.dto.PostForm;
 import com.ohs.monolithic.board.dto.PostPaginationDto;
-import com.ohs.monolithic.board.service.BoardService;
-import com.ohs.monolithic.board.service.PostPaginationService;
-import com.ohs.monolithic.board.service.PostTagService;
-import com.ohs.monolithic.board.service.PostWriteService;
+import com.ohs.monolithic.board.service.*;
 import com.ohs.monolithic.problem.domain.Problem;
 import com.ohs.monolithic.problem.domain.ProblemPostCreateEvent;
 import com.ohs.monolithic.problem.domain.ProblemPostHistory;
@@ -46,7 +44,7 @@ public class ProblemPostService {
   final private ProblemRepository problemRepository;
   final private ProblemPostHistoryRepository problemPostHistoryRepository;
   final private PostWriteService postWriteService;
-  final private BoardService boardService;
+  final private BoardInternalService boardInternalService;
   final private PostPaginationService postPaginationService;
 
   final public static String POST_TAG_PREFIX = "P";
@@ -55,9 +53,9 @@ public class ProblemPostService {
 
   @EventListener(ApplicationReadyEvent.class)
   public void doSomethingAfterStartup() {
-    Board pBoard = boardService.getBoardFromTitle(PROBLEM_BOARD_NAME);
+    Board pBoard = boardInternalService.getBoardFromTitleInternal(PROBLEM_BOARD_NAME);
     if(pBoard == null)
-      problemBoardId = boardService.createBoard(PROBLEM_BOARD_NAME, "").getId();
+      problemBoardId = boardInternalService.createBoardInternal(PROBLEM_BOARD_NAME, "", BoardPaginationType.Offset_CountCache_CoveringIndex).getId();
     else
       problemBoardId = pBoard.getId();
   }

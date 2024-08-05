@@ -9,6 +9,9 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,6 +43,9 @@ public class ProblemApiControllerIntegrationTest extends IntegrationTestWithMySQ
     // then
     result.andExpect(status().isOk());
     result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    result.andDo(document("problems/{id}/get-succeed-default",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())));
 
   }
 
@@ -69,6 +75,7 @@ public class ProblemApiControllerIntegrationTest extends IntegrationTestWithMySQ
     // then
     result.andExpect(status().isOk());
     result.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
 
   }
 

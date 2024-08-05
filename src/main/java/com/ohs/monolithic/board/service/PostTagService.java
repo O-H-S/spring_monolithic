@@ -153,6 +153,13 @@ public class PostTagService {
   }
 
 
+  @Deprecated
+  @Transactional(readOnly = true)
+  public List<PostTag> getPostTags_Legacy(Long postId){
+    return postTagRepository.findAllByPostWithoutTagLoad(postRepository.getReferenceById(postId));
+  }
+
+
   @Transactional(readOnly = true)
   public BooleanBuilder getTagFilter( List<String> tagNames){
     BooleanBuilder tagFilter = new BooleanBuilder();

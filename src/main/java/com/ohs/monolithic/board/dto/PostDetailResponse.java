@@ -17,10 +17,7 @@ import java.util.List;
 public class PostDetailResponse extends PostPaginationDto {
 
   public Integer boardId;
-
-
   public String content;
-
   public LocalDateTime modifyDate;
   public Integer commentCount;
   public Boolean mine;
@@ -45,11 +42,8 @@ public class PostDetailResponse extends PostPaginationDto {
     newResponse.mine = mine;
 
 
-    // n+1 발생하는지 테스트 필요
     for (PostTag tag : tags) {
-      if (tag.getType() == null) {
-        continue;
-      } else {
+      if (tag.getType() != null) {
         switch (tag.getType()) {
           case System -> newResponse.systemTags.add(tag.getTag().getName());
           case Highlight -> newResponse.highlightTags.add(tag.getTag().getName());

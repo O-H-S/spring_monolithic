@@ -1,11 +1,13 @@
 # OHSite
 
-> **Spring Boot** 학습 목적의 개인 프로젝트입니다.
+> 웹 개발 학습 목적의 1인 프로젝트입니다.
 >
-> 
 > 여러 알고리즘 문제 사이트를 크롤링하여 최신 문제를 한 곳에서 확인할 수 있습니다.  
 > 또한, 키워드와 검색 옵션을 통해 다양한 방식으로 문제들을 탐색할 수 있습니다.  
-> 커뮤니티 기능을 제공하여 문제에 대해 토론할 수 있고, 북마크 기능을 통해 개인의 문제 진행도를 기록할 수 있습니다.
+> 커뮤니티 기능을 제공하여 문제에 대해 토론할 수 있고, 북마크 기능을 통해 개인의 문제 진행도를 기록할 수 있습니다.  
+> 
+> `Front-end(리액트) repository`: [링크](https://github.com/O-H-S/react)  
+> `Collector(크롤러) repository` : [링크](https://github.com/O-H-S/problemcollector)
 
 ---
 |                                                           메인                                                           |                                                         소셜 로그인                                                         |                                                          커뮤니티                                                          |
@@ -39,9 +41,9 @@
 ### ERD
 
 ![ERD.png](documents%2Fimages%2FERD.png)
-<!--
-### [REST Docs(클릭하여 이동)](https://www.ohs.kr/docs/index.html)
+
+### [REST Docs(클릭하여 이동)](https://ohs.kr/api)
 
 ![restdocs_intro.png](documents%2Fimages%2Frestdocs_intro.png)
--->
+
 

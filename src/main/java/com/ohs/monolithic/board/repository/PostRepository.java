@@ -9,9 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.Optional;
 
 
@@ -20,9 +17,17 @@ public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRep
 
 
 
-    @EntityGraph(attributePaths = {"board", "author"}, type = EntityGraph.EntityGraphType.LOAD)
+   /*
+    FETCH: entity graph에 명시한 attribute는 EAGER로 패치하고, 나머지 attribute는 LAZY로 패치
+    LOAD: entity graph에 명시한 attribute는 EAGER로 패치하고, 나머지 attribute는 entity에 명시한 fetch type이나 디폴트 FetchType으로 패치 (e.g. @OneToMany는 LAZY, @ManyToOne은 EAGER 등이 디폴트이다.)
+    */
+    @EntityGraph(attributePaths = {"board", "author"})
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
-    Optional<Post> findWithAuthorAndBoard(@Param("id") Long id);
+    Optional<Post> findWithAssociations(@Param("id") Long id);
+
+   /*@EntityGraph(attributePaths = {"board", "author", "postTags", "postTags.tag"})
+   @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
+   Optional<Post> findWithAssociations(@Param("id") Long id);*/
 
 
     @Query("SELECT p FROM Post p WHERE p.id = :id and p.deleted = false")
@@ -40,7 +45,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRep
 
 
     // legacy
-    Page<Post> findAllByBoard(Pageable pageable, Board board);
+    Page<Post> findAllByBoardAndDeletedFalse(Pageable pageable, Board board);
 
 
 

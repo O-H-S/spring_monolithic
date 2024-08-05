@@ -11,6 +11,7 @@ import com.ohs.monolithic.board.domain.Board;
 import com.ohs.monolithic.board.domain.Post;
 import com.ohs.monolithic.board.dto.BulkInsertResponse;
 import com.ohs.monolithic.board.dto.PostForm;
+
 import com.ohs.monolithic.common.exception.DataNotFoundException;
 import com.ohs.monolithic.board.repository.PostRepository;
 import com.ohs.monolithic.account.domain.Account;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.security.access.AccessDeniedException;
 
 
 import java.time.LocalDateTime;
@@ -45,6 +45,7 @@ public class PostWriteService {
   final ApplicationEventPublisher eventPublisher;
   final PostRepository pRepo;
   final BoardPermissionService boardPermissionService;
+  final BoardInternalService boardInternalService;
   final PostTagService postTagService;
   final AccountRepository accountRepository;
 
@@ -91,7 +92,7 @@ public class PostWriteService {
     boardPermissionService.validateWritePermission(boardID, user.isAdmin()? UserRole.ADMIN : UserRole.USER, form.getMethod());
 
     // 게시글 추가 로직
-    boardService.incrementPostCount(boardID);
+    boardInternalService.incrementPostCount(boardID, 1);
 
     Board boardReference = em.getReference(Board.class, boardID);
     Post q = Post.builder()
@@ -122,6 +123,7 @@ public class PostWriteService {
   @Transactional
   public CompletableFuture<Void> createAllAsync(Integer boardID, Long authorId, BiConsumer<Post, Long> entityConfigurer, Long counts) {
 
+    boardInternalService.assertBoardExists(boardID);
     Long tID = Thread.currentThread().getId();
     bulkInsertStatus.put(tID, new BulkInsertResponse());
 
@@ -136,7 +138,7 @@ public class PostWriteService {
       }
     });
 
-    boardService.incrementPostCount(boardID, counts.intValue());
+    boardInternalService.incrementPostCount(boardID, counts.intValue());
     Board boardReference = em.getReference(Board.class, boardID);
 
     Post reusablePost = Post.builder()
@@ -206,7 +208,7 @@ public class PostWriteService {
   public void delete(Long id) {
     Post target = getPostWithWriteLock(id); // s-lock을 걸면, 동시에 삭제할 때 post count가 불일치할 가능성이 존재함.
     Integer boardId = target.getBoard().getId();
-    boardService.decrementPostCount(boardId);
+    boardInternalService.incrementPostCount(boardId, -1);
     target.setDeleted(Boolean.TRUE);
     pRepo.save(target);
 

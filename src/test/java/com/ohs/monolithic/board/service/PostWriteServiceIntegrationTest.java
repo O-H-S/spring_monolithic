@@ -39,7 +39,7 @@ public class PostWriteServiceIntegrationTest extends IntegrationTestWithH2 {
 
     future.join();
 
-    assertThat(helper.boardService.getPostCount(targetBoard.getId())).isEqualTo(1 + counts);
+    assertThat(helper.boardInternalService.getPostCount(targetBoard.getId())).isEqualTo(1 + counts);
 
 
   }

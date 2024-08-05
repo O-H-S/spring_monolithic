@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+// 조회수 서비스
 @Service
 @RequiredArgsConstructor
 public class PostViewService {

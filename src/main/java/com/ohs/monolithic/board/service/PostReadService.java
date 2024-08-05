@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+// 단일 게시글 조회 서비스
 @RequiredArgsConstructor
 @Service
 public class PostReadService {
@@ -39,7 +40,7 @@ public class PostReadService {
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostReadOnly(Long postId, Long viewerId, boolean determineLiked, boolean determineMine){
-        Post targetPost = getPost(postId, false);
+        Post targetPost = getPost(postId, true);
         Boolean isLiked = null;
         Boolean isMine = null;
         if(viewerId != null) {
@@ -56,6 +57,26 @@ public class PostReadService {
 
     }
 
+    @Deprecated
+    @Transactional(readOnly = true)
+    public PostDetailResponse getPostReadOnly_Legacy(Long postId, Long viewerId, boolean determineLiked, boolean determineMine){
+        Post targetPost = getPost(postId, false);
+        Boolean isLiked = null;
+        Boolean isMine = null;
+        if(viewerId != null) {
+            if(determineLiked)
+                isLiked = postLikeService.doesLikePost(postId, viewerId);
+            if(determineMine)
+                isMine = viewerId.equals( targetPost.getAuthor().getId());
+        }
+        List<PostTag> tags = postTagService.getPostTags_Legacy(postId);
+
+
+        return PostDetailResponse.of(targetPost, isMine, isLiked, tags);
+
+
+    }
+
     // 리팩토링 : private으로 변경할 예정
     public Post getPost(Long id){
         return this.getPost(id, false);
@@ -64,7 +85,7 @@ public class PostReadService {
     // 리팩토링 : private으로 변경할 예정
     public Post getPost(Long id, Boolean relatedData ) {
 
-        Optional<Post> question = relatedData ? this.repository.findWithAuthorAndBoard(id) : this.repository.findById(id);
+        Optional<Post> question = relatedData ? this.repository.findWithAssociations(id) : this.repository.findById(id);
 
         if (question.isPresent()) {
             return question.get();
